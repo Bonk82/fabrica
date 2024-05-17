@@ -3,6 +3,8 @@ import "./globals.css";
 import '@mantine/core/styles.css';
 
 import { ColorSchemeScript, MantineProvider } from '@mantine/core';
+import { AuthProvider } from "./context/AuthContext";
+import { SupabaseContextProvider } from "./context/SupabaseContext";
 
 
 const inter = Inter({ subsets: ["latin"] });
@@ -22,7 +24,11 @@ export default function RootLayout({ children }) {
       <body>
         <MantineProvider defaultColorScheme="dark" theme={{primaryColor:'cyan'}}>
           {/* <Model>{children}</Model> */}
-          {children}
+          <AuthProvider>
+            <SupabaseContextProvider>
+              {children}
+            </SupabaseContextProvider>
+          </AuthProvider>
         </MantineProvider>
       </body>
     </html>

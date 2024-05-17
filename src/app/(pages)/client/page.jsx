@@ -6,7 +6,7 @@ const page = () => {
   return (
     <div>
       <h1>Clientes</h1>
-      <Button fullWidth color='cyan' leftSection={iAward}>Ingresar</Button>
+      <Button fullWidth leftSection={iAward}>Ingresar</Button>
     </div>
   )
 }
