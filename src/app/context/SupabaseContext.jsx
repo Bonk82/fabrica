@@ -69,18 +69,22 @@ export const SupabaseContextProvider = ({ children }) => {
   };
 
   const signInWithGoogle = async ()=> {
+    console.log('enrtando a singGoogle');
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
     })
-    console.log(data,error);
+    // console.log('login google',data,error);
+    // if(data) router.push('/dashboard')
   }
 
   const logout = async () => {
     setLoading(true);
     try {
       const { error } = await supabase.auth.signOut();
-      if (error) {
-        throw error;
+      if (error) throw error;
+      if(!error){
+        setUsuario(null);
+        router.push('/login');
       }
     } catch (error) {
       console.log(error.error_description || error.message);
@@ -103,6 +107,7 @@ export const SupabaseContextProvider = ({ children }) => {
       if (pivotUser.data.user){
         getReg('vw_menu_rol','id_menu','asc')
         setUsuario(pivotUser.data.user)
+        router.push('/dashboard')
       } 
     } catch (error) {
       console.log('erro al cargar usuario',error);
@@ -115,7 +120,7 @@ export const SupabaseContextProvider = ({ children }) => {
       const { error, data } = await supabase.from(table).insert(reg).select();
       console.log('llega aca',error,data,reg,table);
       if (error) throw new Error(error.message);
-      if(!error && table == 'cliente') setClientes(data);
+      // if(!error && table == 'cliente') setClientes(data);
     } catch (error) {
       console.log(error.error_description || error.message || error);
       throw new Error(error.message);
@@ -154,7 +159,7 @@ export const SupabaseContextProvider = ({ children }) => {
       const { error, data } = await supabase
         .from(tabla)
         .update(updatedFields)
-        .eq("id_"+tabla, updatedFields.id)
+        .eq("id_"+tabla, updatedFields['id_'+tabla]);
       if (error) throw new Error(error.message);
       console.log(error,data);
     } catch (error) {

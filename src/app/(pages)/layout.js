@@ -1,6 +1,6 @@
 'use client'
 
-import { ActionIcon,AppShell, Burger, Group, Image, Skeleton } from '@mantine/core';
+import { ActionIcon,AppShell, Burger, Group, Image } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { IconRipple } from '@tabler/icons-react';
 import { useState } from "react";
@@ -23,7 +23,7 @@ export function Model({ children }) {
     <AppShell
       header={{ height: 60 }}
       footer={{ height: 20 }}
-      navbar={{ width: nav ? 300:60, breakpoint: 'sm', collapsed: {mobile: !opened } }}
+      navbar={{ width: nav ? 300:70, breakpoint: 'sm', collapsed: {mobile: !opened } }}
       aside={{ width: 200, breakpoint: 'md', collapsed: { desktop: false, mobile: true } }}
       padding="md"
       transitionDuration={500}
@@ -37,10 +37,10 @@ export function Model({ children }) {
           <Header/>
         </Group>
       </AppShell.Header>
-      <AppShell.Navbar p="md" style={{overflow:'hidden',backgroundColor:'transparent'}}>
+      <AppShell.Navbar p="sm" style={{overflow:'hidden',backgroundColor:'transparent'}}>
         {(window.innerWidth >= 768) &&
           <div style={{display:'flex',justifyContent:'space-between', fontSize:'x-large',marginBottom:'2rem'}}>{nav ? 'Menú de opciones' : ''}
-            <ActionIcon onClick={toggleNav}><IconRipple/></ActionIcon>
+            <ActionIcon style={{width:'50px'}} onClick={toggleNav}><IconRipple/></ActionIcon>
           </div>
         }
         <Navbar/>

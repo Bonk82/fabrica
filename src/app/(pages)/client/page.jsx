@@ -1,8 +1,8 @@
 'use client'
 import { useSupa } from '@/app/context/SupabaseContext';
-import { ActionIcon, BackgroundImage, Box, Button, Center, Group, Text, TextInput } from '@mantine/core'
+import { ActionIcon, BackgroundImage, Box, Button, Center, Group, LoadingOverlay, NativeSelect, Text, TextInput } from '@mantine/core'
 import { useForm } from '@mantine/form';
-import { IconAward, IconEdit, IconEye, IconTrash } from '@tabler/icons-react';
+import { IconDeviceFloppy, IconEdit, IconEye, IconRefresh, IconTrash } from '@tabler/icons-react';
 import { DataTable } from 'mantine-datatable';
 import { useEffect, useState } from 'react';
 import { useMemo } from 'react';
@@ -37,9 +37,10 @@ import { MRT_Localization_ES } from 'mantine-react-table/locales/es';
 // ];
 
 const Page = () => {
-  const { loading,usuario,createReg,clientes,getReg } = useSupa();
+  const { loading,usuario,createReg,clientes,getReg,updateReg } = useSupa();
   const [records, setRecords] = useState([])
-  const iAward = <IconAward/>
+  const [id, setId] = useState(null)
+  // const iAward = <IconAward/>
   useEffect(() => {
     cargarCliente()
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -62,9 +63,9 @@ const Page = () => {
       tipo_cliente: '',
     },
 
-    validate: {
-      tipo_cliente: (value) => (/^\S+@\S+$/.test(value) ? null : 'Correo Inválido'),
-    },
+    // validate: {
+    //   tipo_cliente: (value) => (/^\S+@\S+$/.test(value) ? null : 'Correo Inválido'),
+    // },
   });
 
   const registrarCliente = async (data) => {
@@ -79,21 +80,27 @@ const Page = () => {
       activo:1
     }
 
-    console.log('new client',newClient);
+    console.log('new client',newClient,id);
     try {
-      await createReg(newClient,'cliente');
+      id ? await updateReg('cliente',newClient) : await createReg(newClient,'cliente');
       // setAlerta([true,'success','Préstamo registrado con éxito!'])
       // await cargarData();
-      console.log('los clientes',clientes);
-      setRecords(clientes)
+      // console.log('los clientes',clientes);
+      // setRecords(clientes)
+      cargarCliente();
     } catch (error) {
       // setAlerta([true,'error',error.message || error])
       console.log(error);
+    }finally{
+      form.reset();
+      setId(null)
     }
   }
 
   const cargarData = (data) =>{
-    console.log(data);
+    console.log('cargando data',data);
+    setId(data.id_cliente);
+    form.setValues(data)
   }
 
   // const table = useMantineReactTable({
@@ -155,7 +162,7 @@ const Page = () => {
     enableRowActions: true,
     renderRowActions: ({ row }) => (
       <Box>
-        <ActionIcon variant="subtle" onClick={() => console.info('Edit',row.original)}>
+        <ActionIcon variant="subtle" onClick={() => cargarData(row.original)}>
           <IconEdit color='orange' />
         </ActionIcon>
         <ActionIcon variant="subtle" onClick={() => console.info('Delete',row.original)}>
@@ -181,55 +188,69 @@ const Page = () => {
           Clientes
         </Text>
       </Center>
-      <form onSubmit={form.onSubmit((values) => registrarCliente(values))}>
-        <TextInput
-          label="Nombre:"
-          placeholder="Nombre"
-          key={form.key('nombre')}
-          type='text'
-          {...form.getInputProps('nombre')}
+      <Box pos='relative'>
+        <LoadingOverlay
+          visible={loading}
+          zIndex={1000}
+          overlayProps={{ radius: 'lg', blur: 2 }}
+          loaderProps={{ color: 'indigo', type: 'bars' }}
         />
-        <TextInput
-          label="Direccion:"
-          placeholder="Direccion"
-          key={form.key('direccion')}
-          type='text'
-          {...form.getInputProps('direccion')}
-        />
-        <TextInput
-          label="Coordenadas:"
-          placeholder="Coordenadas"
-          key={form.key('coordenadas')}
-          type='text'
-          {...form.getInputProps('coordenadas')}
-        />
-        <TextInput
-          label="referencia:"
-          placeholder="referencia"
-          key={form.key('referencia')}
-          type='text'
-          {...form.getInputProps('referencia')}
-        />
-        <TextInput
-          label="Telefonos:"
-          placeholder="Telefonos"
-          key={form.key('telefonos')}
-          type='text'
-          {...form.getInputProps('telefonos')}
-        />
-        <TextInput
-          label="tipo_cliente:"
-          placeholder="tipo_cliente"
-          key={form.key('tipo_cliente')}
-          type='text'
-          {...form.getInputProps('tipo_cliente')}
-        />
+        <form onSubmit={form.onSubmit((values) => registrarCliente(values))}>
+          <TextInput
+            label="Nombre:"
+            placeholder="Nombre"
+            key={form.key('nombre')}
+            type='text'
+            {...form.getInputProps('nombre')}
+          />
+          <TextInput
+            label="Direccion:"
+            placeholder="Direccion"
+            key={form.key('direccion')}
+            type='text'
+            {...form.getInputProps('direccion')}
+          />
+          <TextInput
+            label="Coordenadas:"
+            placeholder="Coordenadas"
+            key={form.key('coordenadas')}
+            type='text'
+            {...form.getInputProps('coordenadas')}
+          />
+          <TextInput
+            label="referencia:"
+            placeholder="referencia"
+            key={form.key('referencia')}
+            type='text'
+            {...form.getInputProps('referencia')}
+          />
+          <TextInput
+            label="Telefonos:"
+            placeholder="Telefonos"
+            key={form.key('telefonos')}
+            type='text'
+            {...form.getInputProps('telefonos')}
+          />
+          {/* <TextInput
+            label="tipo_cliente:"
+            placeholder="tipo_cliente"
+            key={form.key('tipo_cliente')}
+            type='text'
+            {...form.getInputProps('tipo_cliente')}
+          /> */}
+          <NativeSelect
+            label="Tipo Cliente"
+            data={['Eventual', 'Descuento', 'Pago Semanal']}
+            key={form.key('tipo_cliente')}
+            {...form.getInputProps('tipo_cliente')}
+          />
 
-        <Group justify="flex-end" mt="md">
-          <Button fullWidth leftSection={iAward} type='submit'>Ingresar</Button>
-        </Group>
-      </form>
-
+          <Group justify="flex-end" mt="md">
+            {!id && <Button fullWidth leftSection={<IconDeviceFloppy/>} type='submit'>Registrar Cliente</Button>}
+            {id && <Button fullWidth leftSection={<IconRefresh/>} type='submit'>Actualizar Cliente</Button>}
+          </Group>
+        </form>
+      </Box>
       {/* <DataTable
         withTableBorder
         borderRadius="sm"

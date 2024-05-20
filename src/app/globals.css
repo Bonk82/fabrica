@@ -120,3 +120,10 @@ tr{
 .mantine-Input-wrapper{
   background-color: #031321 !important;
 }
+
+.mantine-TextInput-input{
+  background-color: #031321 !important;
+}
+.mantine-Input-input,.mantine-Select-input{
+  background-color: #031321 !important;
+}
