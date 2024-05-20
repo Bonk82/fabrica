@@ -28,13 +28,24 @@ const Login = () => {
     },
   });
 
+  const signUp = async(valores)=>{
+    console.log('signUp',valores);
+    try {
+      // const r = await singUpWithPassword(valores.email,valores.password)
+      const r = await singUpWithPassword('cristian.bonk@hotmail.com','123456')
+      console.log('respuesta',r);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   const login = async(valores)=>{
     console.log('login',valores);
     try {
-      const r = await singUpWithPassword(valores.email,valores.password)
+      const r = await signInWithEmail(valores.email,valores.password)
       console.log('respuesta',r);
     } catch (error) {
-      console.log(erro);
+      console.log(error);
     }
   }
 
@@ -64,7 +75,7 @@ const Login = () => {
           {...form.getInputProps('password')}
         />
         <Group justify="flex-end" mt="md">
-          <Button onClick={login}>password</Button>
+          <Button onClick={()=>signUp(form.values) }>Registrar</Button>
           <Button onClick={signInWithGoogle}>GOOGLE</Button>
           <Button type="submit">Ingresar</Button>
         </Group>

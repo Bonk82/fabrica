@@ -1,7 +1,8 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
 import '@mantine/core/styles.css';
-
+import 'mantine-react-table/styles.css'; 
+import '@mantine/dates/styles.css'; //if using mantine date picker features
 import { ColorSchemeScript, MantineProvider } from '@mantine/core';
 import { AuthProvider } from "./context/AuthContext";
 import { SupabaseContextProvider } from "./context/SupabaseContext";

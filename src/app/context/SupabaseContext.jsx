@@ -21,14 +21,15 @@ export const SupabaseContextProvider = ({ children }) => {
   const [pedidos, setPedidos] = useState([]);
   const [cuentas, setCuentas] = useState([]);
   const [transacciones, setTransacciones] = useState([]);
+  const [menu, setMenu] = useState([]);
   const [loading, setLoading] = useState(false);
   const [avatar, setAvatar] = useState('');
-  const [usuario, setUsuario] = useState(null)
+  const [usuario, setUsuario] = useState(null);
   const router = useRouter()
   
   useEffect(()=>{
-    // getUser();
-    if(!usuario) router.push('/login')
+    getUser();
+    // if(!usuario) router.push('/login')
   // eslint-disable-next-line react-hooks/exhaustive-deps
   },[])
 
@@ -60,6 +61,10 @@ export const SupabaseContextProvider = ({ children }) => {
       email,
       password,
     })
+    if(data.user){
+      setUsuario(data.user)
+      router.push('/dashboard')
+    } 
     console.log(data,error);
   };
 
@@ -88,13 +93,17 @@ export const SupabaseContextProvider = ({ children }) => {
     try {
       const pivotUser = await supabase.auth.getUser();
       console.log('ingresando',pivotUser);
-      // if(!pivotUser.data.user) router.push('/login')
+      if(!pivotUser.data.user) router.push('/login')
       pivotUser.data.user?.identities.forEach(e => {
         e.identity_data.picture ? setAvatar(e.identity_data.picture):'C'
         // console.log('entroEach',avatar);
       });
+
       // pivotUser.data.user.email === 'bonkalvarado@gmail.com' ? pivotUser.data.user.rol =  'ADMIN': 'USUARIO';
-      if (pivotUser.data.user) setUsuario(pivotUser.data.user)
+      if (pivotUser.data.user){
+        getReg('vw_menu_rol','id_menu','asc')
+        setUsuario(pivotUser.data.user)
+      } 
     } catch (error) {
       console.log('erro al cargar usuario',error);
     }
@@ -106,7 +115,7 @@ export const SupabaseContextProvider = ({ children }) => {
       const { error, data } = await supabase.from(table).insert(reg).select();
       console.log('llega aca',error,data,reg,table);
       if (error) throw new Error(error.message);
-      if(!error && table == 'cuota') setProveedores(data);
+      if(!error && table == 'cliente') setClientes(data);
     } catch (error) {
       console.log(error.error_description || error.message || error);
       throw new Error(error.message);
@@ -118,6 +127,7 @@ export const SupabaseContextProvider = ({ children }) => {
   const getReg = async (table,col,ascending) => {
     try {
       setLoading(true);
+      supabase.schema('seguridad')
       const {data, error}  = await supabase
         .from(table)
         .select("*")
@@ -125,7 +135,8 @@ export const SupabaseContextProvider = ({ children }) => {
       console.log(table,data,error);
       if (error) throw new Error(error.message);
       if(table == 'cliente') setClientes(data);
-      if(['prestamo','vw_prestamos'].includes(table)) setProductos(data);
+      if(table == 'vw_menu_rol') setMenu(data);
+      // if(['prestamo','vw_prestamos'].includes(table)) setProductos(data);
       return data;
     } catch (error) {
       console.log(error.error_description || error.message || error);
@@ -189,6 +200,7 @@ export const SupabaseContextProvider = ({ children }) => {
         getUser,
         avatar,
         usuario,
+        menu,
         createReg,
         getReg,
         updateReg,
