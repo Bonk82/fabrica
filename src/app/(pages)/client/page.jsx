@@ -7,7 +7,7 @@ import { DataTable } from 'mantine-datatable';
 import { useEffect, useState } from 'react';
 import { useMemo } from 'react';
 import { MantineReactTable, useMantineReactTable} from 'mantine-react-table';
-
+import { MRT_Localization_ES } from 'mantine-react-table/locales/es';
 // const columns = [
 //   {
 //     accessorKey: 'nombre',
@@ -168,7 +168,8 @@ const Page = () => {
     },
     mantineTableProps:{
       striped: true,
-    }
+    },
+    localization:MRT_Localization_ES
   });
 
   return (

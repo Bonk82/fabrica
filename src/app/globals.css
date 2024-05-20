@@ -38,6 +38,9 @@
   --callout-border-rgb: 172, 175, 176;
   --card-rgb: 180, 185, 188;
   --card-border-rgb: 131, 134, 135;
+
+  --mrt-base-background-color : transparent !important;
+  --input-bg: #031321 !important;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -101,4 +104,19 @@ a {
   html {
     color-scheme: dark;
   }
+}
+
+.MRT_TopToolbar-module_root__r4-V9, .MRT_TablePaper-module_root__q0v5L{
+  background-color: transparent !important;
+}
+th{
+  background-color: teal !important;
+}
+
+tr{
+  background-color: transparent !important;
+}
+
+.mantine-Input-wrapper{
+  background-color: #031321 !important;
 }
