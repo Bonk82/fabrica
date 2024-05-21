@@ -127,3 +127,7 @@ tr{
 .mantine-Input-input,.mantine-Select-input{
   background-color: #031321 !important;
 }
+
+.mantine-Notifications-notification{
+  color: aqua;
+}

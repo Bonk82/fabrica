@@ -1,40 +1,14 @@
 'use client'
 import { useSupa } from '@/app/context/SupabaseContext';
-import { ActionIcon, BackgroundImage, Box, Button, Center, Group, LoadingOverlay, NativeSelect, Text, TextInput } from '@mantine/core'
+import { ActionIcon, Box, Button, Center, Group, LoadingOverlay, NativeSelect, Notification, Text, TextInput } from '@mantine/core'
 import { useForm } from '@mantine/form';
-import { IconDeviceFloppy, IconEdit, IconEye, IconRefresh, IconTrash } from '@tabler/icons-react';
-import { DataTable } from 'mantine-datatable';
+import { IconCheck, IconDeviceFloppy, IconEdit, IconEye, IconRefresh, IconTrash } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import { useMemo } from 'react';
 import { MantineReactTable, useMantineReactTable} from 'mantine-react-table';
 import { MRT_Localization_ES } from 'mantine-react-table/locales/es';
-// const columns = [
-//   {
-//     accessorKey: 'nombre',
-//     header: 'Nombre',
-//     enableColumnOrdering:true
-//   },
-//   {
-//     accessorKey: 'direccion',
-//     header: 'Dirección',
-//   },
-//   {
-//     accessorKey: 'coordenadas',
-//     header: 'Coordenadas',
-//   },
-//   {
-//     accessorKey: 'referencia',
-//     header: 'Referencia',
-//   },
-//   {
-//     accessorKey: 'telefonos',
-//     header: 'Teléfonos',
-//   },
-//   {
-//     accessorKey: 'tipo_cliente',
-//     header: 'Tipo Cliente',
-//   },
-// ];
+import { notifications } from '@mantine/notifications';
+import classes from '../../page.module.css';
 
 const Page = () => {
   const { loading,usuario,createReg,clientes,getReg,updateReg } = useSupa();
@@ -88,6 +62,21 @@ const Page = () => {
       // console.log('los clientes',clientes);
       // setRecords(clientes)
       cargarCliente();
+      // <Notification color="teal" title='Gestión Clientes' position="top-right">
+      //   {`Cliente ${id? 'registrado': 'actualziado'} satisfactoriamente!`}
+      // </Notification>
+      notifications.show({
+        withCloseButton: true,
+        autoClose: 5000,
+        title: 'Gestión Clientes',
+        message: `Cliente ${id? 'actualziado': 'registrado'} satisfactoriamente!`,
+        color: 'lime',
+        icon: <IconCheck/>,
+        // className: 'my-notification-class',
+        style: { backgroundColor: '#2A7045',color:'antiquewhite' },
+        loading: false,
+        classNames: classes,
+      });
     } catch (error) {
       // setAlerta([true,'error',error.message || error])
       console.log(error);
@@ -102,21 +91,6 @@ const Page = () => {
     setId(data.id_cliente);
     form.setValues(data)
   }
-
-  // const table = useMantineReactTable({
-  //   columns,
-  //   data:records,
-  //   initialState: {
-  //     pagination: { pageSize: 5, pageIndex: 0 },
-  //     showGlobalFilter: true,
-  //   },
-  //   //customize the MRT components
-  //   mantinePaginationProps: {
-  //     rowsPerPageOptions: ['5', '10', '15'],
-  //   },
-  //   paginationDisplayMode: 'pages',
-  //   enableSorting:true,
-  // });
 
   const columns = useMemo(
     () => [
@@ -150,11 +124,11 @@ const Page = () => {
 
   const table = useMantineReactTable({
     columns,
-    data: clientes, //must be memoized or stable (useState, useMemo, defined outside of this component, etc.)
+    data: clientes, 
     defaultColumn: {
-      minSize: 20, //allow columns to get smaller than default
-      maxSize: 200, //allow columns to get larger than default
-      size: 100, //make columns wider by default
+      minSize: 50, 
+      maxSize: 200, 
+      size: 100,
     },
     initialState: {
       density: 'xs',
@@ -179,6 +153,13 @@ const Page = () => {
     localization:MRT_Localization_ES
   });
 
+  // const mostrarNotificacion=(tipo,titulo,mensaje)=>{
+  //   notifications.show({
+  //     title: 'Default notification',
+  //     message: 'Hey there, your code is awesome! 🤥',
+  //   })
+  // }
+
   return (
     <div>
       <Center>
@@ -188,6 +169,18 @@ const Page = () => {
           Clientes
         </Text>
       </Center>
+      <Button
+        onClick={() =>
+          notifications.show({
+            title: 'Notification with custom styles',
+            message: 'It is default blue',
+            color:'grape.4',
+            classNames: classes,
+          })
+        }
+      >
+        Default notification
+      </Button>
       <Box pos='relative'>
         <LoadingOverlay
           visible={loading}
@@ -231,13 +224,6 @@ const Page = () => {
             type='text'
             {...form.getInputProps('telefonos')}
           />
-          {/* <TextInput
-            label="tipo_cliente:"
-            placeholder="tipo_cliente"
-            key={form.key('tipo_cliente')}
-            type='text'
-            {...form.getInputProps('tipo_cliente')}
-          /> */}
           <NativeSelect
             label="Tipo Cliente"
             data={['Eventual', 'Descuento', 'Pago Semanal']}
@@ -251,53 +237,6 @@ const Page = () => {
           </Group>
         </form>
       </Box>
-      {/* <DataTable
-        withTableBorder
-        borderRadius="sm"
-        striped
-        columns={[
-          { accessor: 'nombre',title:'Nombre' },
-          { accessor: 'direccion',title:'Dirección' },
-          { accessor: 'coordenadas',title:'Doordenadas' },
-          { accessor: 'referencia',title:'Referencia' },
-          { accessor: 'telefonos',title:'Teléfonos' },
-          { accessor: 'tipo_cliente',title:'Tipo Cliente' },
-          {
-            accessor: 'actions',
-            title: <Box mr={6}>Acciones</Box>,
-            textAlign: 'right',
-            render: (company) => (
-              <Group gap={4} justify="right" wrap="nowrap">
-                <ActionIcon
-                  size="sm"
-                  variant="subtle"
-                  color="green"
-                  onClick={() => cargarData({ company, action: 'view' })}
-                >
-                  <IconEye size={16} />
-                </ActionIcon>
-                <ActionIcon
-                  size="sm"
-                  variant="subtle"
-                  color="blue"
-                  onClick={() => cargarData({ company, action: 'edit' })}
-                >
-                  <IconEdit size={16} />
-                </ActionIcon>
-                <ActionIcon
-                  size="sm"
-                  variant="subtle"
-                  color="red"
-                  onClick={() => cargarData({ company, action: 'delete' })}
-                >
-                  <IconTrash size={16} />
-                </ActionIcon>
-              </Group>
-            ),
-          },
-        ]}
-        records={records}
-      /> */}
 
       <MantineReactTable table={table} />
 
