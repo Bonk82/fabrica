@@ -8,6 +8,7 @@ import { ColorSchemeScript, MantineProvider } from '@mantine/core';
 import { AuthProvider } from "./context/AuthContext";
 import { SupabaseContextProvider } from "./context/SupabaseContext";
 import { Notifications } from '@mantine/notifications';
+import { ModalsProvider } from "@mantine/modals";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -29,7 +30,9 @@ export default function RootLayout({ children }) {
           {/* <Model>{children}</Model> */}
           <AuthProvider>
             <SupabaseContextProvider>
-              {children}
+              <ModalsProvider>
+                {children}
+              </ModalsProvider>
             </SupabaseContextProvider>
           </AuthProvider>
         </MantineProvider>

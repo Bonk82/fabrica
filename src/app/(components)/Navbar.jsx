@@ -30,6 +30,7 @@ const Navbar = () => {
           onClick={()=>navegar(e.ruta)}
           fullWidth style={{marginBottom:'1rem'}}
           justify='flex-start'
+          variant='light'
         >
           {e.descripcion}
         </Button>

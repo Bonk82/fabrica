@@ -140,6 +140,7 @@ export const SupabaseContextProvider = ({ children }) => {
       console.log(table,data,error);
       if (error) throw new Error(error.message);
       if(table == 'cliente') setClientes(data);
+      if(table == 'producto') setProductos(data);
       if(table == 'vw_menu_rol') setMenu(data);
       // if(['prestamo','vw_prestamos'].includes(table)) setProductos(data);
       return data;

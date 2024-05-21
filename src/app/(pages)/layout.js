@@ -23,7 +23,7 @@ export function Model({ children }) {
     <AppShell
       header={{ height: 60 }}
       footer={{ height: 20 }}
-      navbar={{ width: nav ? 300:70, breakpoint: 'sm', collapsed: {mobile: !opened } }}
+      navbar={{ width: nav ? 300:70, breakpoint: 'sm', collapsed: {mobile: !opened }}}
       aside={{ width: 200, breakpoint: 'md', collapsed: { desktop: false, mobile: true } }}
       padding="md"
       transitionDuration={500}
@@ -38,7 +38,7 @@ export function Model({ children }) {
         </Group>
       </AppShell.Header>
       <AppShell.Navbar p="sm" style={{overflow:'hidden',backgroundColor:'transparent'}}>
-        {(window.innerWidth >= 768) &&
+        {(window?.innerWidth >= 768) &&
           <div style={{display:'flex',justifyContent:'space-between', fontSize:'x-large',marginBottom:'2rem'}}>{nav ? 'Menú de opciones' : ''}
             <ActionIcon style={{width:'50px'}} onClick={toggleNav}><IconRipple/></ActionIcon>
           </div>

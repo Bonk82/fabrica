@@ -1,6 +1,6 @@
 'use client'
 import { useSupa } from '@/app/context/SupabaseContext';
-import { ActionIcon, Box, Button, Center, Group, LoadingOverlay, NativeSelect, Notification, Text, TextInput } from '@mantine/core'
+import { ActionIcon, Box, Button, Center, Group, LoadingOverlay, NativeSelect, Text, TextInput } from '@mantine/core'
 import { useForm } from '@mantine/form';
 import { IconCheck, IconDeviceFloppy, IconEdit, IconEye, IconRefresh, IconTrash } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
@@ -8,22 +8,20 @@ import { useMemo } from 'react';
 import { MantineReactTable, useMantineReactTable} from 'mantine-react-table';
 import { MRT_Localization_ES } from 'mantine-react-table/locales/es';
 import { notifications } from '@mantine/notifications';
-import classes from '../../page.module.css';
+import classes from '../../toast.module.css';
+import { modals } from '@mantine/modals';
 
 const Page = () => {
-  const { loading,usuario,createReg,clientes,getReg,updateReg } = useSupa();
-  const [records, setRecords] = useState([])
+  const { loading,usuario,createReg,clientes,getReg,updateReg,deleteReg } = useSupa();
   const [id, setId] = useState(null)
-  // const iAward = <IconAward/>
+  
   useEffect(() => {
-    cargarCliente()
+    cargarData()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   
-  const cargarCliente = async () =>{
-    const r = await getReg('cliente','id_cliente',false);
-    console.log('efect',clientes,records,r);
-    setRecords(r); 
+  const cargarData = async () =>{
+    await getReg('cliente','id_cliente',false);
   }
 
   const form = useForm({
@@ -36,49 +34,42 @@ const Page = () => {
       telefonos:'',
       tipo_cliente: '',
     },
-
     // validate: {
     //   tipo_cliente: (value) => (/^\S+@\S+$/.test(value) ? null : 'Correo Inválido'),
     // },
   });
 
+  const toast = (title,message,type) =>{
+    // return <Toast title='el totulo' message='el mensaje' type='error'/>
+    let color = type
+    if(type == 'success') color = 'lime.8';
+    if(type == 'info') color = 'cyan.8';
+    if(type == 'warning') color = 'yellow.8';
+    if(type == 'error') color = 'red.8';
+    notifications.show({
+      title,
+      message,
+      color,
+      classNames: classes,
+    })
+  }
+
   const registrarCliente = async (data) => {
     // event.preventDefault();
     console.log('la data',data);
-
-    // const data = new FormData(event.currentTarget);
     const newClient = {
       ...data,
       usuario_registro:usuario?.id,
       fecha_registro:new Date(),
       activo:1
     }
-
     console.log('new client',newClient,id);
     try {
       id ? await updateReg('cliente',newClient) : await createReg(newClient,'cliente');
-      // setAlerta([true,'success','Préstamo registrado con éxito!'])
-      // await cargarData();
-      // console.log('los clientes',clientes);
-      // setRecords(clientes)
-      cargarCliente();
-      // <Notification color="teal" title='Gestión Clientes' position="top-right">
-      //   {`Cliente ${id? 'registrado': 'actualziado'} satisfactoriamente!`}
-      // </Notification>
-      notifications.show({
-        withCloseButton: true,
-        autoClose: 5000,
-        title: 'Gestión Clientes',
-        message: `Cliente ${id? 'actualziado': 'registrado'} satisfactoriamente!`,
-        color: 'lime',
-        icon: <IconCheck/>,
-        // className: 'my-notification-class',
-        style: { backgroundColor: '#2A7045',color:'antiquewhite' },
-        loading: false,
-        classNames: classes,
-      });
+      cargarData();
+      toast('Control Clientes',`Cliente ${id? 'actualziado': 'registrado'} satisfactoriamente!`,'success')
     } catch (error) {
-      // setAlerta([true,'error',error.message || error])
+      toast('Control Clientes',error.message || error,'error')
       console.log(error);
     }finally{
       form.reset();
@@ -86,7 +77,35 @@ const Page = () => {
     }
   }
 
-  const cargarData = (data) =>{
+  const confirmar = (e)=>{
+    modals.openConfirmModal({
+      title: 'Confirmar Eliminación',
+      centered: true,
+      children: (
+        <Text size="sm">
+        Está seguro de ELIMINAR el cliente: <strong>{e.nombre.toUpperCase()}</strong>
+        </Text>
+      ),
+      labels: { confirm: 'Eliminar Cliente', cancel: "Cancelar" },
+      confirmProps: { color: 'red' },
+      onCancel: () => console.log('Cancel'),
+      onConfirm: () => onDeleteCliente(e),
+    });
+  }
+
+  const onDeleteCliente = async(e) => {
+    console.log('delete cliente',e);
+    try {
+      await deleteReg('cliente',e.id_cliente);
+      toast('Control Clientes',`Cliente eliminado satisfactoriamente!`,'success')
+    } catch (error) {
+      toast('Control Clientes',error.message || error,'error')
+    } finally{
+      cargarData()
+    } 
+  }
+
+  const mostrarRegistro = (data) =>{
     console.log('cargando data',data);
     setId(data.id_cliente);
     form.setValues(data)
@@ -136,10 +155,10 @@ const Page = () => {
     enableRowActions: true,
     renderRowActions: ({ row }) => (
       <Box>
-        <ActionIcon variant="subtle" onClick={() => cargarData(row.original)}>
+        <ActionIcon variant="subtle" onClick={() => mostrarRegistro(row.original)}>
           <IconEdit color='orange' />
         </ActionIcon>
-        <ActionIcon variant="subtle" onClick={() => console.info('Delete',row.original)}>
+        <ActionIcon variant="subtle" onClick={() => confirmar(row.original)}>
           <IconTrash color='red' />
         </ActionIcon>
       </Box>
@@ -153,13 +172,6 @@ const Page = () => {
     localization:MRT_Localization_ES
   });
 
-  // const mostrarNotificacion=(tipo,titulo,mensaje)=>{
-  //   notifications.show({
-  //     title: 'Default notification',
-  //     message: 'Hey there, your code is awesome! 🤥',
-  //   })
-  // }
-
   return (
     <div>
       <Center>
@@ -169,18 +181,6 @@ const Page = () => {
           Clientes
         </Text>
       </Center>
-      <Button
-        onClick={() =>
-          notifications.show({
-            title: 'Notification with custom styles',
-            message: 'It is default blue',
-            color:'grape.4',
-            classNames: classes,
-          })
-        }
-      >
-        Default notification
-      </Button>
       <Box pos='relative'>
         <LoadingOverlay
           visible={loading}
@@ -236,10 +236,9 @@ const Page = () => {
             {id && <Button fullWidth leftSection={<IconRefresh/>} type='submit'>Actualizar Cliente</Button>}
           </Group>
         </form>
+
+        <MantineReactTable table={table} />
       </Box>
-
-      <MantineReactTable table={table} />
-
     </div>
   )
 }
