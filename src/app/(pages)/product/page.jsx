@@ -184,7 +184,7 @@ const Page = () => {
         <Text c="cyan.4" size='30px' fw={900}
           variant="gradient"
           gradient={{ from: 'lightblue', to: 'cyan', deg: 90 }}>
-          Prodcutos
+          Productos
         </Text>
       </Center>
       <Box pos='relative'>
