@@ -2,7 +2,7 @@
 import { useSupa } from '@/app/context/SupabaseContext';
 import { ActionIcon, Box, Button, Center, Group, LoadingOverlay, NativeSelect, Text, TextInput } from '@mantine/core'
 import { useForm } from '@mantine/form';
-import { IconCheck, IconDeviceFloppy, IconEdit, IconEye, IconRefresh, IconTrash } from '@tabler/icons-react';
+import { IconBuilding, IconCheck, IconDeviceFloppy, IconEdit, IconEye, IconFolder, IconGps, IconMap, IconMapSearch, IconPhone, IconRefresh, IconTrash, IconUser } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import { useMemo } from 'react';
 import { MantineReactTable, useMantineReactTable} from 'mantine-react-table';
@@ -192,45 +192,50 @@ const Page = () => {
           <TextInput
             label="Nombre:"
             placeholder="Nombre"
-            key={form.key('nombre')}
             type='text'
+            leftSection={<IconUser size={16} />}
+            key={form.key('nombre')}
             {...form.getInputProps('nombre')}
           />
           <TextInput
             label="Direccion:"
             placeholder="Direccion"
-            key={form.key('direccion')}
             type='text'
+            leftSection={<IconGps size={16} />}
+            key={form.key('direccion')}
             {...form.getInputProps('direccion')}
           />
           <TextInput
             label="Coordenadas:"
             placeholder="Coordenadas"
-            key={form.key('coordenadas')}
             type='text'
+            leftSection={<IconMapSearch size={16} />}
+            key={form.key('coordenadas')}
             {...form.getInputProps('coordenadas')}
           />
           <TextInput
             label="referencia:"
             placeholder="referencia"
-            key={form.key('referencia')}
             type='text'
+            leftSection={<IconBuilding size={16} />}
+            key={form.key('referencia')}
             {...form.getInputProps('referencia')}
           />
           <TextInput
             label="Telefonos:"
             placeholder="Telefonos"
-            key={form.key('telefonos')}
             type='text'
+            leftSection={<IconPhone size={16} />}
+            key={form.key('telefonos')}
             {...form.getInputProps('telefonos')}
           />
           <NativeSelect
             label="Tipo Cliente"
             data={['Eventual', 'Descuento', 'Pago Semanal']}
+            leftSection={<IconFolder size={16} />}
             key={form.key('tipo_cliente')}
             {...form.getInputProps('tipo_cliente')}
           />
-
           <Group justify="flex-end" mt="md">
             {!id && <Button fullWidth leftSection={<IconDeviceFloppy/>} type='submit'>Registrar Cliente</Button>}
             {id && <Button fullWidth leftSection={<IconRefresh/>} type='submit'>Actualizar Cliente</Button>}

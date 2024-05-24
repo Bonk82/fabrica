@@ -1,8 +1,8 @@
 'use client'
 import { useSupa } from '@/app/context/SupabaseContext';
-import { ActionIcon, Box, Button, Center, Group, LoadingOverlay, NativeSelect, Text, TextInput } from '@mantine/core'
+import { ActionIcon, Box, Button, Center, Group, LoadingOverlay, NativeSelect, NumberInput, Text, TextInput } from '@mantine/core'
 import { useForm } from '@mantine/form';
-import { IconCheck, IconDeviceFloppy, IconEdit, IconEye, IconRefresh, IconTrash } from '@tabler/icons-react';
+import { IconBuilding, IconCashBanknote, IconCheck, IconDeviceFloppy, IconEdit, IconEye, IconGps, IconPhone, IconRefresh, IconTrash, IconUser } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import { useMemo } from 'react';
 import { MantineReactTable, useMantineReactTable} from 'mantine-react-table';
@@ -100,7 +100,7 @@ const Page = () => {
     } catch (error) {
       toast('Control Proveedor',error.message || error,'error')
     } finally{
-      cargarCliente()
+      cargarData()
     } 
   }
 
@@ -188,36 +188,41 @@ const Page = () => {
           <TextInput
             label="Nombre:"
             placeholder="Nombre del cliente o empresa"
-            key={form.key('nombre')}
             type='text'
+            leftSection={<IconUser size={16} />}
+            key={form.key('nombre')}
             {...form.getInputProps('nombre')}
           />
           <TextInput
             label="Dirección:"
             placeholder="Dirección del local"
-            key={form.key('direccion')}
             type='text'
+            leftSection={<IconGps size={16} />}
+            key={form.key('direccion')}
             {...form.getInputProps('direccion')}
           />
           <TextInput
             label="Referencia:"
             placeholder="referecnias para llegar al local"
+            leftSection={<IconBuilding size={16} />}
+            type='text'
             key={form.key('referencia')}
-            type='number'
             {...form.getInputProps('referencia')}
           />
           <TextInput
             label="Teléfonos:"
             placeholder="70611111"
+            leftSection={<IconPhone size={16} />}
             key={form.key('telefonos')}
             type='number'
             {...form.getInputProps('telefonos')}
           />
-          <TextInput
+          <NumberInput
             label="Cuenta Bancaria:"
-            placeholder="10000111122255"
+            placeholder="le numero de cuenta bancaria"
+            allowDecimal={false}
+            leftSection={<IconCashBanknote size={16} />}
             key={form.key('cuenta')}
-            type='number'
             {...form.getInputProps('cuenta')}
           />
           <Group justify="flex-end" mt="md">

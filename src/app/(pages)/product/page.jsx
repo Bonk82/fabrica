@@ -1,8 +1,8 @@
 'use client'
 import { useSupa } from '@/app/context/SupabaseContext';
-import { ActionIcon, Box, Button, Center, Group, LoadingOverlay, NativeSelect, Text, TextInput } from '@mantine/core'
+import { ActionIcon, Box, Button, Center, Group, LoadingOverlay, NativeSelect, NumberInput, Text, TextInput } from '@mantine/core'
 import { useForm } from '@mantine/form';
-import { IconCheck, IconDeviceFloppy, IconEdit, IconEye, IconRefresh, IconTrash } from '@tabler/icons-react';
+import { IconAlignLeft, IconBox, IconCheck, IconDeviceFloppy, IconEdit, IconEye, IconFileBarcode, IconPlusMinus, IconReceipt2, IconRefresh, IconStack2, IconTrash } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import { useMemo } from 'react';
 import { MantineReactTable, useMantineReactTable} from 'mantine-react-table';
@@ -102,7 +102,7 @@ const Page = () => {
     } catch (error) {
       toast('Control Producto',error.message || error,'error')
     } finally{
-      cargarCliente()
+      cargarData()
     } 
   }
 
@@ -200,6 +200,7 @@ const Page = () => {
             placeholder="Código"
             key={form.key('codigo')}
             type='text'
+            leftSection={<IconFileBarcode size={16} />}
             {...form.getInputProps('codigo')}
           />
           <TextInput
@@ -207,40 +208,59 @@ const Page = () => {
             placeholder="Descripción"
             key={form.key('descripcion')}
             type='text'
+            leftSection={<IconAlignLeft size={16} />}
             {...form.getInputProps('descripcion')}
           />
           <NativeSelect
             label="Tipo Unidad"
             data={['Kilo', 'Bolsa', 'Paquete']}
             key={form.key('unidad')}
+            leftSection={<IconBox size={16} />}
             {...form.getInputProps('unidad')}
           />
-          <TextInput
+          <NumberInput
             label="Existencias:"
             placeholder="cantidad en stock"
             key={form.key('existencia')}
-            type='number'
+            defaultValue={0}
+            allowDecimal={false}
+            thousandSeparator=','
+            min={0}
+            leftSection={<IconStack2 size={16} />}
             {...form.getInputProps('existencia')}
           />
-          <TextInput
+          <NumberInput
             label="Precio:"
             placeholder="Precio normal de venta"
+            prefix='Bs. '
+            defaultValue={0.00}
+            decimalScale={2}
+            fixedDecimalScale
+            thousandSeparator=','
             key={form.key('precio')}
-            type='number'
+            leftSection={<IconReceipt2 size={16} />}
             {...form.getInputProps('precio')}
           />
-          <TextInput
+          <NumberInput
             label="Promoción:"
             placeholder="Promoción"
+            prefix='Bs. '
+            defaultValue={0.00}
+            decimalScale={2}
+            fixedDecimalScale
+            thousandSeparator=','
             key={form.key('promocion')}
-            type='number'
+            leftSection={<IconReceipt2 size={16} />}
             {...form.getInputProps('promocion')}
           />
-          <TextInput
+          <NumberInput
             label="Pedido Mínimo:"
             placeholder="Pedido Mínimo"
+            allowDecimal={false}
             key={form.key('pedido_minimo')}
-            type='number'
+            max={100}
+            min={1}
+            leftSection={<IconPlusMinus size={16} />}
             {...form.getInputProps('pedido_minimo')}
           />
           <Group justify="flex-end" mt="md">
