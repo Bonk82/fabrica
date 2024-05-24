@@ -136,9 +136,10 @@ const Page = () => {
   }
 
   const mostrarRegistro = (data) =>{
-    console.log('cargando data',data);
+    console.log('cargando data',data,listaProductos);
     setId(data.id_producto);
     form.setValues(data)
+    // form.setValues({id_producto:''})
   }
 
   const columns = useMemo(
@@ -238,6 +239,13 @@ const Page = () => {
     localization:MRT_Localization_ES
   });
 
+  const actualizarPrecio = ()=>{
+    const elPrecio =  productos.filter(f=> f.id_producto == form.getValues().fid_producto)[0]?.precio;
+    console.log('el precio',elPrecio,form.getValues());
+    form.setValues({precio:form.getValues().cantidad_solicitada * (elPrecio || 0)})
+    // form.setFieldValue('fid_producto','agua')
+  }
+
 
   return (
     <div>
@@ -284,11 +292,11 @@ const Page = () => {
           />
           <Select
             label="Producto:"
-            placeholder="Seleccione producto..."
             data={listaProductos}
             searchable
             required
             withAsterisk
+            onChange={(value)=>console.log('revi',value)}
             leftSection={<IconBox size={16} />}
             key={form.key('fid_producto')}
             {...form.getInputProps('fid_producto')}
@@ -322,6 +330,7 @@ const Page = () => {
             leftSection={<IconPlusMinus size={16} />}
             required
             withAsterisk
+            onValueChange={actualizarPrecio}
             key={form.key('cantidad_solicitada')}
             {...form.getInputProps('cantidad_solicitada')}
           />
@@ -336,6 +345,7 @@ const Page = () => {
             leftSection={<IconReceipt2 size={16} />}
             required
             withAsterisk
+            // value={form.getInputProps('cantidad_solicitada').value}
             key={form.key('precio')}
             {...form.getInputProps('precio')}
           />
