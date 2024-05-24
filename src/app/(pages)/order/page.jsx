@@ -1,6 +1,6 @@
 'use client'
 import { useSupa } from '@/app/context/SupabaseContext';
-import { ActionIcon, Box, Button, Center, Group, LoadingOverlay, NativeSelect, NumberInput, Text, TextInput } from '@mantine/core'
+import { ActionIcon, Box, Button, Center, Group, LoadingOverlay, NativeSelect, NumberInput, Select, Text, TextInput } from '@mantine/core'
 import { useForm } from '@mantine/form';
 import { IconAlignLeft, IconBox, IconCalendar, IconCheck, IconDeviceFloppy, IconEdit, IconEye, IconFileBarcode, IconFolder, IconPlusMinus, IconReceipt2, IconRefresh, IconStack2, IconTrash } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
@@ -13,6 +13,8 @@ import { modals } from '@mantine/modals';
 const Page = () => {
   const { loading,usuario,createReg,pedidos,clientes,productos,getReg,updateReg,deleteReg } = useSupa();
   const [id, setId] = useState(null)
+  const [listaClientes, setListaClientes] = useState([])
+  const [listaProductos, setListaProductos] = useState([])
 
   useEffect(() => {
     cargarData()
@@ -21,20 +23,41 @@ const Page = () => {
   
   const cargarData = async () =>{
     await getReg('vw_pedido','id_pedido',false);
-    await getReg('cliente','id_cliente',false);
-    await getReg('producto','id_producto',false);
+    const pivotClientes = await getReg('cliente','id_cliente',false);
+    const pivotProductos = await getReg('producto','id_producto',false);
+    pivotClientes.map(c => {
+      c.label = c.nombre;
+      c.value = c.id_cliente.toString();
+      return c;
+    });
+    setListaClientes(pivotClientes);
+    pivotProductos.map(p => {
+      p.label = p.descripcion;
+      p.value = p.id_producto.toString();
+      return p;
+    });
+    setListaProductos(pivotProductos);
+    console.log('revisando listas',listaClientes,listaProductos);
   }
 
   const form = useForm({
     mode: 'uncontrolled',
     initialValues: {
-      codigo:'',
-      descripcion:'',
-      unidad:'',
-      existencia:'',
-      precio:'',
-      promocion: '',
-      pedido_minimo:''
+      id_pedido:null,
+      fid_cliente:null,
+      fid_producto:null,
+      fecha_entrega:null,
+      cantidad_solicitada:1,
+      precio: 0,
+      descuento:0,
+      cantidad_entregada:0,
+      estado_pedido:'',
+      monto_pago:0,
+      estado_pago:'',
+      fecha_pago:null,
+      metodo_pago: '',
+      metodo_entrega:'',
+      fecha_registro:null,
     },
     // validate: {
     //   tipo_cliente: (value) => (/^\S+@\S+$/.test(value) ? null : 'Correo Inválido'),
@@ -58,12 +81,17 @@ const Page = () => {
 
   const registrarPedido = async (data) => {
     // event.preventDefault();
+    if(!data.id_pedido) data.id_pedido = null;
     console.log('la data',data);
     const newPedido = {
       ...data,
       usuario_registro:usuario?.id,
       fecha_registro:new Date(),
       activo:1
+    }
+    if(!id){
+      delete newPedido.id_pedido
+      delete newPedido.fecha_pago
     }
     console.log('new pedido',newPedido,id);
     try {
@@ -120,11 +148,11 @@ const Page = () => {
         header: 'Número',
       },
       {
-        accessorKey: 'fid_cliente',
+        accessorKey: 'nombre',
         header: 'Cliente',
       },
       {
-        accessorKey: 'fid_producto',
+        accessorKey: 'descripcion',
         header: 'Producto',
       },
       {
@@ -236,24 +264,41 @@ const Page = () => {
             leftSection={<IconFileBarcode size={16} />}
             {...form.getInputProps('id_pedido')}
           />
-          {/* <NativeSelect
+          {/* <Select
             label="Cliente:"
-            data={[clientes.forEach(c => {
-              return({
-                label:c.nombre,value:c.id_cliente
-              })
-            })]}
+            placeholder="Seleccione cliente..."
+            data={listaClientes}
+            key={form.key('fid_cliente')}
+            leftSection={<IconBox size={16} />}
+            {...form.getInputProps('fid_cliente')}
+            searchable
+            required
+            withAsterisk
+          /> */}
+          <NativeSelect
+            label="Cliente:"
+            data={listaClientes}
             key={form.key('fid_cliente')}
             leftSection={<IconBox size={16} />}
             {...form.getInputProps('fid_cliente')}
           />
-          <NativeSelect
+          <Select
             label="Producto:"
-            data={[clientes.forEach(c => {
-              return({
-                label:c.descripcion,value:c.id_producto
-              })
-            })]}
+            placeholder="Seleccione producto..."
+            data={listaProductos}
+            searchable
+            required
+            withAsterisk
+            leftSection={<IconBox size={16} />}
+            key={form.key('fid_producto')}
+            {...form.getInputProps('fid_producto')}
+          />
+          {/* <NativeSelect
+            label="Producto:"
+            data={productos.map(c=>(
+              c.label = c.descripcion,
+              c.value = c.id_producto
+            ))}
             leftSection={<IconBox size={16} />}
             key={form.key('fid_producto')}
             {...form.getInputProps('fid_producto')}
@@ -262,6 +307,8 @@ const Page = () => {
             label="Fecha Entrega:"
             placeholder='Fecha Entrega'
             type='date'
+            required
+            withAsterisk
             leftSection={<IconAlignLeft size={16} />}
             key={form.key('fecha_entrega')}
             {...form.getInputProps('fecha_entrega')}
@@ -273,6 +320,8 @@ const Page = () => {
             max={500}
             min={1}
             leftSection={<IconPlusMinus size={16} />}
+            required
+            withAsterisk
             key={form.key('cantidad_solicitada')}
             {...form.getInputProps('cantidad_solicitada')}
           />
@@ -285,6 +334,8 @@ const Page = () => {
             fixedDecimalScale
             thousandSeparator=','
             leftSection={<IconReceipt2 size={16} />}
+            required
+            withAsterisk
             key={form.key('precio')}
             {...form.getInputProps('precio')}
           />
@@ -313,6 +364,8 @@ const Page = () => {
           <NativeSelect
             label="Estado Pedido:"
             data={['Solicitado', 'Entegado', 'Pendiente']}
+            required
+            withAsterisk
             leftSection={<IconFolder size={16} />}
             key={form.key('estado_pedido')}
             {...form.getInputProps('estado_pedido')}
@@ -325,13 +378,16 @@ const Page = () => {
             decimalScale={2}
             fixedDecimalScale
             thousandSeparator=','
+            value={0}
             leftSection={<IconReceipt2 size={16} />}
             key={form.key('monto_pago')}
             {...form.getInputProps('monto_pago')}
           />
           <NativeSelect
             label="Estado Pago:"
-            data={['Pagado', 'Pendiente', 'Descuento']}
+            data={['Pendiente','Pagado', 'Descuento']}
+            required
+            withAsterisk
             leftSection={<IconFolder size={16} />}
             key={form.key('estado_pago')}
             {...form.getInputProps('estado_pago')}
@@ -362,6 +418,7 @@ const Page = () => {
             label="Fecha Pedido:"
             placeholder='Fecha Pedido'
             type='date'
+            readOnly
             leftSection={<IconCalendar size={16} />}
             key={form.key('fecha_registro')}
             {...form.getInputProps('fecha_registro')}

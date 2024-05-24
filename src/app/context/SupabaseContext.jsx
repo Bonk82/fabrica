@@ -25,6 +25,7 @@ export const SupabaseContextProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [avatar, setAvatar] = useState('');
   const [usuario, setUsuario] = useState(null);
+
   const router = useRouter()
   
   useEffect(()=>{
@@ -143,6 +144,7 @@ export const SupabaseContextProvider = ({ children }) => {
       if(table == 'producto') setProductos(data);
       if(table == 'proveedor') setProveedores(data);
       if(table == 'vw_menu_rol') setMenu(data);
+      if(table == 'vw_pedido') setPedidos(data);
       // if(['prestamo','vw_prestamos'].includes(table)) setProductos(data);
       return data;
     } catch (error) {
