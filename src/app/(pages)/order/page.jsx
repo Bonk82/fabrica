@@ -1,8 +1,8 @@
 'use client'
 import { useSupa } from '@/app/context/SupabaseContext';
-import { ActionIcon, Box, Button, Center, Group, LoadingOverlay, NativeSelect, NumberInput, Select, Text, TextInput } from '@mantine/core'
+import { ActionIcon, Autocomplete, Box, Button, Center, Group, LoadingOverlay, NativeSelect, NumberInput, Select, Text, TextInput } from '@mantine/core'
 import { useForm } from '@mantine/form';
-import { IconAlignLeft, IconBox, IconCalendar, IconCheck, IconDeviceFloppy, IconEdit, IconEye, IconFileBarcode, IconFolder, IconPlusMinus, IconReceipt2, IconRefresh, IconStack2, IconTrash } from '@tabler/icons-react';
+import { IconAlignLeft, IconBox, IconCalendar, IconCheck, IconDeviceFloppy, IconEdit, IconEye, IconFileBarcode, IconFolder, IconPlusMinus, IconReceipt2, IconRefresh, IconStack2, IconTrash, IconUser } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import { useMemo } from 'react';
 import { MantineReactTable, useMantineReactTable} from 'mantine-react-table';
@@ -15,6 +15,8 @@ const Page = () => {
   const [id, setId] = useState(null)
   const [listaClientes, setListaClientes] = useState([])
   const [listaProductos, setListaProductos] = useState([])
+  const [elCliente, setElCliente] = useState('')
+  const [elProducto, setElProducto] = useState('')
 
   useEffect(() => {
     cargarData()
@@ -23,27 +25,25 @@ const Page = () => {
   
   const cargarData = async () =>{
     await getReg('vw_pedido','id_pedido',false);
-    const pivotClientes = await getReg('cliente','id_cliente',false);
-    const pivotProductos = await getReg('producto','id_producto',false);
-    pivotClientes.map(c => {
-      c.label = c.nombre;
-      c.value = c.id_cliente.toString();
-      return c;
-    });
+    let pivotClientes = await getReg('cliente','id_cliente',false);
+    let pivotProductos = await getReg('producto','id_producto',false);
+    pivotClientes = pivotClientes.map(c => c.nombre);
     setListaClientes(pivotClientes);
-    pivotProductos.map(p => {
+    pivotProductos = pivotProductos.map(p => {
       p.label = p.descripcion;
-      p.value = p.id_producto.toString();
+      p.value = p.id_producto;
       return p;
     });
+    // pivotProductos = pivotProductos.map(p => p.descripcion);
     setListaProductos(pivotProductos);
-    console.log('revisando listas',listaClientes,listaProductos);
+    console.log('revisando listas',listaClientes,listaProductos,pivotClientes,pivotProductos);
   }
 
   const form = useForm({
     mode: 'uncontrolled',
     initialValues: {
       id_pedido:null,
+      nombre:'',
       fid_cliente:null,
       fid_producto:null,
       fecha_entrega:null,
@@ -92,7 +92,11 @@ const Page = () => {
     if(!id){
       delete newPedido.id_pedido
       delete newPedido.fecha_pago
+      delete newPedido.nombre
     }
+    newPedido.fid_cliente = clientes.filter(f=>f.nombre == data.nombre)[0]?.id_cliente;
+    newPedido.fid_producto = productos.filter(f=>f.id_producto == elProducto)[0]?.id_producto;
+    
     console.log('new pedido',newPedido,id);
     try {
       id ? await updateReg('pedido',newPedido) : await createReg(newPedido,'pedido');
@@ -139,7 +143,7 @@ const Page = () => {
     console.log('cargando data',data,listaProductos);
     setId(data.id_producto);
     form.setValues(data)
-    // form.setValues({id_producto:''})
+    setElProducto(data.fid_producto)
   }
 
   const columns = useMemo(
@@ -239,11 +243,17 @@ const Page = () => {
     localization:MRT_Localization_ES
   });
 
-  const actualizarPrecio = ()=>{
-    const elPrecio =  productos.filter(f=> f.id_producto == form.getValues().fid_producto)[0]?.precio;
+  const handdlerProduct = (v)=>{
+    const elPrecio =  productos.filter(f=> f.id_producto == v)[0]?.precio;
+    console.log('el precio',elPrecio,form.getValues(),v);
+    form.setValues({precio:form.getValues().cantidad_solicitada * (elPrecio || 0)})
+    setElProducto(v)
+  }
+
+  const handdleCantidad = ()=>{
+    const elPrecio =  productos.filter(f=> f.id_producto == elProducto)[0]?.precio;
     console.log('el precio',elPrecio,form.getValues());
     form.setValues({precio:form.getValues().cantidad_solicitada * (elPrecio || 0)})
-    // form.setFieldValue('fid_producto','agua')
   }
 
 
@@ -272,44 +282,54 @@ const Page = () => {
             leftSection={<IconFileBarcode size={16} />}
             {...form.getInputProps('id_pedido')}
           />
-          {/* <Select
+          {/* <Autocomplete
             label="Cliente:"
-            placeholder="Seleccione cliente..."
+            // data={['uno','dos','tres','cuatro','cinco','seis','siete']}
             data={listaClientes}
-            key={form.key('fid_cliente')}
-            leftSection={<IconBox size={16} />}
-            {...form.getInputProps('fid_cliente')}
-            searchable
             required
             withAsterisk
-          /> */}
-          <NativeSelect
-            label="Cliente:"
-            data={listaClientes}
-            key={form.key('fid_cliente')}
+            limit={4}
+            id='cliente'
+            // onChange={(value)=>actualizarPrecio(value)}
+            onValueChange={actualizarPrecio}
             leftSection={<IconBox size={16} />}
-            {...form.getInputProps('fid_cliente')}
+            key={form.key('nombre')}
+            {...form.getInputProps('nombre')}
+          /> */}
+          <Autocomplete
+            label="Cliente:"
+            // data={['uno','dos','tres','cuatro','cinco','seis','siete']}
+            data={listaClientes}
+            required
+            withAsterisk
+            limit={4}
+            // value={elCliente}
+            // onChange={actualizarPrecio}
+            leftSection={<IconUser size={16} />}
+            key={form.key('nombre')}
+            {...form.getInputProps('nombre')}
           />
-          <Select
+          <NativeSelect
             label="Producto:"
             data={listaProductos}
-            searchable
-            required
-            withAsterisk
-            onChange={(value)=>console.log('revi',value)}
             leftSection={<IconBox size={16} />}
-            key={form.key('fid_producto')}
-            {...form.getInputProps('fid_producto')}
+            value={elProducto}
+            onChange={e=>handdlerProduct(e.currentTarget.value)}
+            // onChangeCapture={e=>actualizarPrecio(e)}
+            // key={form.key('fid_producto')}
+            // {...form.getInputProps('fid_producto')}
           />
-          {/* <NativeSelect
+          {/* <Autocomplete
             label="Producto:"
-            data={productos.map(c=>(
-              c.label = c.descripcion,
-              c.value = c.id_producto
-            ))}
+            // data={['uno','dos','tres','cuatro','cinco','seis','siete']}
+            data={listaProductos}
+            required
+            limit={4}
+            value={elProducto}
+            onChange={handdlerProduct}
             leftSection={<IconBox size={16} />}
-            key={form.key('fid_producto')}
-            {...form.getInputProps('fid_producto')}
+            // key={form.key('nombre')}
+            // {...form.getInputProps('nombre')}
           /> */}
           <TextInput
             label="Fecha Entrega:"
@@ -330,7 +350,7 @@ const Page = () => {
             leftSection={<IconPlusMinus size={16} />}
             required
             withAsterisk
-            onValueChange={actualizarPrecio}
+            onValueChange={handdleCantidad}
             key={form.key('cantidad_solicitada')}
             {...form.getInputProps('cantidad_solicitada')}
           />

@@ -13,7 +13,7 @@ import { ModalsProvider } from "@mantine/modals";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "Iceland",
+  title: "Cristales",
   description: "Aplicación para ventas",
 };
 

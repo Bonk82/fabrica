@@ -33,7 +33,7 @@ export function Model({ children }) {
         <Group h="100%" px="md">
           <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
           {/* <MantineLogo size={30} /> */}
-          <Image radius="md" src="/assets/icono.jpg" h={50} w="auto" fit='contain' alt=''/>
+          <Image radius="md" src="/assets/icono3.jpg" h={50} w="auto" fit='contain' alt=''/>
           <Header/>
         </Group>
       </AppShell.Header>

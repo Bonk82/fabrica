@@ -56,7 +56,7 @@ const Login = () => {
         <Text c="cyan.4" size='50px' fw={900}
           variant="gradient"
           gradient={{ from: 'lightblue', to: 'cyan', deg: 90 }}>
-          Fábrica de Hielos
+          Cristales Ice 
         </Text>
       </Center>
       <form onSubmit={form.onSubmit((values) => login(values))}>
