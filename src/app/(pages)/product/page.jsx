@@ -28,6 +28,7 @@ const Page = () => {
     mode: 'uncontrolled',
     initialValues: {
       codigo:'',
+      categoria:'',
       descripcion:'',
       unidad:'',
       existencia:'',
@@ -119,6 +120,10 @@ const Page = () => {
         header: 'Código',
       },
       {
+        accessorKey: 'categoria',
+        header: 'Categoría',
+      },
+      {
         accessorKey: 'descripcion',
         header: 'Descripción',
       },
@@ -202,6 +207,13 @@ const Page = () => {
             type='text'
             leftSection={<IconFileBarcode size={16} />}
             {...form.getInputProps('codigo')}
+          />
+          <NativeSelect
+            label="Categoría"
+            data={['Sólidos', 'Líquidos', 'Derivados']}
+            leftSection={<IconBox size={16} />}
+            key={form.key('categoria')}
+            {...form.getInputProps('categoria')}
           />
           <TextInput
             label="Descripción:"

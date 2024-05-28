@@ -2,7 +2,7 @@
 import { useSupa } from '@/app/context/SupabaseContext';
 import { ActionIcon, Box, Button, Center, Group, LoadingOverlay, NativeSelect, Text, TextInput } from '@mantine/core'
 import { useForm } from '@mantine/form';
-import { IconBuilding, IconCheck, IconDeviceFloppy, IconEdit, IconEye, IconFolder, IconGps, IconMap, IconMapSearch, IconPhone, IconRefresh, IconTrash, IconUser } from '@tabler/icons-react';
+import { IconBuilding, IconCheck, IconDeviceFloppy, IconEdit, IconEye, IconFolder, IconGps, IconMail, IconMap, IconMapSearch, IconPhone, IconRefresh, IconTrash, IconUser } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import { useMemo } from 'react';
 import { MantineReactTable, useMantineReactTable} from 'mantine-react-table';
@@ -28,11 +28,22 @@ const Page = () => {
     mode: 'uncontrolled',
     initialValues: {
       nombre:'',
+      telefonos:'',
+      referencia:'',
+      categoria:'',
+      tipo_cliente:'',
+      estado: '',
+      propietario:'',
+      propietario_celular:'',
+      administrador:'',
+      administrador_celular:'',
+      correo:'',
+      ciudad: '',
+      zona:'',
       direccion:'',
       coordenadas:'',
-      referencia:'',
-      telefonos:'',
-      tipo_cliente: '',
+      equipo:'',
+      letrero:'',
     },
     // validate: {
     //   tipo_cliente: (value) => (/^\S+@\S+$/.test(value) ? null : 'Correo Inválido'),
@@ -118,6 +129,42 @@ const Page = () => {
         header: 'Nombre',
       },
       {
+        accessorKey: 'categoria',
+        header: 'Categoría',
+      },
+      {
+        accessorKey: 'estado',
+        header: 'Estado',
+      },
+      {
+        accessorKey: 'propietario',
+        header: 'Propietario',
+      },
+      {
+        accessorKey: 'propietario_celular',
+        header: 'Propietario Cel.',
+      },
+      {
+        accessorKey: 'administrador',
+        header: 'Administrador',
+      },
+      {
+        accessorKey: 'administrador_celular',
+        header: 'Administrador Cel.',
+      },
+      {
+        accessorKey: 'correo',
+        header: 'Correo',
+      },
+      {
+        accessorKey: 'ciudad',
+        header: 'Ciudad',
+      },
+      {
+        accessorKey: 'zona',
+        header: 'Zona',
+      },
+      {
         accessorKey: 'direccion',
         header: 'Dirección',
       },
@@ -136,6 +183,14 @@ const Page = () => {
       {
         accessorKey: 'tipo_cliente',
         header: 'Tipo Cliente',
+      },
+      {
+        accessorKey: 'equipo',
+        header: 'Equipo Frio',
+      },
+      {
+        accessorKey: 'letrero',
+        header: 'letrero',
       },
     ],
     [],
@@ -197,6 +252,76 @@ const Page = () => {
             key={form.key('nombre')}
             {...form.getInputProps('nombre')}
           />
+          <NativeSelect
+            label="Categoría"
+            data={['Bar', 'Cafetería', 'Complejo Deportivo', 'salón de Eventos', 'Discoteca','PUB','KARAOKE']}
+            leftSection={<IconFolder size={16} />}
+            key={form.key('categoria')}
+            {...form.getInputProps('categoria')}
+          />
+          <NativeSelect
+            label="Estado"
+            data={['COMPRA','NO COMPRA']}
+            leftSection={<IconFolder size={16} />}
+            key={form.key('estado')}
+            {...form.getInputProps('estado')}
+          />
+          <TextInput
+            label="Propietario:"
+            placeholder="Propietario"
+            type='text'
+            leftSection={<IconUser size={16} />}
+            key={form.key('propietario')}
+            {...form.getInputProps('propietario')}
+          />
+          <TextInput
+            label="Propietario Celular:"
+            placeholder="Propietario Celular"
+            type='text'
+            leftSection={<IconPhone size={16} />}
+            key={form.key('propietario_celular')}
+            {...form.getInputProps('propietario_celular')}
+          />
+          <TextInput
+            label="Administrador:"
+            placeholder="Administrador"
+            type='text'
+            leftSection={<IconUser size={16} />}
+            key={form.key('administrador')}
+            {...form.getInputProps('administrador')}
+          />
+          <TextInput
+            label="Administrador Celular:"
+            placeholder="Administrador Celular"
+            type='text'
+            leftSection={<IconPhone size={16} />}
+            key={form.key('administrador_celular')}
+            {...form.getInputProps('administrador_celular')}
+          />
+          <TextInput
+            label="Correo:"
+            placeholder="sucorreo@gmail.com"
+            type='text'
+            leftSection={<IconMail size={16} />}
+            key={form.key('correo')}
+            {...form.getInputProps('correo')}
+          />
+          <TextInput
+            label="Ciudad:"
+            placeholder="Ciudad"
+            type='text'
+            leftSection={<IconGps size={16} />}
+            key={form.key('ciudad')}
+            {...form.getInputProps('ciudad')}
+          />
+           <TextInput
+            label="Zona:"
+            placeholder="zona"
+            type='text'
+            leftSection={<IconGps size={16} />}
+            key={form.key('zona')}
+            {...form.getInputProps('zona')}
+          />
           <TextInput
             label="Direccion:"
             placeholder="Direccion"
@@ -228,6 +353,20 @@ const Page = () => {
             leftSection={<IconPhone size={16} />}
             key={form.key('telefonos')}
             {...form.getInputProps('telefonos')}
+          />
+          <NativeSelect
+            label="Equipo:"
+            data={['Propio', 'Préstamo']}
+            leftSection={<IconFolder size={16} />}
+            key={form.key('equipo')}
+            {...form.getInputProps('equipo')}
+          />
+          <NativeSelect
+            label="Letrero:"
+            data={['SI', 'NO']}
+            leftSection={<IconFolder size={16} />}
+            key={form.key('letrero')}
+            {...form.getInputProps('letrero')}
           />
           <NativeSelect
             label="Tipo Cliente"

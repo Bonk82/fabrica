@@ -92,7 +92,7 @@ body {
   color: rgb(var(--foreground-rgb));
   height: 100vh;
   background: rgb(2,9,19);
-  background: linear-gradient(7deg, #020913 0%, #072e4e 100%); 
+  background: linear-gradient(90deg, #020913 0%, #072e4e 100%); 
 }
 
 a {
@@ -110,7 +110,7 @@ a {
   background-color: transparent !important;
 }
 th{
-  background-color: teal !important;
+  background-color: var(--mantine-primary-color-filled) !important;
 }
 
 tr{
@@ -130,4 +130,12 @@ tr{
 
 .mantine-Notifications-notification{
   color: aqua;
+}
+
+.mantine-Modal-body{
+  background: linear-gradient(90deg, #020913 0%, #072e4e 100%); 
+}
+
+.mantine-Modal-header{
+  background-color: var(--mantine-primary-color-filled);
 }
