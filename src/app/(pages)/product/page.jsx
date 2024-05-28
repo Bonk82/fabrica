@@ -1,6 +1,6 @@
 'use client'
 import { useSupa } from '@/app/context/SupabaseContext';
-import { ActionIcon, Box, Button, Center, Group, LoadingOverlay, NativeSelect, NumberInput, Text, TextInput } from '@mantine/core'
+import { ActionIcon, Box, Button, Center, Group, LoadingOverlay, Modal, NativeSelect, NumberInput, Text, TextInput } from '@mantine/core'
 import { useForm } from '@mantine/form';
 import { IconAlignLeft, IconBox, IconCheck, IconDeviceFloppy, IconEdit, IconEye, IconFileBarcode, IconPlusMinus, IconReceipt2, IconRefresh, IconStack2, IconTrash } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
@@ -10,9 +10,11 @@ import { MRT_Localization_ES } from 'mantine-react-table/locales/es';
 import { notifications } from '@mantine/notifications';
 import classes from '../../toast.module.css';
 import { modals } from '@mantine/modals';
+import { useDisclosure } from '@mantine/hooks';
 
 const Page = () => {
   const { loading,usuario,createReg,productos,getReg,updateReg,deleteReg } = useSupa();
+  const [opened, { open, close }] = useDisclosure(false);
   const [id, setId] = useState(null)
   // const iAward = <IconAward/>
   useEffect(() => {
@@ -75,6 +77,7 @@ const Page = () => {
       console.log(error);
     }finally{
       form.reset();
+      close()
       setId(null)
     }
   }
@@ -109,6 +112,7 @@ const Page = () => {
 
   const mostrarRegistro = (data) =>{
     console.log('cargando data',data);
+    open()
     setId(data.id_producto);
     form.setValues(data)
   }
@@ -182,6 +186,12 @@ const Page = () => {
     localization:MRT_Localization_ES
   });
 
+  const nuevo = ()=>{
+    open()
+    setId(null)
+    form.reset()
+  }
+
 
   return (
     <div>
@@ -195,92 +205,98 @@ const Page = () => {
       <Box pos='relative'>
         <LoadingOverlay
           visible={loading}
-          zIndex={1000}
-          overlayProps={{ radius: 'lg', blur: 2 }}
-          loaderProps={{ color: 'indigo', type: 'bars' }}
+          zIndex={39}
+          overlayProps={{ radius: 'lg', blur: 4 }}
+          loaderProps={{ color: 'cyan', type: 'dots',size:'xl' }}
         />
-        <form onSubmit={form.onSubmit((values) => registrarProducto(values))}>
-          <TextInput
-            label="Código:"
-            placeholder="Código"
-            key={form.key('codigo')}
-            type='text'
-            leftSection={<IconFileBarcode size={16} />}
-            {...form.getInputProps('codigo')}
-          />
-          <NativeSelect
-            label="Categoría"
-            data={['Sólidos', 'Líquidos', 'Derivados']}
-            leftSection={<IconBox size={16} />}
-            key={form.key('categoria')}
-            {...form.getInputProps('categoria')}
-          />
-          <TextInput
-            label="Descripción:"
-            placeholder="Descripción"
-            key={form.key('descripcion')}
-            type='text'
-            leftSection={<IconAlignLeft size={16} />}
-            {...form.getInputProps('descripcion')}
-          />
-          <NativeSelect
-            label="Tipo Unidad"
-            data={['Kilo', 'Bolsa', 'Paquete']}
-            key={form.key('unidad')}
-            leftSection={<IconBox size={16} />}
-            {...form.getInputProps('unidad')}
-          />
-          <NumberInput
-            label="Existencias:"
-            placeholder="cantidad en stock"
-            key={form.key('existencia')}
-            defaultValue={0}
-            allowDecimal={false}
-            thousandSeparator=','
-            min={0}
-            leftSection={<IconStack2 size={16} />}
-            {...form.getInputProps('existencia')}
-          />
-          <NumberInput
-            label="Precio:"
-            placeholder="Precio normal de venta"
-            prefix='Bs. '
-            defaultValue={0.00}
-            decimalScale={2}
-            fixedDecimalScale
-            thousandSeparator=','
-            key={form.key('precio')}
-            leftSection={<IconReceipt2 size={16} />}
-            {...form.getInputProps('precio')}
-          />
-          <NumberInput
-            label="Promoción:"
-            placeholder="Promoción"
-            prefix='Bs. '
-            defaultValue={0.00}
-            decimalScale={2}
-            fixedDecimalScale
-            thousandSeparator=','
-            key={form.key('promocion')}
-            leftSection={<IconReceipt2 size={16} />}
-            {...form.getInputProps('promocion')}
-          />
-          <NumberInput
-            label="Pedido Mínimo:"
-            placeholder="Pedido Mínimo"
-            allowDecimal={false}
-            key={form.key('pedido_minimo')}
-            max={100}
-            min={1}
-            leftSection={<IconPlusMinus size={16} />}
-            {...form.getInputProps('pedido_minimo')}
-          />
-          <Group justify="flex-end" mt="md">
-            {!id && <Button fullWidth leftSection={<IconDeviceFloppy/>} type='submit'>Registrar Producto</Button>}
-            {id && <Button fullWidth leftSection={<IconRefresh/>} type='submit'>Actualizar Producto</Button>}
-          </Group>
-        </form>
-
+        <Modal opened={opened} onClose={close} title={id?'Actualizar Producto: '+ id:'Registrar Producto'}
+          size='lg' zIndex={20} overlayProps={{
+            backgroundOpacity: 0.55,
+            blur: 3,
+          }}>
+          <form onSubmit={form.onSubmit((values) => registrarProducto(values))}>
+            <TextInput
+              label="Código:"
+              placeholder="Código"
+              key={form.key('codigo')}
+              type='text'
+              leftSection={<IconFileBarcode size={16} />}
+              {...form.getInputProps('codigo')}
+            />
+            <NativeSelect
+              label="Categoría"
+              data={['Sólidos', 'Líquidos', 'Derivados']}
+              leftSection={<IconBox size={16} />}
+              key={form.key('categoria')}
+              {...form.getInputProps('categoria')}
+            />
+            <TextInput
+              label="Descripción:"
+              placeholder="Descripción"
+              key={form.key('descripcion')}
+              type='text'
+              leftSection={<IconAlignLeft size={16} />}
+              {...form.getInputProps('descripcion')}
+            />
+            <NativeSelect
+              label="Tipo Unidad"
+              data={['Kilo', 'Bolsa', 'Paquete']}
+              key={form.key('unidad')}
+              leftSection={<IconBox size={16} />}
+              {...form.getInputProps('unidad')}
+            />
+            <NumberInput
+              label="Existencias:"
+              placeholder="cantidad en stock"
+              key={form.key('existencia')}
+              defaultValue={0}
+              allowDecimal={false}
+              thousandSeparator=','
+              min={0}
+              leftSection={<IconStack2 size={16} />}
+              {...form.getInputProps('existencia')}
+            />
+            <NumberInput
+              label="Precio:"
+              placeholder="Precio normal de venta"
+              prefix='Bs. '
+              defaultValue={0.00}
+              decimalScale={2}
+              fixedDecimalScale
+              thousandSeparator=','
+              key={form.key('precio')}
+              leftSection={<IconReceipt2 size={16} />}
+              {...form.getInputProps('precio')}
+            />
+            <NumberInput
+              label="Promoción:"
+              placeholder="Promoción"
+              prefix='Bs. '
+              defaultValue={0.00}
+              decimalScale={2}
+              fixedDecimalScale
+              thousandSeparator=','
+              key={form.key('promocion')}
+              leftSection={<IconReceipt2 size={16} />}
+              {...form.getInputProps('promocion')}
+            />
+            <NumberInput
+              label="Pedido Mínimo:"
+              placeholder="Pedido Mínimo"
+              allowDecimal={false}
+              key={form.key('pedido_minimo')}
+              max={100}
+              min={1}
+              leftSection={<IconPlusMinus size={16} />}
+              {...form.getInputProps('pedido_minimo')}
+            />
+            <Group justify="flex-end" mt="md">
+              {!id && <Button fullWidth leftSection={<IconDeviceFloppy/>} type='submit'>Registrar Producto</Button>}
+              {id && <Button fullWidth leftSection={<IconRefresh/>} type='submit'>Actualizar Producto</Button>}
+            </Group>
+          </form>
+        </Modal>
+        <Button onClick={nuevo} style={{marginBottom:'1rem'}} size='sm'>Nuevo Producto</Button>
         <MantineReactTable table={table} />
       </Box>
     </div>

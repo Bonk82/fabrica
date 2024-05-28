@@ -19,6 +19,7 @@ export const SupabaseContextProvider = ({ children }) => {
   const [productos, setProductos] = useState([]);
   const [proveedores, setProveedores] = useState([]);
   const [pedidos, setPedidos] = useState([]);
+  const [pedidosDetalle, setPedidosDetalle] = useState([]);
   const [cuentas, setCuentas] = useState([]);
   const [transacciones, setTransacciones] = useState([]);
   const [menu, setMenu] = useState([]);
@@ -133,7 +134,6 @@ export const SupabaseContextProvider = ({ children }) => {
   const getReg = async (table,col,ascending) => {
     try {
       setLoading(true);
-      supabase.schema('seguridad')
       const {data, error}  = await supabase
         .from(table)
         .select("*")
@@ -146,6 +146,27 @@ export const SupabaseContextProvider = ({ children }) => {
       if(table == 'vw_menu_rol') setMenu(data);
       if(table == 'vw_pedido') setPedidos(data);
       // if(['prestamo','vw_prestamos'].includes(table)) setProductos(data);
+      return data;
+    } catch (error) {
+      console.log(error.error_description || error.message || error);
+      throw new Error(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getRegFilter = async (table,col,value) => {
+    console.log('lo q llega',table,col,value);
+    try {
+      setLoading(true);
+      const {data, error}  = await supabase
+        .from(table)
+        .select("*")
+        .eq(col,value)
+        .order('id_'+table.replace('vw_',''),{ ascending: true })
+      console.log(table,data,error);
+      if (error) throw new Error(error.message);
+      if(table == 'vw_pedido_detalle') setPedidosDetalle(data);
       return data;
     } catch (error) {
       console.log(error.error_description || error.message || error);
@@ -182,10 +203,11 @@ export const SupabaseContextProvider = ({ children }) => {
         .from(tabla)
         .delete()
         .eq("id_"+tabla, id);
-      if (error) throw error;
-      setClientes(clientes.filter(c => c.id !== id));
+      if (error) throw new Error(error.message);
+      // setClientes(clientes.filter(c => c.id !== id));
     } catch (error) {
       console.log(error.error_description || error.message);
+      throw new Error(error.message);
     } finally {
       setLoading(false)
     }
@@ -198,6 +220,7 @@ export const SupabaseContextProvider = ({ children }) => {
         productos,
         proveedores,
         pedidos,
+        pedidosDetalle,
         cuentas,
         transacciones,
         loading,
@@ -212,6 +235,7 @@ export const SupabaseContextProvider = ({ children }) => {
         menu,
         createReg,
         getReg,
+        getRegFilter,
         updateReg,
         deleteReg,
       }}

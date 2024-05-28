@@ -1,8 +1,8 @@
 'use client'
 import { useSupa } from '@/app/context/SupabaseContext';
-import { ActionIcon, Autocomplete, Box, Button, Center, Group, LoadingOverlay, Modal, NativeSelect, NumberInput, Select, Text, TextInput } from '@mantine/core'
+import { ActionIcon, Autocomplete, Box, Button, Center, Group, Kbd, LoadingOverlay, Modal, NativeSelect, NumberInput, Text, TextInput } from '@mantine/core'
 import { useForm } from '@mantine/form';
-import { IconAlignLeft, IconBox, IconCalendar, IconCheck, IconDeviceFloppy, IconEdit, IconEye, IconFileBarcode, IconFolder, IconPlusMinus, IconReceipt2, IconRefresh, IconStack2, IconTrash, IconUser } from '@tabler/icons-react';
+import { IconAlignLeft, IconBox, IconCalendar, IconCheck, IconDeviceFloppy, IconEdit, IconEye, IconFileBarcode, IconFolder, IconMoneybag, IconPlusMinus, IconReceipt2, IconRefresh, IconStack2, IconTrash, IconUser } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import { useMemo } from 'react';
 import { MantineReactTable, useMantineReactTable} from 'mantine-react-table';
@@ -15,9 +15,12 @@ import dayjs from 'dayjs';
 
 
 const Page = () => {
-  const { loading,usuario,createReg,pedidos,clientes,productos,getReg,updateReg,deleteReg } = useSupa();
+  const { loading,usuario,createReg,pedidos,pedidosDetalle,clientes,productos,getReg,getRegFilter,updateReg,deleteReg } = useSupa();
   const [opened, { open, close }] = useDisclosure(false);
+  const [verDetalle, setVerDetalle] = useState(false);
+  const [verGrillaDetalle, setVerGrillaDetalle] = useState(false);
   const [id, setId] = useState(null)
+  const [idDetalle, setIdDetalle] = useState(null)
   const [listaClientes, setListaClientes] = useState([])
   const [listaProductos, setListaProductos] = useState([])
   const [elCliente, setElCliente] = useState('')
@@ -43,6 +46,10 @@ const Page = () => {
     setListaProductos(pivotProductos);
     console.log('revisando listas',listaClientes,listaProductos,pivotClientes,pivotProductos);
   }
+  const cargarDetallePedido = async (value) =>{
+    console.log('¡lo q llega',value);
+    await getRegFilter('vw_pedido_detalle','fid_pedido',value);
+  }
 
   const form = useForm({
     mode: 'uncontrolled',
@@ -63,14 +70,13 @@ const Page = () => {
     //   tipo_cliente: (value) => (/^\S+@\S+$/.test(value) ? null : 'Correo Inválido'),
     // },
   });
-  const form_detalle = useForm({
+  const formDetalle = useForm({
     mode: 'uncontrolled',
     initialValues: {
-      descripcion:'',
-      nombre:'',
       cantidad_solicitada:0,
       precio_unidad:0,
       cantidad_entregada:0,
+      monto_total:0,
     }
   });
 
@@ -114,12 +120,6 @@ const Page = () => {
     delete newPedido.referencia
     delete newPedido.telefonos
     delete newPedido.tipo_cliente
-    // delete newPedido.codigo
-    // delete newPedido.descripcion
-    // delete newPedido.unidad
-    // delete newPedido.precio
-    // delete newPedido.promocion
-    // delete newPedido.pedido_minimo
     
     newPedido.fid_cliente = clientes.filter(f=>f.nombre == data.nombre)[0]?.id_cliente;
     newPedido.fid_producto = productos.filter(f=>f.id_producto == elProducto)[0]?.id_producto;
@@ -138,6 +138,36 @@ const Page = () => {
       setId(null)
     }
   }
+  const registrarPedidoDetalle = async (data) => {
+    // event.preventDefault();
+    // if(!data.id_pedido_detalle) data.id_pedido_detalle = null;
+    console.log('la data',data,id,idDetalle);
+    const newPedidoDetalle = data
+    delete newPedidoDetalle.monto_total
+    delete newPedidoDetalle.codigo
+    delete newPedidoDetalle.descripcion
+    delete newPedidoDetalle.precio
+    delete newPedidoDetalle.promocion
+    delete newPedidoDetalle.unidad
+    delete newPedidoDetalle.pedido_minimo
+    if(!idDetalle) delete newPedidoDetalle.id_pedido
+    newPedidoDetalle.fid_producto = productos.filter(f=>f.id_producto == elProducto)[0]?.id_producto;
+    newPedidoDetalle.fid_pedido = id
+    
+    console.log('new pedido_detalle',newPedidoDetalle,id,idDetalle);
+    try {
+      idDetalle ? await updateReg('pedido_detalle',newPedidoDetalle) : await createReg(newPedidoDetalle,'pedido_detalle');
+      cargarDetallePedido(id);
+      toast('Control Pedido',`Detalle ${idDetalle? 'actualziado': 'registrado'} satisfactoriamente!`,'success')
+    } catch (error) {
+      toast('Control Pedido',error.message || error,'error')
+      console.log(error);
+    }finally{
+      formDetalle.reset();
+      setVerDetalle(false)
+      setIdDetalle(null)
+    }
+  }
 
   const confirmar = (e)=>{
     modals.openConfirmModal({
@@ -148,22 +178,24 @@ const Page = () => {
         Está seguro de ELIMINAR el pedido: <strong>{e.id_pedido}</strong>
         </Text>
       ),
-      labels: { confirm: 'Eliminar Pedido', cancel: "Cancelar" },
+      labels: { confirm: `Eliminar ${e.id_pedido ? 'Pedido' : 'Producto'}`, cancel: "Cancelar" },
       confirmProps: { color: 'red' },
       onCancel: () => console.log('Cancel'),
-      onConfirm: () => onDeletePedido(e),
+      onConfirm: () => onDelete(e),
     });
   }
 
-  const onDeletePedido = async(e) => {
+  const onDelete = async(e) => {
     console.log('delete pedido',e);
+    const tabla = e.id_pedido ? 'pedido':'pedido_detalle'
+    const elId = e.id_pedido ? e.id_pedido:e.id_pedido_detalle
     try {
-      await deleteReg('pedido',e.id_pedido);
-      toast('Control Pedido',`Pedido eliminado satisfactoriamente!`,'success')
+      await deleteReg(tabla,elId);
+      toast('Control Pedido',`${e.id_pedido ? 'Pedido' : 'Producto'} eliminado satisfactoriamente!`,'success')
     } catch (error) {
       toast('Control Pedido',error.message || error,'error')
     } finally{
-      cargarData()
+      e.id_pedido ? cargarData() : cargarDetallePedido(id)
     } 
   }
 
@@ -172,7 +204,17 @@ const Page = () => {
     open()
     setId(data.id_pedido);
     form.setValues(data)
+    // setElProducto(data.fid_producto)
+  }
+
+  const mostrarRegistroDetalle = (data) =>{
+    console.log('cargando data',data,listaProductos);
+    setVerDetalle(true)
+    setIdDetalle(data.id_pedido_detalle);
+    setId(data.fid_pedido);
+    formDetalle.setValues(data)
     setElProducto(data.fid_producto)
+    formDetalle.setFieldValue('monto_total', (data.precio || 0) * data.cantidad_solicitada )
   }
 
   const columns = useMemo(
@@ -231,7 +273,7 @@ const Page = () => {
     [],
   );
 
-  const col_detalle = useMemo(
+  const colDetalle = useMemo(
     () => [
       {
         accessorKey: 'fid_pedido',
@@ -249,7 +291,10 @@ const Page = () => {
         accessorKey: 'precio_unidad',
         header: 'Precio Unitario',
         Cell:({cell})=>(
-          <span>{cell.getValue()?.toLocaleString('es-Es', { style: 'currency', currency: 'BOB' })}</span>
+          <span>
+            {cell.getValue().toLocaleString('es-Es', { style: 'currency', currency: 'BOB'
+            ,minimumFractionDigits: 2, maximumFractionDigits: 2, })}
+          </span>
         )
       },
       {
@@ -260,8 +305,19 @@ const Page = () => {
     [],
   );
 
-
-
+  const mostrarGrillaPedido = (data,tipo)=>{
+    console.log('ladata',data);
+    if(id == data.id_pedido && verGrillaDetalle){
+      setVerGrillaDetalle(false)
+      setId(null)
+      return true
+    }
+    setId(data.id_pedido)
+    setVerGrillaDetalle(true)
+    cargarDetallePedido(data.id_pedido)
+    // if(tipo=='nuevo') setVerDetalle(true)
+    // if(tipo=='grilla') setVerGrillaDetalle(true)
+  }
   const table = useMantineReactTable({
     columns,
     data: pedidos, 
@@ -272,11 +328,14 @@ const Page = () => {
     },
     initialState: {
       density: 'xs',
+      columnPinning: {
+        left: ['mrt-row-expand'],
+      },
     },
     enableRowActions: true,
     renderRowActions: ({ row }) => (
       <Box style={{gap:'1rem'}}>
-        <ActionIcon variant="subtle" onClick={() => mostrarRegistro(row.original)} title='Detalle Pedido'>
+        <ActionIcon variant="subtle" onClick={() => mostrarGrillaPedido(row.original)} title='Ver detalle del pedido'>
           <IconEye color='skyblue' />
         </ActionIcon>
         <ActionIcon variant="subtle" onClick={() => mostrarRegistro(row.original)} title='Editar Pedido'>
@@ -293,20 +352,71 @@ const Page = () => {
     mantineTableProps:{
       striped: true,
     },
+    localization:MRT_Localization_ES,
+    // enableColumnResizing:true,
+    renderDetailPanel:({row}) => (
+      <Box
+        sx={{
+          alignItems: 'center',
+          display: 'flex',
+          justifyContent: 'space-around',
+          width: '100%',
+        }}
+      >
+        <h2>{row.original.nombre}</h2>
+        <p>{row.original.direccion} {row.original.referencia}</p>
+        <strong>{row.original.telefonos}</strong><br />
+        <Kbd>{row.original.tipo_cliente}</Kbd>
+      </Box>
+    )
+  });
+
+  const tableDetalle = useMantineReactTable({
+    columns:colDetalle,
+    data: pedidosDetalle, 
+    defaultColumn: {
+      minSize: 40, 
+      maxSize: 100, 
+      size: 60,
+    },
+    initialState: {
+      density: 'xs',
+    },
+    enableRowActions: true,
+    renderRowActions: ({ row }) => (
+      <Box style={{gap:'1rem'}}>
+        <ActionIcon variant="subtle" onClick={() => mostrarRegistroDetalle(row.original)} title='Editar porducto en pedido'>
+          <IconEdit color='orange' />
+        </ActionIcon>
+        <ActionIcon variant="subtle" onClick={() => confirmar(row.original)} title='Eliminar producto del pedido'>
+          <IconTrash color='red' />
+        </ActionIcon>
+      </Box>
+    ),
+    mantineTableHeadCellProps:{
+      color:'cyan'
+    },
+    mantineTableProps:{
+      striped: true,
+    },
     localization:MRT_Localization_ES
   });
 
   const handdlerProduct = (v)=>{
     const elPrecio =  productos.filter(f=> f.id_producto == v)[0]?.precio;
-    console.log('el precio',elPrecio,form.getValues(),v);
-    form.setValues({precio:form.getValues().cantidad_solicitada * (elPrecio || 0)})
+    // formDetalle.setValues({precio:formDetalle.getValues().cantidad_solicitada * (elPrecio || 0)})
+    formDetalle.setFieldValue('precio_unidad', elPrecio)
+    formDetalle.setFieldValue('monto_total', (elPrecio || 0) * formDetalle.getValues().cantidad_solicitada )
     setElProducto(v)
+    console.log('handdlerProduct-el precio',elPrecio,formDetalle.getValues(),v);
   }
 
   const handdleCantidad = ()=>{
     const elPrecio =  productos.filter(f=> f.id_producto == elProducto)[0]?.precio;
-    console.log('el precio',elPrecio,form.getValues());
-    form.setFieldValue('precio', form.getValues().cantidad_solicitada * (elPrecio || 0))
+    console.log('el precio',elPrecio,formDetalle.getValues());
+    // form.setFieldValue('precio', form.getValues().cantidad_solicitada * (elPrecio || 0))
+    formDetalle.setFieldValue('cantidad_entregada', formDetalle.getValues().cantidad_solicitada)
+    formDetalle.setFieldValue('monto_total', (elPrecio || 0) * formDetalle.getValues().cantidad_solicitada )
   }
 
   const nuevo = ()=>{
@@ -315,7 +425,14 @@ const Page = () => {
     form.reset()
     form.setFieldValue('estado_pedido','SOLICITADO')
   }
-
+  const nuevoDetalle = ()=>{
+    console.log('nuevo detalle');
+    setVerDetalle(true)
+    setIdDetalle(null)
+    // setId(value.id_pedido)
+    formDetalle.reset()
+    // formDetalle.setFieldValue('estado_pedido','SOLICITADO')
+  }
 
   return (
     <div>
@@ -524,9 +641,84 @@ const Page = () => {
           </form>
         </Modal>
 
-        <Button onClick={nuevo} style={{marginBottom:'2rem'}} size='sm'>Nuevo Pedido</Button>
+        <Modal opened={verDetalle} onClose={()=>setVerDetalle(false)} title={idDetalle?'Actualizar Detalle: '+ id:'Registrar Detalle'}
+          size='md' zIndex={20} overlayProps={{
+            backgroundOpacity: 0.55,
+            blur: 3,
+          }}>
+          <form onSubmit={formDetalle.onSubmit((values) => registrarPedidoDetalle(values))}>
+            <NativeSelect
+              label="Producto:"
+              data={listaProductos}
+              leftSection={<IconBox size={16} />}
+              value={elProducto}
+              onChange={e=>handdlerProduct(e.currentTarget.value)}
+              // onChangeCapture={e=>actualizarPrecio(e)}
+              // key={form.key('fid_producto')}
+              // {...form.getInputProps('fid_producto')}
+            />
+            <NumberInput
+              label="Cantidad Solicitada:"
+              placeholder="10"
+              allowDecimal={false}
+              max={500}
+              min={1}
+              leftSection={<IconPlusMinus size={16} />}
+              required
+              onValueChange={handdleCantidad}
+              key={formDetalle.key('cantidad_solicitada')}
+              {...formDetalle.getInputProps('cantidad_solicitada')}
+            />
+            <NumberInput
+              label="precio_unidad:"
+              placeholder="precio_unidad"
+              prefix='Bs. '
+              defaultValue={0.00}
+              decimalScale={2}
+              fixedDecimalScale
+              thousandSeparator=','
+              leftSection={<IconReceipt2 size={16} />}
+              required
+              key={formDetalle.key('precio_unidad')}
+              {...formDetalle.getInputProps('precio_unidad')}
+            />
+            <NumberInput
+              label="Cantidad Entregada:"
+              allowDecimal={false}
+              max={500}
+              min={1}
+              leftSection={<IconPlusMinus size={16} />}
+              key={formDetalle.key('cantidad_entregada')}
+              {...formDetalle.getInputProps('cantidad_entregada')}
+            />
+            <NumberInput
+              label="Monto total producto:"
+              prefix='Bs. '
+              defaultValue={0.00}
+              decimalScale={2}
+              fixedDecimalScale
+              thousandSeparator=','
+              readOnly
+              leftSection={<IconMoneybag size={16} />}
+              key={formDetalle.key('monto_total')}
+              {...formDetalle.getInputProps('monto_total')}
+            />
+            <Group justify="flex-end" mt="md">
+              {!idDetalle && <Button fullWidth leftSection={<IconDeviceFloppy/>} type='submit'>Registrar Detalle</Button>}
+              {idDetalle && <Button fullWidth leftSection={<IconRefresh/>} type='submit'>Actualizar Detalle</Button>}
+            </Group>
+          </form>
+        </Modal>
+
+        <Button onClick={nuevo} style={{marginBottom:'1rem'}} size='sm'>Nuevo Pedido</Button>
 
         <MantineReactTable table={table} />
+
+        {verGrillaDetalle && <Box>
+          <Button onClick={nuevoDetalle} style={{margin:'1rem 0'}} size='sm'>Agregar Producto</Button>
+
+          <MantineReactTable table={tableDetalle} />
+        </Box>}
       </Box>
     </div>
   )

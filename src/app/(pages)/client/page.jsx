@@ -1,6 +1,6 @@
 'use client'
 import { useSupa } from '@/app/context/SupabaseContext';
-import { ActionIcon, Box, Button, Center, Group, LoadingOverlay, NativeSelect, Text, TextInput } from '@mantine/core'
+import { ActionIcon, Box, Button, Center, Group, LoadingOverlay, Modal, NativeSelect, Text, TextInput } from '@mantine/core'
 import { useForm } from '@mantine/form';
 import { IconBuilding, IconCheck, IconDeviceFloppy, IconEdit, IconEye, IconFolder, IconGps, IconMail, IconMap, IconMapSearch, IconPhone, IconRefresh, IconTrash, IconUser } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
@@ -10,9 +10,11 @@ import { MRT_Localization_ES } from 'mantine-react-table/locales/es';
 import { notifications } from '@mantine/notifications';
 import classes from '../../toast.module.css';
 import { modals } from '@mantine/modals';
+import { useDisclosure } from '@mantine/hooks';
 
 const Page = () => {
   const { loading,usuario,createReg,clientes,getReg,updateReg,deleteReg } = useSupa();
+  const [opened, { open, close }] = useDisclosure(false);
   const [id, setId] = useState(null)
   
   useEffect(() => {
@@ -84,6 +86,7 @@ const Page = () => {
       console.log(error);
     }finally{
       form.reset();
+      close()
       setId(null)
     }
   }
@@ -118,7 +121,8 @@ const Page = () => {
 
   const mostrarRegistro = (data) =>{
     console.log('cargando data',data);
-    setId(data.id_cliente);
+    open()
+    setId(data.id_cliente)
     form.setValues(data)
   }
 
@@ -227,6 +231,12 @@ const Page = () => {
     localization:MRT_Localization_ES
   });
 
+  const nuevo = ()=>{
+    open()
+    setId(null)
+    form.reset()
+  }
+
   return (
     <div>
       <Center>
@@ -239,147 +249,155 @@ const Page = () => {
       <Box pos='relative'>
         <LoadingOverlay
           visible={loading}
-          zIndex={1000}
-          overlayProps={{ radius: 'lg', blur: 2 }}
-          loaderProps={{ color: 'indigo', type: 'bars' }}
+          zIndex={39}
+          overlayProps={{ radius: 'lg', blur: 4 }}
+          loaderProps={{ color: 'cyan', type: 'dots',size:'xl' }}
         />
-        <form onSubmit={form.onSubmit((values) => registrarCliente(values))}>
-          <TextInput
-            label="Nombre:"
-            placeholder="Nombre"
-            type='text'
-            leftSection={<IconUser size={16} />}
-            key={form.key('nombre')}
-            {...form.getInputProps('nombre')}
-          />
-          <NativeSelect
-            label="Categoría"
-            data={['Bar', 'Cafetería', 'Complejo Deportivo', 'salón de Eventos', 'Discoteca','PUB','KARAOKE']}
-            leftSection={<IconFolder size={16} />}
-            key={form.key('categoria')}
-            {...form.getInputProps('categoria')}
-          />
-          <NativeSelect
-            label="Estado"
-            data={['COMPRA','NO COMPRA']}
-            leftSection={<IconFolder size={16} />}
-            key={form.key('estado')}
-            {...form.getInputProps('estado')}
-          />
-          <TextInput
-            label="Propietario:"
-            placeholder="Propietario"
-            type='text'
-            leftSection={<IconUser size={16} />}
-            key={form.key('propietario')}
-            {...form.getInputProps('propietario')}
-          />
-          <TextInput
-            label="Propietario Celular:"
-            placeholder="Propietario Celular"
-            type='text'
-            leftSection={<IconPhone size={16} />}
-            key={form.key('propietario_celular')}
-            {...form.getInputProps('propietario_celular')}
-          />
-          <TextInput
-            label="Administrador:"
-            placeholder="Administrador"
-            type='text'
-            leftSection={<IconUser size={16} />}
-            key={form.key('administrador')}
-            {...form.getInputProps('administrador')}
-          />
-          <TextInput
-            label="Administrador Celular:"
-            placeholder="Administrador Celular"
-            type='text'
-            leftSection={<IconPhone size={16} />}
-            key={form.key('administrador_celular')}
-            {...form.getInputProps('administrador_celular')}
-          />
-          <TextInput
-            label="Correo:"
-            placeholder="sucorreo@gmail.com"
-            type='text'
-            leftSection={<IconMail size={16} />}
-            key={form.key('correo')}
-            {...form.getInputProps('correo')}
-          />
-          <TextInput
-            label="Ciudad:"
-            placeholder="Ciudad"
-            type='text'
-            leftSection={<IconGps size={16} />}
-            key={form.key('ciudad')}
-            {...form.getInputProps('ciudad')}
-          />
-           <TextInput
-            label="Zona:"
-            placeholder="zona"
-            type='text'
-            leftSection={<IconGps size={16} />}
-            key={form.key('zona')}
-            {...form.getInputProps('zona')}
-          />
-          <TextInput
-            label="Direccion:"
-            placeholder="Direccion"
-            type='text'
-            leftSection={<IconGps size={16} />}
-            key={form.key('direccion')}
-            {...form.getInputProps('direccion')}
-          />
-          <TextInput
-            label="Coordenadas:"
-            placeholder="Coordenadas"
-            type='text'
-            leftSection={<IconMapSearch size={16} />}
-            key={form.key('coordenadas')}
-            {...form.getInputProps('coordenadas')}
-          />
-          <TextInput
-            label="referencia:"
-            placeholder="referencia"
-            type='text'
-            leftSection={<IconBuilding size={16} />}
-            key={form.key('referencia')}
-            {...form.getInputProps('referencia')}
-          />
-          <TextInput
-            label="Telefonos:"
-            placeholder="Telefonos"
-            type='text'
-            leftSection={<IconPhone size={16} />}
-            key={form.key('telefonos')}
-            {...form.getInputProps('telefonos')}
-          />
-          <NativeSelect
-            label="Equipo:"
-            data={['Propio', 'Préstamo']}
-            leftSection={<IconFolder size={16} />}
-            key={form.key('equipo')}
-            {...form.getInputProps('equipo')}
-          />
-          <NativeSelect
-            label="Letrero:"
-            data={['SI', 'NO']}
-            leftSection={<IconFolder size={16} />}
-            key={form.key('letrero')}
-            {...form.getInputProps('letrero')}
-          />
-          <NativeSelect
-            label="Tipo Cliente"
-            data={['Eventual', 'Descuento', 'Pago Semanal']}
-            leftSection={<IconFolder size={16} />}
-            key={form.key('tipo_cliente')}
-            {...form.getInputProps('tipo_cliente')}
-          />
-          <Group justify="flex-end" mt="md">
-            {!id && <Button fullWidth leftSection={<IconDeviceFloppy/>} type='submit'>Registrar Cliente</Button>}
-            {id && <Button fullWidth leftSection={<IconRefresh/>} type='submit'>Actualizar Cliente</Button>}
-          </Group>
-        </form>
+        <Modal opened={opened} onClose={close} title={id?'Actualizar Cliente: '+ id:'Registrar Cliente'}
+          size='lg' zIndex={20} overlayProps={{
+            backgroundOpacity: 0.55,
+            blur: 3,
+          }}>
+          <form onSubmit={form.onSubmit((values) => registrarCliente(values))}>
+            <TextInput
+              label="Nombre:"
+              placeholder="Nombre"
+              type='text'
+              leftSection={<IconUser size={16} />}
+              key={form.key('nombre')}
+              {...form.getInputProps('nombre')}
+            />
+            <NativeSelect
+              label="Categoría"
+              data={['Bar', 'Cafetería', 'Complejo Deportivo', 'salón de Eventos', 'Discoteca','PUB','KARAOKE']}
+              leftSection={<IconFolder size={16} />}
+              key={form.key('categoria')}
+              {...form.getInputProps('categoria')}
+            />
+            <NativeSelect
+              label="Estado"
+              data={['COMPRA','NO COMPRA']}
+              leftSection={<IconFolder size={16} />}
+              key={form.key('estado')}
+              {...form.getInputProps('estado')}
+            />
+            <TextInput
+              label="Propietario:"
+              placeholder="Propietario"
+              type='text'
+              leftSection={<IconUser size={16} />}
+              key={form.key('propietario')}
+              {...form.getInputProps('propietario')}
+            />
+            <TextInput
+              label="Propietario Celular:"
+              placeholder="Propietario Celular"
+              type='text'
+              leftSection={<IconPhone size={16} />}
+              key={form.key('propietario_celular')}
+              {...form.getInputProps('propietario_celular')}
+            />
+            <TextInput
+              label="Administrador:"
+              placeholder="Administrador"
+              type='text'
+              leftSection={<IconUser size={16} />}
+              key={form.key('administrador')}
+              {...form.getInputProps('administrador')}
+            />
+            <TextInput
+              label="Administrador Celular:"
+              placeholder="Administrador Celular"
+              type='text'
+              leftSection={<IconPhone size={16} />}
+              key={form.key('administrador_celular')}
+              {...form.getInputProps('administrador_celular')}
+            />
+            <TextInput
+              label="Correo:"
+              placeholder="sucorreo@gmail.com"
+              type='text'
+              leftSection={<IconMail size={16} />}
+              key={form.key('correo')}
+              {...form.getInputProps('correo')}
+            />
+            <TextInput
+              label="Ciudad:"
+              placeholder="Ciudad"
+              type='text'
+              leftSection={<IconGps size={16} />}
+              key={form.key('ciudad')}
+              {...form.getInputProps('ciudad')}
+            />
+            <TextInput
+              label="Zona:"
+              placeholder="zona"
+              type='text'
+              leftSection={<IconGps size={16} />}
+              key={form.key('zona')}
+              {...form.getInputProps('zona')}
+            />
+            <TextInput
+              label="Direccion:"
+              placeholder="Direccion"
+              type='text'
+              leftSection={<IconGps size={16} />}
+              key={form.key('direccion')}
+              {...form.getInputProps('direccion')}
+            />
+            <TextInput
+              label="Coordenadas:"
+              placeholder="Coordenadas"
+              type='text'
+              leftSection={<IconMapSearch size={16} />}
+              key={form.key('coordenadas')}
+              {...form.getInputProps('coordenadas')}
+            />
+            <TextInput
+              label="referencia:"
+              placeholder="referencia"
+              type='text'
+              leftSection={<IconBuilding size={16} />}
+              key={form.key('referencia')}
+              {...form.getInputProps('referencia')}
+            />
+            <TextInput
+              label="Telefonos:"
+              placeholder="Telefonos"
+              type='text'
+              leftSection={<IconPhone size={16} />}
+              key={form.key('telefonos')}
+              {...form.getInputProps('telefonos')}
+            />
+            <NativeSelect
+              label="Equipo:"
+              data={['Propio', 'Préstamo']}
+              leftSection={<IconFolder size={16} />}
+              key={form.key('equipo')}
+              {...form.getInputProps('equipo')}
+            />
+            <NativeSelect
+              label="Letrero:"
+              data={['SI', 'NO']}
+              leftSection={<IconFolder size={16} />}
+              key={form.key('letrero')}
+              {...form.getInputProps('letrero')}
+            />
+            <NativeSelect
+              label="Tipo Cliente"
+              data={['Eventual', 'Descuento', 'Pago Semanal']}
+              leftSection={<IconFolder size={16} />}
+              key={form.key('tipo_cliente')}
+              {...form.getInputProps('tipo_cliente')}
+            />
+            <Group justify="flex-end" mt="md">
+              {!id && <Button fullWidth leftSection={<IconDeviceFloppy/>} type='submit'>Registrar Cliente</Button>}
+              {id && <Button fullWidth leftSection={<IconRefresh/>} type='submit'>Actualizar Cliente</Button>}
+            </Group>
+          </form>
+        </Modal>
+        
+        <Button onClick={nuevo} style={{marginBottom:'1rem'}} size='sm'>Nuevo Pedido</Button>
 
         <MantineReactTable table={table} />
       </Box>

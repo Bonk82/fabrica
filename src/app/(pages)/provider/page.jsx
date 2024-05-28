@@ -1,6 +1,6 @@
 'use client'
 import { useSupa } from '@/app/context/SupabaseContext';
-import { ActionIcon, Box, Button, Center, Group, LoadingOverlay, NativeSelect, NumberInput, Text, TextInput } from '@mantine/core'
+import { ActionIcon, Box, Button, Center, Group, LoadingOverlay, Modal, NativeSelect, NumberInput, Text, TextInput } from '@mantine/core'
 import { useForm } from '@mantine/form';
 import { IconBuilding, IconCashBanknote, IconCheck, IconDeviceFloppy, IconEdit, IconEye, IconGps, IconPhone, IconRefresh, IconTrash, IconUser } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
@@ -10,9 +10,11 @@ import { MRT_Localization_ES } from 'mantine-react-table/locales/es';
 import { notifications } from '@mantine/notifications';
 import classes from '../../toast.module.css';
 import { modals } from '@mantine/modals';
+import { useDisclosure } from '@mantine/hooks';
 
 const Page = () => {
   const { loading,usuario,createReg,proveedores,getReg,updateReg,deleteReg } = useSupa();
+  const [opened, { open, close }] = useDisclosure(false);
   const [id, setId] = useState(null)
 
   useEffect(() => {
@@ -72,6 +74,7 @@ const Page = () => {
       console.log(error);
     }finally{
       form.reset();
+      close()
       setId(null)
     }
   }
@@ -106,6 +109,7 @@ const Page = () => {
 
   const mostrarRegistro = (data) =>{
     console.log('cargando data',data);
+    open()
     setId(data.id_proveedor);
     form.setValues(data)
   }
@@ -167,6 +171,11 @@ const Page = () => {
     localization:MRT_Localization_ES
   });
 
+  const nuevo = ()=>{
+    open()
+    setId(null)
+    form.reset()
+  }
 
   return (
     <div>
@@ -180,57 +189,63 @@ const Page = () => {
       <Box pos='relative'>
         <LoadingOverlay
           visible={loading}
-          zIndex={1000}
-          overlayProps={{ radius: 'lg', blur: 2 }}
-          loaderProps={{ color: 'indigo', type: 'bars' }}
+          zIndex={39}
+          overlayProps={{ radius: 'lg', blur: 4 }}
+          loaderProps={{ color: 'cyan', type: 'dots',size:'xl' }}
         />
-        <form onSubmit={form.onSubmit((values) => registrarProveedor(values))}>
-          <TextInput
-            label="Nombre:"
-            placeholder="Nombre del cliente o empresa"
-            type='text'
-            leftSection={<IconUser size={16} />}
-            key={form.key('nombre')}
-            {...form.getInputProps('nombre')}
-          />
-          <TextInput
-            label="Dirección:"
-            placeholder="Dirección del local"
-            type='text'
-            leftSection={<IconGps size={16} />}
-            key={form.key('direccion')}
-            {...form.getInputProps('direccion')}
-          />
-          <TextInput
-            label="Referencia:"
-            placeholder="referecnias para llegar al local"
-            leftSection={<IconBuilding size={16} />}
-            type='text'
-            key={form.key('referencia')}
-            {...form.getInputProps('referencia')}
-          />
-          <TextInput
-            label="Teléfonos:"
-            placeholder="70611111"
-            leftSection={<IconPhone size={16} />}
-            key={form.key('telefonos')}
-            type='number'
-            {...form.getInputProps('telefonos')}
-          />
-          <NumberInput
-            label="Cuenta Bancaria:"
-            placeholder="le numero de cuenta bancaria"
-            allowDecimal={false}
-            leftSection={<IconCashBanknote size={16} />}
-            key={form.key('cuenta')}
-            {...form.getInputProps('cuenta')}
-          />
-          <Group justify="flex-end" mt="md">
-            {!id && <Button fullWidth leftSection={<IconDeviceFloppy/>} type='submit'>Registrar Proveedor</Button>}
-            {id && <Button fullWidth leftSection={<IconRefresh/>} type='submit'>Actualizar Proveedor</Button>}
-          </Group>
-        </form>
-
+        <Modal opened={opened} onClose={close} title={id?'Actualizar Proveedor: '+ id:'Registrar Proveedor'}
+          size='lg' zIndex={20} overlayProps={{
+            backgroundOpacity: 0.55,
+            blur: 3,
+          }}>
+          <form onSubmit={form.onSubmit((values) => registrarProveedor(values))}>
+            <TextInput
+              label="Nombre:"
+              placeholder="Nombre del cliente o empresa"
+              type='text'
+              leftSection={<IconUser size={16} />}
+              key={form.key('nombre')}
+              {...form.getInputProps('nombre')}
+            />
+            <TextInput
+              label="Dirección:"
+              placeholder="Dirección del local"
+              type='text'
+              leftSection={<IconGps size={16} />}
+              key={form.key('direccion')}
+              {...form.getInputProps('direccion')}
+            />
+            <TextInput
+              label="Referencia:"
+              placeholder="referecnias para llegar al local"
+              leftSection={<IconBuilding size={16} />}
+              type='text'
+              key={form.key('referencia')}
+              {...form.getInputProps('referencia')}
+            />
+            <TextInput
+              label="Teléfonos:"
+              placeholder="70611111"
+              leftSection={<IconPhone size={16} />}
+              key={form.key('telefonos')}
+              type='number'
+              {...form.getInputProps('telefonos')}
+            />
+            <NumberInput
+              label="Cuenta Bancaria:"
+              placeholder="le numero de cuenta bancaria"
+              allowDecimal={false}
+              leftSection={<IconCashBanknote size={16} />}
+              key={form.key('cuenta')}
+              {...form.getInputProps('cuenta')}
+            />
+            <Group justify="flex-end" mt="md">
+              {!id && <Button fullWidth leftSection={<IconDeviceFloppy/>} type='submit'>Registrar Proveedor</Button>}
+              {id && <Button fullWidth leftSection={<IconRefresh/>} type='submit'>Actualizar Proveedor</Button>}
+            </Group>
+          </form>
+        </Modal>
+        <Button onClick={nuevo} style={{marginBottom:'1rem'}} size='sm'>Nuevo Proveedor</Button>
         <MantineReactTable table={table} />
       </Box>
     </div>

@@ -231,7 +231,7 @@
 
 
 
-
+/* 
 .root {
   background-color: var(--notification-color, var(--mantine-primary-color-filled));
 
@@ -251,4 +251,4 @@
   @mixin hover {
     background-color: rgba(0, 0, 0, 0.1);
   }
-}
+} */
