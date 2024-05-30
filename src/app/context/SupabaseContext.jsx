@@ -145,6 +145,7 @@ export const SupabaseContextProvider = ({ children }) => {
       if(table == 'proveedor') setProveedores(data);
       if(table == 'vw_menu_rol') setMenu(data);
       if(table == 'vw_pedido') setPedidos(data);
+      if(table == 'cuenta') setCuentas(data);
       // if(['prestamo','vw_prestamos'].includes(table)) setProductos(data);
       return data;
     } catch (error) {

@@ -2,7 +2,7 @@
 import { useSupa } from '@/app/context/SupabaseContext';
 import { ActionIcon, Box, Button, Center, Group, LoadingOverlay, Modal, NativeSelect, NumberInput, Text, TextInput } from '@mantine/core'
 import { useForm } from '@mantine/form';
-import { IconBuilding, IconCashBanknote, IconCheck, IconDeviceFloppy, IconEdit, IconEye, IconGps, IconPhone, IconRefresh, IconTrash, IconUser } from '@tabler/icons-react';
+import { IconBuilding, IconCashBanknote, IconCheck, IconCode, IconDeviceFloppy, IconEdit, IconEye, IconGps, IconPhone, IconRefresh, IconSection, IconTrash, IconUser } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import { useMemo } from 'react';
 import { MantineReactTable, useMantineReactTable} from 'mantine-react-table';
@@ -13,7 +13,7 @@ import { modals } from '@mantine/modals';
 import { useDisclosure } from '@mantine/hooks';
 
 const Page = () => {
-  const { loading,usuario,createReg,proveedores,getReg,updateReg,deleteReg } = useSupa();
+  const { loading,usuario,createReg,cuentas,getReg,updateReg,deleteReg } = useSupa();
   const [opened, { open, close }] = useDisclosure(false);
   const [id, setId] = useState(null)
 
@@ -23,17 +23,17 @@ const Page = () => {
   }, [])
   
   const cargarData = async () =>{
-    await getReg('proveedor','id_proveedor',false);
+    await getReg('cuenta','id_cuenta',true);
   }
 
   const form = useForm({
     mode: 'uncontrolled',
     initialValues: {
-      nombre:'',
-      direccion:'',
-      referencia:'',
-      telefonos:'',
-      cuenta:'',
+      codigo:'',
+      descripcion:'',
+      categoria:'',
+      tipo_cuenta:'',
+      saldo:0,
     },
     // validate: {
     //   tipo_cliente: (value) => (/^\S+@\S+$/.test(value) ? null : 'Correo Inválido'),
@@ -43,7 +43,7 @@ const Page = () => {
   const toast = (title,message,type) =>{
     // return <Toast title='el totulo' message='el mensaje' type='error'/>
     let color = type
-    if(type == 'success') color = 'teal.8';
+    if(type == 'success') color = 'lime.8';
     if(type == 'info') color = 'cyan.8';
     if(type == 'warning') color = 'yellow.8';
     if(type == 'error') color = 'red.8';
@@ -55,22 +55,22 @@ const Page = () => {
     })
   }
 
-  const registrarProveedor = async (data) => {
+  const registrarCuenta = async (data) => {
     // event.preventDefault();
     console.log('la data',data);
-    const newProveedor = {
+    const newCuenta = {
       ...data,
       usuario_registro:usuario?.id,
       fecha_registro:new Date(),
       activo:1
     }
-    console.log('new proveedor',newProveedor,id);
+    console.log('new cuenta',newCuenta,id);
     try {
-      id ? await updateReg('proveedor',newProveedor) : await createReg(newProveedor,'proveedor');
+      id ? await updateReg('cuenta',newCuenta) : await createReg(newCuenta,'cuenta');
       cargarData();
-      toast('Control Proveedor',`Proveedor ${id? 'actualziado': 'registrado'} satisfactoriamente!`,'success')
+      toast('Control Cuenta',`Cuenta ${id? 'actualziada': 'registrada'} satisfactoriamente!`,'success')
     } catch (error) {
-      toast('Control Proveedor',error.message || error,'error')
+      toast('Control Cuenta',error.message || error,'error')
       console.log(error);
     }finally{
       form.reset();
@@ -85,23 +85,23 @@ const Page = () => {
       centered: true,
       children: (
         <Text size="sm">
-        Está seguro de ELIMINAR el proveedor: <strong>{e.nombre.toUpperCase()}</strong>
+        Está seguro de ELIMINAR la cuenta: <strong>{e.descripcion.toUpperCase()}</strong>
         </Text>
       ),
-      labels: { confirm: 'Eliminar Proveedor', cancel: "Cancelar" },
+      labels: { confirm: 'Eliminar Cuenta', cancel: "Cancelar" },
       confirmProps: { color: 'red' },
       onCancel: () => console.log('Cancel'),
-      onConfirm: () => onDeleteProveedor(e),
+      onConfirm: () => onDeleteCuenta(e),
     });
   }
 
-  const onDeleteProveedor = async(e) => {
-    console.log('delete proveedor',e);
+  const onDeleteCuenta = async(e) => {
+    console.log('delete cuenta',e);
     try {
-      await deleteReg('proveedor',e.id_proveedor);
-      toast('Control Proveedor',`Proveedor eliminado satisfactoriamente!`,'success')
+      await deleteReg('cuenta',e.id_cuenta);
+      toast('Control Cuenta',`Cuenta eliminada satisfactoriamente!`,'success')
     } catch (error) {
-      toast('Control Proveedor',error.message || error,'error')
+      toast('Control Cuenta',error.message || error,'error')
     } finally{
       cargarData()
     } 
@@ -110,31 +110,31 @@ const Page = () => {
   const mostrarRegistro = (data) =>{
     console.log('cargando data',data);
     open()
-    setId(data.id_proveedor);
+    setId(data.id_cuenta);
     form.setValues(data)
   }
 
   const columns = useMemo(
     () => [
       {
-        accessorKey: 'nombre',
-        header: 'Nombre',
+        accessorKey: 'codigo',
+        header: 'Código',
       },
       {
-        accessorKey: 'direccion',
-        header: 'Dirección',
+        accessorKey: 'descripcion',
+        header: 'Descripción',
       },
       {
-        accessorKey: 'referencia',
-        header: 'Referencia',
+        accessorKey: 'categoria',
+        header: 'Categoría',
       },
       {
-        accessorKey: 'telefonos',
-        header: 'Teléfonos',
+        accessorKey: 'tipo_cuenta',
+        header: 'Tipo de Cuenta',
       },
       {
-        accessorKey: 'cuenta',
-        header: 'Cuenta Bancaria',
+        accessorKey: 'saldo',
+        header: 'Saldo Actual',
       },
     ],
     [],
@@ -142,7 +142,7 @@ const Page = () => {
 
   const table = useMantineReactTable({
     columns,
-    data: proveedores, 
+    data: cuentas, 
     defaultColumn: {
       minSize: 50, 
       maxSize: 200, 
@@ -183,7 +183,7 @@ const Page = () => {
         <Text c="cyan.4" size='30px' fw={900}
           variant="gradient"
           gradient={{ from: 'lightblue', to: 'cyan', deg: 90 }}>
-          Proveedores
+          Cuentas
         </Text>
       </Center>
       <Box pos='relative'>
@@ -193,59 +193,59 @@ const Page = () => {
           overlayProps={{ radius: 'lg', blur: 4 }}
           loaderProps={{ color: 'cyan', type: 'dots',size:'xl' }}
         />
-        <Modal opened={opened} onClose={close} title={id?'Actualizar Proveedor: '+ id:'Registrar Proveedor'}
+        <Modal opened={opened} onClose={close} title={id?'Actualizar Cuenta: '+ id:'Registrar Cuenta'}
           size='lg' zIndex={20} overlayProps={{
             backgroundOpacity: 0.55,
             blur: 3,
           }}>
-          <form onSubmit={form.onSubmit((values) => registrarProveedor(values))}>
+          <form onSubmit={form.onSubmit((values) => registrarCuenta(values))}>
             <TextInput
-              label="Nombre:"
-              placeholder="Nombre del cliente o empresa"
+              label="Código:"
+              placeholder="325001"
               type='text'
-              leftSection={<IconUser size={16} />}
-              key={form.key('nombre')}
-              {...form.getInputProps('nombre')}
+              leftSection={<IconCode size={16} />}
+              key={form.key('codigo')}
+              {...form.getInputProps('codigo')}
             />
             <TextInput
-              label="Dirección:"
-              placeholder="Dirección del local"
+              label="Descripción:"
+              placeholder="Nombre de la cuenta"
               type='text'
               leftSection={<IconGps size={16} />}
-              key={form.key('direccion')}
-              {...form.getInputProps('direccion')}
+              key={form.key('descripcion')}
+              {...form.getInputProps('descripcion')}
             />
-            <TextInput
-              label="Referencia:"
-              placeholder="referecnias para llegar al local"
-              leftSection={<IconBuilding size={16} />}
-              type='text'
-              key={form.key('referencia')}
-              {...form.getInputProps('referencia')}
+            <NativeSelect
+              label="Categoría:"
+              data={['Operativos','Ventas Productos','Alquiler Equipos','Salarios','Servicios','Inversión','Descuentos']}
+              required
+              leftSection={<IconSection size={16} />}
+              key={form.key('categoria')}
+              {...form.getInputProps('categoria')}
             />
-            <TextInput
-              label="Teléfonos:"
-              placeholder="70611111"
-              leftSection={<IconPhone size={16} />}
-              key={form.key('telefonos')}
-              type='number'
-              {...form.getInputProps('telefonos')}
+            <NativeSelect
+              label="Tipo Cuenta:"
+              data={['Negocio','Ingreso','Egreso','Traspaso']}
+              required
+              leftSection={<IconSection size={16} />}
+              key={form.key('tipo_cuenta')}
+              {...form.getInputProps('tipo_cuenta')}
             />
             <NumberInput
-              label="Cuenta Bancaria:"
-              placeholder="le numero de cuenta bancaria"
-              allowDecimal={false}
+              label="Saldo:"
+              placeholder="0"
+              readOnly
               leftSection={<IconCashBanknote size={16} />}
-              key={form.key('cuenta')}
-              {...form.getInputProps('cuenta')}
+              key={form.key('saldo')}
+              {...form.getInputProps('saldo')}
             />
             <Group justify="flex-end" mt="md">
-              {!id && <Button fullWidth leftSection={<IconDeviceFloppy/>} type='submit'>Registrar Proveedor</Button>}
-              {id && <Button fullWidth leftSection={<IconRefresh/>} type='submit'>Actualizar Proveedor</Button>}
+              {!id && <Button fullWidth leftSection={<IconDeviceFloppy/>} type='submit'>Registrar Cuenta</Button>}
+              {id && <Button fullWidth leftSection={<IconRefresh/>} type='submit'>Actualizar Cuenta</Button>}
             </Group>
           </form>
         </Modal>
-        <Button onClick={nuevo} style={{marginBottom:'1rem'}} size='sm'>Nuevo Proveedor</Button>
+        <Button onClick={nuevo} style={{marginBottom:'1rem'}} size='sm'>Nuevo Cuenta</Button>
         <MantineReactTable table={table} />
       </Box>
     </div>
