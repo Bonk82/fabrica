@@ -153,7 +153,7 @@ const Page = () => {
     },
     enableRowActions: true,
     renderRowActions: ({ row }) => (
-      <Box>
+      <Box style={{gap:'0.8rem',display:'flex'}}>
         <ActionIcon variant="subtle" onClick={() => mostrarRegistro(row.original)}>
           <IconEdit color='orange' />
         </ActionIcon>
@@ -203,6 +203,7 @@ const Page = () => {
               label="Código:"
               placeholder="325001"
               type='text'
+              maxLength={10}
               leftSection={<IconCode size={16} />}
               key={form.key('codigo')}
               {...form.getInputProps('codigo')}
@@ -211,6 +212,7 @@ const Page = () => {
               label="Descripción:"
               placeholder="Nombre de la cuenta"
               type='text'
+              maxLength={50}
               leftSection={<IconGps size={16} />}
               key={form.key('descripcion')}
               {...form.getInputProps('descripcion')}

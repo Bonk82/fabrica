@@ -1,8 +1,8 @@
 'use client'
 import { useSupa } from '@/app/context/SupabaseContext';
-import { ActionIcon, Autocomplete, Box, Button, Center, Group, Kbd, LoadingOverlay, Modal, NativeSelect, NumberInput, Text, TextInput } from '@mantine/core'
+import { ActionIcon, Autocomplete, Box, Button, Center, Group, Kbd, LoadingOverlay, Modal, NativeSelect, NumberInput, Switch, Text, TextInput } from '@mantine/core'
 import { useForm } from '@mantine/form';
-import { IconAlignLeft, IconBox, IconCalendar, IconCheck, IconDeviceFloppy, IconEdit, IconEye, IconFileBarcode, IconFolder, IconMoneybag, IconPlusMinus, IconReceipt2, IconRefresh, IconStack2, IconTrash, IconUser } from '@tabler/icons-react';
+import { IconAlignLeft, IconBox, IconCalendar, IconCar, IconCheck, IconDeviceFloppy, IconEdit, IconEye, IconFileBarcode, IconFolder, IconMoneybag, IconPlusMinus, IconReceipt2, IconRefresh, IconStack2, IconTrash, IconUser } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import { useMemo } from 'react';
 import { MantineReactTable, useMantineReactTable} from 'mantine-react-table';
@@ -25,11 +25,14 @@ const Page = () => {
   const [listaProductos, setListaProductos] = useState([])
   const [elCliente, setElCliente] = useState('')
   const [elProducto, setElProducto] = useState('')
+  const [facturado, setFacturado] = useState(false)
 
   useEffect(() => {
     cargarData()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  const hoy=dayjs().format('YYYY-MM-DD')
   
   const cargarData = async () =>{
     await getReg('vw_pedido','id_pedido',false);
@@ -64,6 +67,8 @@ const Page = () => {
       fecha_pago:null,
       metodo_pago: '',
       metodo_entrega:'',
+      factura:false,
+      delivery:0,
       fecha_registro:null,
     },
     // validate: {
@@ -123,6 +128,7 @@ const Page = () => {
     
     newPedido.fid_cliente = clientes.filter(f=>f.nombre == data.nombre)[0]?.id_cliente;
     newPedido.fid_producto = productos.filter(f=>f.id_producto == elProducto)[0]?.id_producto;
+    newPedido.factura = facturado;
     
     console.log('new pedido',newPedido,id);
     try {
@@ -203,6 +209,7 @@ const Page = () => {
     console.log('cargando data',data,listaProductos);
     open()
     setId(data.id_pedido);
+    setFacturado(data.factura);
     form.setValues(data)
     // setElProducto(data.fid_producto)
   }
@@ -261,6 +268,14 @@ const Page = () => {
       {
         accessorKey: 'metodo_entrega',
         header: 'Método Entrega',
+      },
+      {
+        accessorKey: 'factura',
+        header: 'Facturado',
+      },
+      {
+        accessorKey: 'delivery',
+        header: 'Monto Delivery',
       },
       {
         accessorKey: 'fecha_registro',
@@ -334,9 +349,9 @@ const Page = () => {
     },
     enableRowActions: true,
     renderRowActions: ({ row }) => (
-      <Box style={{gap:'1rem'}}>
+      <Box style={{gap:'0.8rem',display:'flex'}}>
         <ActionIcon variant="subtle" onClick={() => mostrarGrillaPedido(row.original)} title='Ver detalle del pedido'>
-          <IconEye color='skyblue' />
+          <IconEye color='skyblue'/>
         </ActionIcon>
         <ActionIcon variant="subtle" onClick={() => mostrarRegistro(row.original)} title='Editar Pedido'>
           <IconEdit color='orange' />
@@ -384,7 +399,7 @@ const Page = () => {
     },
     enableRowActions: true,
     renderRowActions: ({ row }) => (
-      <Box style={{gap:'1rem'}}>
+      <Box style={{gap:'0.8rem',display:'flex'}}>
         <ActionIcon variant="subtle" onClick={() => mostrarRegistroDetalle(row.original)} title='Editar porducto en pedido'>
           <IconEdit color='orange' />
         </ActionIcon>
@@ -456,100 +471,29 @@ const Page = () => {
             blur: 3,
           }}>
           <form onSubmit={form.onSubmit((values) => registrarPedido(values))}>
-            {/* <TextInput
-              label="Número Pedido:"
-              key={form.key('id_pedido')}
-              type='number'
-              readOnly
-              leftSection={<IconFileBarcode size={16} />}
-              {...form.getInputProps('id_pedido')}
-            /> */}
-            {/* <Autocomplete
-              label="Cliente:"
-              // data={['uno','dos','tres','cuatro','cinco','seis','siete']}
-              data={listaClientes}
-              required
-              withAsterisk
-              limit={4}
-              id='cliente'
-              // onChange={(value)=>actualizarPrecio(value)}
-              onValueChange={actualizarPrecio}
-              leftSection={<IconBox size={16} />}
-              key={form.key('nombre')}
-              {...form.getInputProps('nombre')}
-            /> */}
             <Autocomplete
               label="Cliente:"
-              // data={['uno','dos','tres','cuatro','cinco','seis','siete']}
               data={listaClientes}
               required
               withAsterisk
               limit={4}
-              // value={elCliente}
-              // onChange={actualizarPrecio}
+              maxLength={100}
               leftSection={<IconUser size={16} />}
               key={form.key('nombre')}
               {...form.getInputProps('nombre')}
             />
-            {/* <NativeSelect
-              label="Producto:"
-              data={listaProductos}
-              leftSection={<IconBox size={16} />}
-              value={elProducto}
-              onChange={e=>handdlerProduct(e.currentTarget.value)}
-              // onChangeCapture={e=>actualizarPrecio(e)}
-              // key={form.key('fid_producto')}
-              // {...form.getInputProps('fid_producto')}
-            /> */}
-            {/* <Autocomplete
-              label="Producto:"
-              // data={['uno','dos','tres','cuatro','cinco','seis','siete']}
-              data={listaProductos}
-              required
-              limit={4}
-              value={elProducto}
-              onChange={handdlerProduct}
-              leftSection={<IconBox size={16} />}
-              // key={form.key('nombre')}
-              // {...form.getInputProps('nombre')}
-            /> */}
             <TextInput
               label="Fecha Entrega:"
               placeholder='Fecha Entrega'
               type='date'
               required
               withAsterisk
+              maxLength={10}
+              min={hoy}
               leftSection={<IconAlignLeft size={16} />}
               key={form.key('fecha_entrega')}
               {...form.getInputProps('fecha_entrega')}
             />
-            {/* <NumberInput
-              label="Cantidad Solicitada:"
-              placeholder="10"
-              allowDecimal={false}
-              max={500}
-              min={1}
-              leftSection={<IconPlusMinus size={16} />}
-              required
-              withAsterisk
-              onValueChange={handdleCantidad}
-              key={form.key('cantidad_solicitada')}
-              {...form.getInputProps('cantidad_solicitada')}
-            /> */}
-            {/* <NumberInput
-              label="precio_unidad:"
-              placeholder="precio_unidad"
-              prefix='Bs. '
-              defaultValue={0.00}
-              decimalScale={2}
-              fixedDecimalScale
-              thousandSeparator=','
-              leftSection={<IconReceipt2 size={16} />}
-              required
-              withAsterisk
-              key={form.key('precio_unidad')}
-              {...form.getInputProps('precio_unidad')}
-            /> */}
             <NumberInput
               label="Descuento:"
               placeholder="Descuento al precio normal"
@@ -558,23 +502,14 @@ const Page = () => {
               decimalScale={2}
               fixedDecimalScale
               thousandSeparator=','
+              maxLength={10}
               leftSection={<IconReceipt2 size={16} />}
               key={form.key('descuento')}
               {...form.getInputProps('descuento')}
             />
-            {/* <NumberInput
-              label="Cantidad Entregada:"
-              placeholder="10"
-              allowDecimal={false}
-              max={500}
-              min={1}
-              leftSection={<IconPlusMinus size={16} />}
-              key={form.key('cantidad_entregada')}
-              {...form.getInputProps('cantidad_entregada')}
-            /> */}
             <NativeSelect
               label="Estado Pedido:"
-              data={['Solicitado', 'Pendiente', 'Entegado']}
+              data={['SOLICITADO', 'PENDIENTE', 'ENTREGADO']}
               required
               withAsterisk
               leftSection={<IconFolder size={16} />}
@@ -590,13 +525,14 @@ const Page = () => {
               fixedDecimalScale
               thousandSeparator=','
               value={0}
+              maxLength={10}
               leftSection={<IconReceipt2 size={16} />}
               key={form.key('monto_pago')}
               {...form.getInputProps('monto_pago')}
             />
             <NativeSelect
               label="Estado Pago:"
-              data={['Pendiente','Pagado', 'Descuento']}
+              data={['PENDIENTE','PAGADO', 'DESCUENTO']}
               required
               withAsterisk
               leftSection={<IconFolder size={16} />}
@@ -607,23 +543,42 @@ const Page = () => {
               label="Fecha Pago:"
               placeholder='Fecha Pago'
               type='date'
+              maxLength={10}
               leftSection={<IconCalendar size={16} />}
               key={form.key('fecha_pago')}
               {...form.getInputProps('fecha_pago')}
             />
             <NativeSelect
               label="Método Pago:"
-              data={['Contado', 'Descuento', 'QR','Transferencia']}
+              data={['CONTADO', 'DESCUENTO', 'QR','TRASNFERENCIA','TARJETA']}
               leftSection={<IconFolder size={16} />}
               key={form.key('metodo_pago')}
               {...form.getInputProps('metodo_pago')}
             />
             <NativeSelect
               label="Método Entrega:"
-              data={['En fábrica', 'Delivery', 'Envío','Entrega programada']}
+              data={['EN FABRICA', 'DELIVERY', 'ENVÍO','ENTREGA PROGRAMDA']}
               leftSection={<IconFolder size={16} />}
               key={form.key('metodo_entrega')}
               {...form.getInputProps('metodo_entrega')}
+            />
+            <Switch size="lg" onLabel="SI" offLabel="NO"
+              label="Pedido con Factura:"
+              style={{marginTop:'0.5rem'}}
+              checked={facturado}
+              onChange={(event) => setFacturado(event.currentTarget.checked)}
+            />
+            <NumberInput
+              label="Monto Delivery:"
+              prefix='Bs. '
+              defaultValue={0.00}
+              decimalScale={2}
+              fixedDecimalScale
+              thousandSeparator=','
+              maxLength={10}
+              leftSection={<IconCar size={16} />}
+              key={form.key('delivery')}
+              {...form.getInputProps('delivery')}
             />
             <TextInput
               label="Fecha Pedido:"
@@ -653,9 +608,6 @@ const Page = () => {
               leftSection={<IconBox size={16} />}
               value={elProducto}
               onChange={e=>handdlerProduct(e.currentTarget.value)}
-              // onChangeCapture={e=>actualizarPrecio(e)}
-              // key={form.key('fid_producto')}
-              // {...form.getInputProps('fid_producto')}
             />
             <NumberInput
               label="Cantidad Solicitada:"
@@ -663,9 +615,10 @@ const Page = () => {
               allowDecimal={false}
               max={500}
               min={1}
-              leftSection={<IconPlusMinus size={16} />}
               required
               onValueChange={handdleCantidad}
+              maxLength={10}
+              leftSection={<IconPlusMinus size={16} />}
               key={formDetalle.key('cantidad_solicitada')}
               {...formDetalle.getInputProps('cantidad_solicitada')}
             />
@@ -679,6 +632,7 @@ const Page = () => {
               thousandSeparator=','
               leftSection={<IconReceipt2 size={16} />}
               required
+              maxLength={10}
               key={formDetalle.key('precio_unidad')}
               {...formDetalle.getInputProps('precio_unidad')}
             />
@@ -687,6 +641,7 @@ const Page = () => {
               allowDecimal={false}
               max={500}
               min={1}
+              maxLength={10}
               leftSection={<IconPlusMinus size={16} />}
               key={formDetalle.key('cantidad_entregada')}
               {...formDetalle.getInputProps('cantidad_entregada')}

@@ -153,7 +153,7 @@ const Page = () => {
     },
     enableRowActions: true,
     renderRowActions: ({ row }) => (
-      <Box>
+      <Box style={{gap:'0.8rem',display:'flex'}}>
         <ActionIcon variant="subtle" onClick={() => mostrarRegistro(row.original)}>
           <IconEdit color='orange' />
         </ActionIcon>
@@ -201,8 +201,9 @@ const Page = () => {
           <form onSubmit={form.onSubmit((values) => registrarProveedor(values))}>
             <TextInput
               label="Nombre:"
-              placeholder="Nombre del cliente o empresa"
+              placeholder="Nombre del porveedor o empresa"
               type='text'
+              maxLength={100}
               leftSection={<IconUser size={16} />}
               key={form.key('nombre')}
               {...form.getInputProps('nombre')}
@@ -211,6 +212,7 @@ const Page = () => {
               label="Dirección:"
               placeholder="Dirección del local"
               type='text'
+              maxLength={100}
               leftSection={<IconGps size={16} />}
               key={form.key('direccion')}
               {...form.getInputProps('direccion')}
@@ -220,6 +222,7 @@ const Page = () => {
               placeholder="referecnias para llegar al local"
               leftSection={<IconBuilding size={16} />}
               type='text'
+              maxLength={100}
               key={form.key('referencia')}
               {...form.getInputProps('referencia')}
             />
@@ -227,14 +230,16 @@ const Page = () => {
               label="Teléfonos:"
               placeholder="70611111"
               leftSection={<IconPhone size={16} />}
-              key={form.key('telefonos')}
               type='number'
+              maxLength={20}
+              key={form.key('telefonos')}
               {...form.getInputProps('telefonos')}
             />
             <NumberInput
               label="Cuenta Bancaria:"
               placeholder="le numero de cuenta bancaria"
               allowDecimal={false}
+              maxLength={15}
               leftSection={<IconCashBanknote size={16} />}
               key={form.key('cuenta')}
               {...form.getInputProps('cuenta')}

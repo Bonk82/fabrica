@@ -47,9 +47,9 @@ const Page = () => {
       equipo:'',
       letrero:'',
     },
-    // validate: {
-    //   tipo_cliente: (value) => (/^\S+@\S+$/.test(value) ? null : 'Correo Inválido'),
-    // },
+    validate: {
+      correo: (value) => (/^\S+@\S+$/.test(value) ? null : 'Correo Inválido'),
+    },
   });
 
   const toast = (title,message,type) =>{
@@ -213,7 +213,7 @@ const Page = () => {
     },
     enableRowActions: true,
     renderRowActions: ({ row }) => (
-      <Box>
+      <Box style={{gap:'0.8rem',display:'flex'}}>
         <ActionIcon variant="subtle" onClick={() => mostrarRegistro(row.original)}>
           <IconEdit color='orange' />
         </ActionIcon>
@@ -263,13 +263,14 @@ const Page = () => {
               label="Nombre:"
               placeholder="Nombre"
               type='text'
+              maxLength={100}
               leftSection={<IconUser size={16} />}
               key={form.key('nombre')}
               {...form.getInputProps('nombre')}
             />
             <NativeSelect
               label="Categoría"
-              data={['Bar', 'Cafetería', 'Complejo Deportivo', 'salón de Eventos', 'Discoteca','PUB','KARAOKE']}
+              data={['BAR', 'CAFETERÍA', 'COMPLEJO DEPORTIVO', 'SALÓN DE EVENTOS', 'DISCOTECA','PUB','KARAOKE']}
               leftSection={<IconFolder size={16} />}
               key={form.key('categoria')}
               {...form.getInputProps('categoria')}
@@ -285,6 +286,7 @@ const Page = () => {
               label="Propietario:"
               placeholder="Propietario"
               type='text'
+              maxLength={50}
               leftSection={<IconUser size={16} />}
               key={form.key('propietario')}
               {...form.getInputProps('propietario')}
@@ -293,6 +295,7 @@ const Page = () => {
               label="Propietario Celular:"
               placeholder="Propietario Celular"
               type='text'
+              maxLength={20}
               leftSection={<IconPhone size={16} />}
               key={form.key('propietario_celular')}
               {...form.getInputProps('propietario_celular')}
@@ -301,6 +304,7 @@ const Page = () => {
               label="Administrador:"
               placeholder="Administrador"
               type='text'
+              maxLength={50}
               leftSection={<IconUser size={16} />}
               key={form.key('administrador')}
               {...form.getInputProps('administrador')}
@@ -309,6 +313,7 @@ const Page = () => {
               label="Administrador Celular:"
               placeholder="Administrador Celular"
               type='text'
+              maxLength={20}
               leftSection={<IconPhone size={16} />}
               key={form.key('administrador_celular')}
               {...form.getInputProps('administrador_celular')}
@@ -317,6 +322,7 @@ const Page = () => {
               label="Correo:"
               placeholder="sucorreo@gmail.com"
               type='text'
+              maxLength={50}
               leftSection={<IconMail size={16} />}
               key={form.key('correo')}
               {...form.getInputProps('correo')}
@@ -325,6 +331,7 @@ const Page = () => {
               label="Ciudad:"
               placeholder="Ciudad"
               type='text'
+              maxLength={50}
               leftSection={<IconGps size={16} />}
               key={form.key('ciudad')}
               {...form.getInputProps('ciudad')}
@@ -333,6 +340,7 @@ const Page = () => {
               label="Zona:"
               placeholder="zona"
               type='text'
+              maxLength={50}
               leftSection={<IconGps size={16} />}
               key={form.key('zona')}
               {...form.getInputProps('zona')}
@@ -341,6 +349,7 @@ const Page = () => {
               label="Direccion:"
               placeholder="Direccion"
               type='text'
+              maxLength={100}
               leftSection={<IconGps size={16} />}
               key={form.key('direccion')}
               {...form.getInputProps('direccion')}
@@ -349,6 +358,7 @@ const Page = () => {
               label="Coordenadas:"
               placeholder="Coordenadas"
               type='text'
+              maxLength={50}
               leftSection={<IconMapSearch size={16} />}
               key={form.key('coordenadas')}
               {...form.getInputProps('coordenadas')}
@@ -357,6 +367,7 @@ const Page = () => {
               label="referencia:"
               placeholder="referencia"
               type='text'
+              maxLength={100}
               leftSection={<IconBuilding size={16} />}
               key={form.key('referencia')}
               {...form.getInputProps('referencia')}
@@ -365,6 +376,7 @@ const Page = () => {
               label="Telefonos:"
               placeholder="Telefonos"
               type='text'
+              maxLength={50}
               leftSection={<IconPhone size={16} />}
               key={form.key('telefonos')}
               {...form.getInputProps('telefonos')}

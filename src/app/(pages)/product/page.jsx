@@ -168,7 +168,7 @@ const Page = () => {
     },
     enableRowActions: true,
     renderRowActions: ({ row }) => (
-      <Box>
+      <Box style={{gap:'0.8rem',display:'flex'}}>
         <ActionIcon variant="subtle" onClick={() => mostrarRegistro(row.original)}>
           <IconEdit color='orange' />
         </ActionIcon>
@@ -220,12 +220,13 @@ const Page = () => {
               placeholder="Código"
               key={form.key('codigo')}
               type='text'
+              maxLength={10}
               leftSection={<IconFileBarcode size={16} />}
               {...form.getInputProps('codigo')}
             />
             <NativeSelect
               label="Categoría"
-              data={['Sólidos', 'Líquidos', 'Derivados']}
+              data={['SÓLIDOS', 'LÍQUIDOS','SERVICIOS','DERIVADOS']}
               leftSection={<IconBox size={16} />}
               key={form.key('categoria')}
               {...form.getInputProps('categoria')}
@@ -235,12 +236,13 @@ const Page = () => {
               placeholder="Descripción"
               key={form.key('descripcion')}
               type='text'
+              maxLength={20}
               leftSection={<IconAlignLeft size={16} />}
               {...form.getInputProps('descripcion')}
             />
             <NativeSelect
               label="Tipo Unidad"
-              data={['Kilo', 'Bolsa', 'Paquete']}
+              data={['KILO', 'BOLSA', 'PAQUETE','LITRO','BOTELLON','UNIDAD']}
               key={form.key('unidad')}
               leftSection={<IconBox size={16} />}
               {...form.getInputProps('unidad')}
@@ -253,6 +255,7 @@ const Page = () => {
               allowDecimal={false}
               thousandSeparator=','
               min={0}
+              maxLength={5}
               leftSection={<IconStack2 size={16} />}
               {...form.getInputProps('existencia')}
             />
@@ -264,6 +267,7 @@ const Page = () => {
               decimalScale={2}
               fixedDecimalScale
               thousandSeparator=','
+              maxLength={10}
               key={form.key('precio')}
               leftSection={<IconReceipt2 size={16} />}
               {...form.getInputProps('precio')}
@@ -276,6 +280,7 @@ const Page = () => {
               decimalScale={2}
               fixedDecimalScale
               thousandSeparator=','
+              maxLength={10}
               key={form.key('promocion')}
               leftSection={<IconReceipt2 size={16} />}
               {...form.getInputProps('promocion')}
@@ -287,6 +292,7 @@ const Page = () => {
               key={form.key('pedido_minimo')}
               max={100}
               min={1}
+              maxLength={3}
               leftSection={<IconPlusMinus size={16} />}
               {...form.getInputProps('pedido_minimo')}
             />
