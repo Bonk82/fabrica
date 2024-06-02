@@ -1,7 +1,7 @@
 import { useRouter } from 'next/navigation';
 import { useSupa } from '../context/SupabaseContext';
 import { Button } from '@mantine/core';
-import { IconUsersGroup,IconBuildingFactory2,IconBriefcase,IconUserCog,IconUserCheck,IconTimeline,IconBusinessplan } from '@tabler/icons-react';
+import { IconUsersGroup,IconBuildingFactory2,IconBriefcase,IconUserCog,IconUserCheck,IconTimeline,IconBusinessplan,IconListCheck } from '@tabler/icons-react';
 
 
 const Navbar = () => {
@@ -20,8 +20,9 @@ const Navbar = () => {
     <IconBriefcase key={2} />,
     <IconUserCog key={3} />,
     <IconBusinessplan key={6} />,
-    <IconUserCheck key={4} />,
     <IconTimeline key={5} />,
+    <IconListCheck key={7} />,
+    <IconUserCheck key={4} />,
   ]
 
   return (

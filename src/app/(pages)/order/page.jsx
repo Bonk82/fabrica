@@ -488,7 +488,7 @@ const Page = () => {
               type='date'
               required
               withAsterisk
-              maxLength={10}
+              maxLength={15}
               min={hoy}
               leftSection={<IconAlignLeft size={16} />}
               key={form.key('fecha_entrega')}
@@ -502,7 +502,7 @@ const Page = () => {
               decimalScale={2}
               fixedDecimalScale
               thousandSeparator=','
-              maxLength={10}
+              maxLength={15}
               leftSection={<IconReceipt2 size={16} />}
               key={form.key('descuento')}
               {...form.getInputProps('descuento')}
@@ -525,7 +525,7 @@ const Page = () => {
               fixedDecimalScale
               thousandSeparator=','
               value={0}
-              maxLength={10}
+              maxLength={15}
               leftSection={<IconReceipt2 size={16} />}
               key={form.key('monto_pago')}
               {...form.getInputProps('monto_pago')}
@@ -543,7 +543,7 @@ const Page = () => {
               label="Fecha Pago:"
               placeholder='Fecha Pago'
               type='date'
-              maxLength={10}
+              maxLength={15}
               leftSection={<IconCalendar size={16} />}
               key={form.key('fecha_pago')}
               {...form.getInputProps('fecha_pago')}
@@ -575,7 +575,7 @@ const Page = () => {
               decimalScale={2}
               fixedDecimalScale
               thousandSeparator=','
-              maxLength={10}
+              maxLength={15}
               leftSection={<IconCar size={16} />}
               key={form.key('delivery')}
               {...form.getInputProps('delivery')}
@@ -617,7 +617,7 @@ const Page = () => {
               min={1}
               required
               onValueChange={handdleCantidad}
-              maxLength={10}
+              maxLength={15}
               leftSection={<IconPlusMinus size={16} />}
               key={formDetalle.key('cantidad_solicitada')}
               {...formDetalle.getInputProps('cantidad_solicitada')}
@@ -632,7 +632,7 @@ const Page = () => {
               thousandSeparator=','
               leftSection={<IconReceipt2 size={16} />}
               required
-              maxLength={10}
+              maxLength={15}
               key={formDetalle.key('precio_unidad')}
               {...formDetalle.getInputProps('precio_unidad')}
             />
@@ -641,7 +641,7 @@ const Page = () => {
               allowDecimal={false}
               max={500}
               min={1}
-              maxLength={10}
+              maxLength={15}
               leftSection={<IconPlusMinus size={16} />}
               key={formDetalle.key('cantidad_entregada')}
               {...formDetalle.getInputProps('cantidad_entregada')}

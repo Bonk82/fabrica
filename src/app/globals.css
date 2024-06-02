@@ -139,3 +139,7 @@ tr{
 .mantine-Modal-header{
   background-color: var(--mantine-primary-color-filled);
 }
+
+input{
+  text-transform: uppercase;
+}

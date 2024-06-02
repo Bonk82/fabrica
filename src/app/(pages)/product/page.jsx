@@ -220,7 +220,7 @@ const Page = () => {
               placeholder="Código"
               key={form.key('codigo')}
               type='text'
-              maxLength={10}
+              maxLength={15}
               leftSection={<IconFileBarcode size={16} />}
               {...form.getInputProps('codigo')}
             />
@@ -267,7 +267,7 @@ const Page = () => {
               decimalScale={2}
               fixedDecimalScale
               thousandSeparator=','
-              maxLength={10}
+              maxLength={15}
               key={form.key('precio')}
               leftSection={<IconReceipt2 size={16} />}
               {...form.getInputProps('precio')}
@@ -280,7 +280,7 @@ const Page = () => {
               decimalScale={2}
               fixedDecimalScale
               thousandSeparator=','
-              maxLength={10}
+              maxLength={15}
               key={form.key('promocion')}
               leftSection={<IconReceipt2 size={16} />}
               {...form.getInputProps('promocion')}

@@ -409,7 +409,7 @@ const Page = () => {
           </form>
         </Modal>
         
-        <Button onClick={nuevo} style={{marginBottom:'1rem'}} size='sm'>Nuevo Pedido</Button>
+        <Button onClick={nuevo} style={{marginBottom:'1rem'}} size='sm'>Nuevo Cliente</Button>
 
         <MantineReactTable table={table} />
       </Box>

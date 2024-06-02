@@ -203,7 +203,7 @@ const Page = () => {
               label="Código:"
               placeholder="325001"
               type='text'
-              maxLength={10}
+              maxLength={15}
               leftSection={<IconCode size={16} />}
               key={form.key('codigo')}
               {...form.getInputProps('codigo')}
@@ -247,7 +247,7 @@ const Page = () => {
             </Group>
           </form>
         </Modal>
-        <Button onClick={nuevo} style={{marginBottom:'1rem'}} size='sm'>Nuevo Cuenta</Button>
+        <Button onClick={nuevo} style={{marginBottom:'1rem'}} size='sm'>Nueva Cuenta</Button>
         <MantineReactTable table={table} />
       </Box>
     </div>
