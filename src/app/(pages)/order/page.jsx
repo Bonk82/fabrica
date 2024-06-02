@@ -103,22 +103,24 @@ const Page = () => {
   const registrarPedido = async (data) => {
     // event.preventDefault();
     if(!data.id_pedido) data.id_pedido = null;
-    console.log('la data',data);
-    const newPedido = {
-      ...data,
-      usuario_registro:usuario?.id,
-      fecha_registro:dayjs().format('YYYY-MM-DD HH:mm:ss'),
-      activo:1
+    console.log('la data',data)
+    let newPedido
+    if(id){
+      newPedido = {
+        ...data,
+        usuario_modifica:usuario?.id,
+        fecha_modifica:dayjs().add(-4,'hours'),
+      }
     }
     if(!id){
+      newPedido = {
+        ...data,
+        usuario_registro:usuario?.id,
+        fecha_registro:dayjs().add(-4,'hours'),
+        activo:1
+      }
       delete newPedido.id_pedido
       delete newPedido.fecha_pago
-    }
-    if(id){
-      newPedido.usuario_modifica = usuario?.id
-      newPedido.fecha_modifica = dayjs().format('YYYY-MM-DD HH:mm:ss')
-      delete newPedido.usuario_registro
-      delete newPedido.fecha_registro
     }
     delete newPedido.nombre
     delete newPedido.direccion
@@ -145,8 +147,6 @@ const Page = () => {
     }
   }
   const registrarPedidoDetalle = async (data) => {
-    // event.preventDefault();
-    // if(!data.id_pedido_detalle) data.id_pedido_detalle = null;
     console.log('la data',data,id,idDetalle);
     const newPedidoDetalle = data
     delete newPedidoDetalle.monto_total
@@ -211,6 +211,7 @@ const Page = () => {
     setId(data.id_pedido);
     setFacturado(data.factura);
     form.setValues(data)
+    form.setFieldValue('estado_pedido','SOLICITADO')
     // setElProducto(data.fid_producto)
   }
 
@@ -490,7 +491,7 @@ const Page = () => {
               withAsterisk
               maxLength={15}
               min={hoy}
-              leftSection={<IconAlignLeft size={16} />}
+              leftSection={<IconCalendar size={16} />}
               key={form.key('fecha_entrega')}
               {...form.getInputProps('fecha_entrega')}
             />
@@ -543,7 +544,7 @@ const Page = () => {
               label="Fecha Pago:"
               placeholder='Fecha Pago'
               type='date'
-              maxLength={15}
+              maxLength={10}
               leftSection={<IconCalendar size={16} />}
               key={form.key('fecha_pago')}
               {...form.getInputProps('fecha_pago')}

@@ -11,9 +11,10 @@ import { notifications } from '@mantine/notifications';
 import classes from '../../toast.module.css';
 import { modals } from '@mantine/modals';
 import { useDisclosure } from '@mantine/hooks';
+import dayjs from 'dayjs';
 
 const Page = () => {
-  const { loading,usuario,createReg,clientes,getReg,updateReg,deleteReg } = useSupa();
+  const { loading,usuario,createReg,clientes,parametricas,getReg,updateReg,deleteReg } = useSupa();
   const [opened, { open, close }] = useDisclosure(false);
   const [id, setId] = useState(null)
   
@@ -24,6 +25,7 @@ const Page = () => {
   
   const cargarData = async () =>{
     await getReg('cliente','id_cliente',false);
+
   }
 
   const form = useForm({
@@ -69,12 +71,29 @@ const Page = () => {
 
   const registrarCliente = async (data) => {
     // event.preventDefault();
+    data.nombre = data.nombre?.toUpperCase(),
+    data.referencia=data.referencia?.toUpperCase(),
+    data.propietario=data.propietario?.toUpperCase(),
+    data.administrador=data.administrador?.toUpperCase(),
+    data.ciudad=data.ciudad?.toUpperCase(),
+    data.zona=data.zona?.toUpperCase(),
+    data.direccion=data.direccion?.toUpperCase(),
     console.log('la data',data);
-    const newClient = {
-      ...data,
-      usuario_registro:usuario?.id,
-      fecha_registro:new Date(),
-      activo:1
+    let newClient
+    if(id){
+      newClient = {
+        ...data,
+        usuario_modifica:usuario?.id,
+        fecha_modifica:dayjs().add(-4,'hours'),
+      }
+    }
+    if(!id){
+      newClient = {
+        ...data,
+        usuario_registro:usuario?.id,
+        fecha_registro:dayjs().add(-4,'hours'),
+        activo:1
+      }
     }
     console.log('new client',newClient,id);
     try {
@@ -270,7 +289,8 @@ const Page = () => {
             />
             <NativeSelect
               label="Categoría"
-              data={['BAR', 'CAFETERÍA', 'COMPLEJO DEPORTIVO', 'SALÓN DE EVENTOS', 'DISCOTECA','PUB','KARAOKE']}
+              // data={['BAR', 'CAFETERÍA', 'COMPLEJO DEPORTIVO', 'SALÓN DE EVENTOS', 'DISCOTECA','PUB','KARAOKE']}
+              data={parametricas.filter(f=>f.tipo === 'CAT_CLIENTE').map(e=>e.nombre)}
               leftSection={<IconFolder size={16} />}
               key={form.key('categoria')}
               {...form.getInputProps('categoria')}
@@ -346,8 +366,8 @@ const Page = () => {
               {...form.getInputProps('zona')}
             />
             <TextInput
-              label="Direccion:"
-              placeholder="Direccion"
+              label="Dirección:"
+              placeholder="Dirección"
               type='text'
               maxLength={100}
               leftSection={<IconGps size={16} />}
@@ -364,8 +384,8 @@ const Page = () => {
               {...form.getInputProps('coordenadas')}
             />
             <TextInput
-              label="referencia:"
-              placeholder="referencia"
+              label="Referencia:"
+              placeholder="Referencia"
               type='text'
               maxLength={100}
               leftSection={<IconBuilding size={16} />}
@@ -373,17 +393,17 @@ const Page = () => {
               {...form.getInputProps('referencia')}
             />
             <TextInput
-              label="Telefonos:"
-              placeholder="Telefonos"
+              label="Teléfonos:"
+              placeholder="Teléfonos"
               type='text'
-              maxLength={50}
+              maxLength={30}
               leftSection={<IconPhone size={16} />}
               key={form.key('telefonos')}
               {...form.getInputProps('telefonos')}
             />
             <NativeSelect
               label="Equipo:"
-              data={['Propio', 'Préstamo']}
+              data={['PROPIO', 'PRÉSTAMO']}
               leftSection={<IconFolder size={16} />}
               key={form.key('equipo')}
               {...form.getInputProps('equipo')}
@@ -397,7 +417,7 @@ const Page = () => {
             />
             <NativeSelect
               label="Tipo Cliente"
-              data={['Eventual', 'Descuento', 'Pago Semanal']}
+              data={['EVENTUAL', 'DESCUENTO', 'PAGO SEMANAL']}
               leftSection={<IconFolder size={16} />}
               key={form.key('tipo_cliente')}
               {...form.getInputProps('tipo_cliente')}

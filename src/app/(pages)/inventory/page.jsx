@@ -2,7 +2,7 @@
 import { useSupa } from '@/app/context/SupabaseContext';
 import { ActionIcon, Box, Button, Center, Group, LoadingOverlay, Modal, NativeSelect, NumberInput, Text, TextInput } from '@mantine/core'
 import { useForm } from '@mantine/form';
-import { IconBuilding, IconCashBanknote, IconCheck, IconCode, IconDeviceFloppy, IconEdit, IconEye, IconGps, IconPhone, IconReceipt2, IconRefresh, IconSection, IconTrash, IconUser } from '@tabler/icons-react';
+import { IconBuilding, IconCalendar, IconCashBanknote, IconCheck, IconCode, IconDeviceFloppy, IconEdit, IconEye, IconGps, IconPhone, IconReceipt2, IconRefresh, IconSection, IconTrash, IconUser } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import { useMemo } from 'react';
 import { MantineReactTable, useMantineReactTable} from 'mantine-react-table';
@@ -65,12 +65,30 @@ const Page = () => {
 
   const registrarInsumo = async (data) => {
     // event.preventDefault();
+    data.codigo = data.codigo?.toUpperCase(),
+    data.articulo=data.articulo?.toUpperCase(),
+    data.marca=data.marca?.toUpperCase(),
+    data.modelo=data.modelo?.toUpperCase(),
+    data.descripcion=data.descripcion?.toUpperCase(),
+    data.proveedor=data.proveedor?.toUpperCase(),
+    data.observacion=data.observacion?.toUpperCase(),
+    data.responsable=data.responsable?.toUpperCase(),
     console.log('la data',data);
-    const newInsumo = {
-      ...data,
-      usuario_registro:usuario?.id,
-      fecha_registro:new Date(),
-      activo:1
+    let newInsumo
+    if(id){
+      newInsumo = {
+        ...data,
+        usuario_modifica:usuario?.id,
+        fecha_modifica:dayjs().add(-4,'hours'),
+      }
+    }
+    if(!id){
+      newInsumo = {
+        ...data,
+        usuario_registro:usuario?.id,
+        fecha_registro:dayjs().add(-4,'hours'),
+        activo:1
+      }
     }
     console.log('new insumo',newInsumo,id);
     try {
@@ -307,7 +325,7 @@ const Page = () => {
               type='date'
               maxLength={15}
               max={hoy}
-              leftSection={<IconGps size={16} />}
+              leftSection={<IconCalendar size={16} />}
               key={form.key('fecha_compra')}
               {...form.getInputProps('fecha_compra')}
             />
@@ -328,7 +346,7 @@ const Page = () => {
               label="Fecha Limite Garantía:"
               type='date'
               maxLength={15}
-              leftSection={<IconGps size={16} />}
+              leftSection={<IconCalendar size={16} />}
               key={form.key('fecha_garantia')}
               {...form.getInputProps('fecha_garantia')}
             />
@@ -356,7 +374,7 @@ const Page = () => {
               maxLength={20}
               // onInput={e=>e.target.value?.toUpperCase()}
               leftSection={<IconGps size={16} />}
-              key={form.key('responsable').toUpperCase()}
+              key={form.key('responsable')}
               {...form.getInputProps('responsable')}
             />
             <Group justify="flex-end" mt="md">

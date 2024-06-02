@@ -2,7 +2,7 @@
 import { useSupa } from '@/app/context/SupabaseContext';
 import { ActionIcon, Box, Button, Center, Group, LoadingOverlay, Modal, NativeSelect, NumberInput, Text, TextInput } from '@mantine/core'
 import { useForm } from '@mantine/form';
-import { IconAlignLeft, IconBox, IconCheck, IconDeviceFloppy, IconEdit, IconEye, IconFileBarcode, IconPlusMinus, IconReceipt2, IconRefresh, IconStack2, IconTrash } from '@tabler/icons-react';
+import { IconAlignLeft, IconBox, IconCheck, IconCircle1, IconCircleNumber1, IconDeviceFloppy, IconEdit, IconEye, IconFileBarcode, IconPlusMinus, IconReceipt2, IconRefresh, IconStack2, IconTrash } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import { useMemo } from 'react';
 import { MantineReactTable, useMantineReactTable} from 'mantine-react-table';
@@ -11,6 +11,7 @@ import { notifications } from '@mantine/notifications';
 import classes from '../../toast.module.css';
 import { modals } from '@mantine/modals';
 import { useDisclosure } from '@mantine/hooks';
+import dayjs from 'dayjs';
 
 const Page = () => {
   const { loading,usuario,createReg,productos,getReg,updateReg,deleteReg } = useSupa();
@@ -60,12 +61,24 @@ const Page = () => {
 
   const registrarProducto = async (data) => {
     // event.preventDefault();
+    data.codigo=data.codigo?.toUpperCase(),
+    data.descripcion=data.descripcion?.toUpperCase(),
     console.log('la data',data);
-    const newProduct = {
-      ...data,
-      usuario_registro:usuario?.id,
-      fecha_registro:new Date(),
-      activo:1
+    let newProduct
+    if(id){
+      newProduct = {
+        ...data,
+        usuario_modifica:usuario?.id,
+        fecha_modifica:dayjs().add(-4,'hours'),
+      }
+    }
+    if(!id){
+      newProduct = {
+        ...data,
+        usuario_registro:usuario?.id,
+        fecha_registro:dayjs().add(-4,'hours'),
+        activo:1
+      }
     }
     console.log('new producto',newProduct,id);
     try {
@@ -220,7 +233,7 @@ const Page = () => {
               placeholder="Código"
               key={form.key('codigo')}
               type='text'
-              maxLength={15}
+              maxLength={10}
               leftSection={<IconFileBarcode size={16} />}
               {...form.getInputProps('codigo')}
             />
@@ -293,7 +306,7 @@ const Page = () => {
               max={100}
               min={1}
               maxLength={3}
-              leftSection={<IconPlusMinus size={16} />}
+              leftSection={<IconCircleNumber1 size={16} />}
               {...form.getInputProps('pedido_minimo')}
             />
             <Group justify="flex-end" mt="md">

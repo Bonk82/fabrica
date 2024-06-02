@@ -11,9 +11,10 @@ import { notifications } from '@mantine/notifications';
 import classes from '../../toast.module.css';
 import { modals } from '@mantine/modals';
 import { useDisclosure } from '@mantine/hooks';
+import dayjs from 'dayjs';
 
 const Page = () => {
-  const { loading,usuario,createReg,cuentas,getReg,updateReg,deleteReg } = useSupa();
+  const { loading,usuario,createReg,cuentas,parametricas,getReg,updateReg,deleteReg } = useSupa();
   const [opened, { open, close }] = useDisclosure(false);
   const [id, setId] = useState(null)
 
@@ -57,12 +58,24 @@ const Page = () => {
 
   const registrarCuenta = async (data) => {
     // event.preventDefault();
+    data.codigo=data.codigo?.toUpperCase(),
+    data.descripcion=data.descripcion?.toUpperCase(),
     console.log('la data',data);
-    const newCuenta = {
-      ...data,
-      usuario_registro:usuario?.id,
-      fecha_registro:new Date(),
-      activo:1
+    let newCuenta
+    if(id){
+      newCuenta = {
+        ...data,
+        usuario_modifica:usuario?.id,
+        fecha_modifica:dayjs().add(-4,'hours'),
+      }
+    }
+    if(!id){
+      newCuenta = {
+        ...data,
+        usuario_registro:usuario?.id,
+        fecha_registro:dayjs().add(-4,'hours'),
+        activo:1
+      }
     }
     console.log('new cuenta',newCuenta,id);
     try {
@@ -219,7 +232,8 @@ const Page = () => {
             />
             <NativeSelect
               label="Categoría:"
-              data={['Operativos','Ventas Productos','Alquiler Equipos','Salarios','Servicios','Inversión','Descuentos']}
+              // data={['OPERATIVO','VENTA DE PRODUCTOS','ALQUILER EQUIPOS','SALARIOS','SERVICIOS','INVERSIÓN','DESCUENTOS']}
+              data={parametricas.filter(f=>f.tipo === 'CAT_CUENTA').map(e=>e.nombre)}
               required
               leftSection={<IconSection size={16} />}
               key={form.key('categoria')}
@@ -227,7 +241,7 @@ const Page = () => {
             />
             <NativeSelect
               label="Tipo Cuenta:"
-              data={['Negocio','Ingreso','Egreso','Traspaso']}
+              data={['NEGOCIO','INGRESO','EGRESO','TRASPASO']}
               required
               leftSection={<IconSection size={16} />}
               key={form.key('tipo_cuenta')}

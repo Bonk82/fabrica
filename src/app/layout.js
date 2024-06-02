@@ -26,7 +26,7 @@ export default function RootLayout({ children }) {
       </head>
       <body>
         <MantineProvider defaultColorScheme="dark" theme={{primaryColor:'cyan'}}>
-          <Notifications position="top-right" zIndex={100}/>
+          <Notifications position="top-right" zIndex={400}/>
           {/* <Model>{children}</Model> */}
           <AuthProvider>
             <SupabaseContextProvider>

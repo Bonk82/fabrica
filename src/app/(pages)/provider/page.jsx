@@ -11,6 +11,7 @@ import { notifications } from '@mantine/notifications';
 import classes from '../../toast.module.css';
 import { modals } from '@mantine/modals';
 import { useDisclosure } from '@mantine/hooks';
+import dayjs from 'dayjs';
 
 const Page = () => {
   const { loading,usuario,createReg,proveedores,getReg,updateReg,deleteReg } = useSupa();
@@ -43,7 +44,7 @@ const Page = () => {
   const toast = (title,message,type) =>{
     // return <Toast title='el totulo' message='el mensaje' type='error'/>
     let color = type
-    if(type == 'success') color = 'teal.8';
+    if(type == 'success') color = 'lime.8';
     if(type == 'info') color = 'cyan.8';
     if(type == 'warning') color = 'yellow.8';
     if(type == 'error') color = 'red.8';
@@ -57,12 +58,25 @@ const Page = () => {
 
   const registrarProveedor = async (data) => {
     // event.preventDefault();
+    data.nombre=data.nombre?.toUpperCase(),
+    data.direccion=data.direccion?.toUpperCase(),
+    data.referencia=data.referencia?.toUpperCase(),
     console.log('la data',data);
-    const newProveedor = {
-      ...data,
-      usuario_registro:usuario?.id,
-      fecha_registro:new Date(),
-      activo:1
+    let newProveedor
+    if(id){
+      newProveedor = {
+        ...data,
+        usuario_modifica:usuario?.id,
+        fecha_modifica:dayjs().add(-4,'hours'),
+      }
+    }
+    if(!id){
+      newProveedor = {
+        ...data,
+        usuario_registro:usuario?.id,
+        fecha_registro:dayjs().add(-4,'hours'),
+        activo:1
+      }
     }
     console.log('new proveedor',newProveedor,id);
     try {
@@ -201,7 +215,7 @@ const Page = () => {
           <form onSubmit={form.onSubmit((values) => registrarProveedor(values))}>
             <TextInput
               label="Nombre:"
-              placeholder="Nombre del porveedor o empresa"
+              placeholder="Nombre del proveedor o empresa"
               type='text'
               maxLength={100}
               leftSection={<IconUser size={16} />}
@@ -219,25 +233,25 @@ const Page = () => {
             />
             <TextInput
               label="Referencia:"
-              placeholder="referecnias para llegar al local"
+              placeholder="Referencias para llegar al local"
               leftSection={<IconBuilding size={16} />}
               type='text'
               maxLength={100}
               key={form.key('referencia')}
               {...form.getInputProps('referencia')}
             />
-            <TextInput
+            <NumberInput
               label="Teléfonos:"
               placeholder="70611111"
+              allowDecimal={false}
+              maxLength={30}
               leftSection={<IconPhone size={16} />}
-              type='number'
-              maxLength={20}
               key={form.key('telefonos')}
               {...form.getInputProps('telefonos')}
             />
             <NumberInput
               label="Cuenta Bancaria:"
-              placeholder="le numero de cuenta bancaria"
+              placeholder="El numero de cuenta bancaria"
               allowDecimal={false}
               maxLength={15}
               leftSection={<IconCashBanknote size={16} />}

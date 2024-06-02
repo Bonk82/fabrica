@@ -22,6 +22,7 @@ export const SupabaseContextProvider = ({ children }) => {
   const [pedidosDetalle, setPedidosDetalle] = useState([]);
   const [cuentas, setCuentas] = useState([]);
   const [insumos, setInsumos] = useState([]);
+  const [parametricas, setParametricas] = useState([]);
   const [transacciones, setTransacciones] = useState([]);
   const [menu, setMenu] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -32,6 +33,7 @@ export const SupabaseContextProvider = ({ children }) => {
   
   useEffect(()=>{
     getUser();
+    getReg('parametrica','nombre',true)
     // if(!usuario) router.push('/login')
   // eslint-disable-next-line react-hooks/exhaustive-deps
   },[])
@@ -148,6 +150,7 @@ export const SupabaseContextProvider = ({ children }) => {
       if(table == 'vw_pedido') setPedidos(data);
       if(table == 'cuenta') setCuentas(data);
       if(table == 'insumo') setInsumos(data);
+      if(table == 'parametrica') setParametricas(data);
       // if(['prestamo','vw_prestamos'].includes(table)) setProductos(data);
       return data;
     } catch (error) {
@@ -226,6 +229,7 @@ export const SupabaseContextProvider = ({ children }) => {
         pedidosDetalle,
         cuentas,
         insumos,
+        parametricas,
         transacciones,
         loading,
         loginWithMagicLink,
