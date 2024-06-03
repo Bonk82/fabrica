@@ -161,18 +161,32 @@ export const SupabaseContextProvider = ({ children }) => {
     }
   };
 
-  const getRegFilter = async (table,col,value) => {
-    console.log('lo q llega',table,col,value);
+  const getRegFilter = async (table,col,value,type,value2) => {
+    console.log('lo q llega',table,col,value,type);
     try {
       setLoading(true);
-      const {data, error}  = await supabase
-        .from(table)
-        .select("*")
-        .eq(col,value)
-        .order('id_'+table.replace('vw_',''),{ ascending: true })
+      let respuesta;
+      if(type=='eq'){
+       respuesta = await supabase
+          .from(table)
+          .select("*")
+          .eq(col,value)
+          .order('id_'+table.replace('vw_',''),{ ascending: true })
+      }
+      if(type=='between'){
+        respuesta = await supabase
+          .from(table)
+          .select("*")
+          .gte(col, value)
+          .lte(col, value2)
+          .order('id_'+table.replace('vw_',''),{ ascending: true })
+       }
+
+      const {data, error} = respuesta
       console.log(table,data,error);
       if (error) throw new Error(error.message);
       if(table == 'vw_pedido_detalle') setPedidosDetalle(data);
+      if(table == 'vw_transaccion') setTransacciones(data);
       return data;
     } catch (error) {
       console.log(error.error_description || error.message || error);

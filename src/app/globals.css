@@ -143,3 +143,12 @@ tr{
 input{
   text-transform: uppercase;
 }
+
+
+.mantine-DatePickerInput-weekday{
+  color: whitesmoke;
+}
+
+.mantine-Popover-dropdown{
+  background-color: #031321;
+}

@@ -51,7 +51,7 @@ const Page = () => {
   }
   const cargarDetallePedido = async (value) =>{
     console.log('¡lo q llega',value);
-    await getRegFilter('vw_pedido_detalle','fid_pedido',value);
+    await getRegFilter('vw_pedido_detalle','fid_pedido',value,'eq');
   }
 
   const form = useForm({

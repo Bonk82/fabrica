@@ -1,5 +1,6 @@
 'use client'
 
+import 'dayjs/locale/es';
 import { ActionIcon,AppShell, Burger, Group, Image } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { IconRipple } from '@tabler/icons-react';
@@ -9,6 +10,7 @@ import { MantineLogo } from '@mantinex/mantine-logo';
 import Header from '../(components)/Header';
 import Aside from '../(components)/Aside';
 import Footer from '../(components)/Footer';
+import { DatesProvider } from '@mantine/dates';
 // import { MantineLogo } from '@mantinex/mantine-logo';
 
 export function Model({ children }) {
@@ -46,7 +48,9 @@ export function Model({ children }) {
         <Navbar/>
       </AppShell.Navbar>
       <AppShell.Main>
-        {children}
+        <DatesProvider settings={{ locale: 'es' }}>
+          {children}
+        </DatesProvider>
       </AppShell.Main>
       <AppShell.Aside p="md" style={{overflow:'hidden',backgroundColor:'transparent'}}><Aside/></AppShell.Aside>
       <AppShell.Footer style={{fontSize:'small',backgroundColor:'#0c8599', padding:'0 2rem'}}><Footer/></AppShell.Footer>

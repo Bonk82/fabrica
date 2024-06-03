@@ -2,7 +2,7 @@
 import { useSupa } from '@/app/context/SupabaseContext';
 import { ActionIcon, Box, Button, Center, Group, LoadingOverlay, Modal, NativeSelect, NumberInput, Text, TextInput } from '@mantine/core'
 import { useForm } from '@mantine/form';
-import { IconBuilding, IconCashBanknote, IconCheck, IconCode, IconDeviceFloppy, IconEdit, IconEye, IconGps, IconPhone, IconRefresh, IconSection, IconTrash, IconUser } from '@tabler/icons-react';
+import {  IconCashBanknote, IconCode, IconDeviceFloppy, IconEdit, IconGps, IconRefresh, IconSection, IconTrash } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import { useMemo } from 'react';
 import { MantineReactTable, useMantineReactTable} from 'mantine-react-table';
@@ -12,11 +12,14 @@ import classes from '../../toast.module.css';
 import { modals } from '@mantine/modals';
 import { useDisclosure } from '@mantine/hooks';
 import dayjs from 'dayjs';
+import { DateInput, DatePickerInput } from '@mantine/dates';
 
 const Page = () => {
-  const { loading,usuario,createReg,cuentas,parametricas,getReg,updateReg,deleteReg } = useSupa();
+  const { loading,usuario,createReg,cuentas,parametricas,transacciones,getReg,getRegFilter,updateReg,deleteReg } = useSupa();
   const [opened, { open, close }] = useDisclosure(false);
   const [id, setId] = useState(null)
+  const [f1, setF1] = useState(dayjs().startOf('month'))
+  const [f2, setF2] = useState(dayjs().endOf('month'))
 
   useEffect(() => {
     cargarData()
@@ -25,6 +28,7 @@ const Page = () => {
   
   const cargarData = async () =>{
     await getReg('cuenta','id_cuenta',true);
+    await getRegFilter('transaccion','fecha',dayjs(f1).format('YYYY-MM-DD 04:00:00'),'between',dayjs(f2).format('YYYY-MM-DD 23:59:59'))
   }
 
   const form = useForm({
@@ -190,6 +194,10 @@ const Page = () => {
     form.reset()
   }
 
+  const cargarTransaciones = ()=>{
+    console.log('las fechas',f1,f2);
+  }
+
   return (
     <div>
       <Center>
@@ -263,6 +271,25 @@ const Page = () => {
         </Modal>
         <Button onClick={nuevo} style={{marginBottom:'1rem'}} size='sm'>Nueva Cuenta</Button>
         <MantineReactTable table={table} />
+      </Box>
+      <Box style={{display:'flex',justifyContent:'start',gap:'1rem'}}>
+        <DatePickerInput
+          value={f1}
+          onChange={setF1}
+          label="Fecha Inicio"
+          placeholder="Fecha Inicio"
+          size='sm'
+          valueFormat='DD MMM YYYY'
+        />
+        <DatePickerInput
+          value={f2}
+          onChange={setF2}
+          label="Fecha Fin"
+          placeholder="Fecha Fin"
+          size='sm'
+          valueFormat='DD MMM YYYY'
+        />
+        <Button onClick={cargarTransaciones} size='sm' style={{marginTop:'1.5rem'}} >Cargar Transacciones</Button>
       </Box>
     </div>
   )
