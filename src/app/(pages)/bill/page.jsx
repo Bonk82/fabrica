@@ -2,7 +2,7 @@
 import { useSupa } from '@/app/context/SupabaseContext';
 import { ActionIcon, Box, Button, Center, Group, LoadingOverlay, Modal, NativeSelect, NumberInput, Text, TextInput } from '@mantine/core'
 import { useForm } from '@mantine/form';
-import {  IconCashBanknote, IconCode, IconDeviceFloppy, IconEdit, IconGps, IconRefresh, IconSection, IconTrash } from '@tabler/icons-react';
+import {  IconCalendar, IconCashBanknote, IconCode, IconDeviceFloppy, IconEdit, IconGps, IconRefresh, IconSection, IconTrash } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import { useMemo } from 'react';
 import { MantineReactTable, useMantineReactTable} from 'mantine-react-table';
@@ -17,7 +17,9 @@ import { DateInput, DatePickerInput } from '@mantine/dates';
 const Page = () => {
   const { loading,usuario,createReg,cuentas,parametricas,transacciones,getReg,getRegFilter,updateReg,deleteReg } = useSupa();
   const [opened, { open, close }] = useDisclosure(false);
+  const [verTrans, setVerTrans] = useState(false)
   const [id, setId] = useState(null)
+  const [idTrans, setIdtrans] = useState(null)
   const [f1, setF1] = useState(dayjs().startOf('month'))
   const [f2, setF2] = useState(dayjs().endOf('month'))
 
@@ -28,7 +30,7 @@ const Page = () => {
   
   const cargarData = async () =>{
     await getReg('cuenta','id_cuenta',true);
-    await getRegFilter('transaccion','fecha',dayjs(f1).format('YYYY-MM-DD 04:00:00'),'between',dayjs(f2).format('YYYY-MM-DD 23:59:59'))
+    await getRegFilter('vw_transaccion','fecha_entrega',dayjs(f1).format('YYYY-MM-DD 04:00:00'),'between',dayjs(f2).format('YYYY-MM-DD 23:59:59'))
   }
 
   const form = useForm({
@@ -40,9 +42,26 @@ const Page = () => {
       tipo_cuenta:'',
       saldo:0,
     },
-    // validate: {
-    //   tipo_cliente: (value) => (/^\S+@\S+$/.test(value) ? null : 'Correo Inválido'),
-    // },
+  });
+
+  const formTrans = useForm({
+    mode: 'uncontrolled',
+    initialValues: {
+      categoria_cuenta:'',
+      tipo_cuenta:'',
+      nombre_cuenta:'',
+      cliente:'',
+      tipo_cliente:'',
+      fecha:'',
+      cantidad_entregada:0,
+      producto:'',
+      monto:0,
+      descuento:0,
+      fecha_entrega:'',
+      metodo_pago:'',
+      metodo_entrega:'',
+      zona:''
+    },
   });
 
   const toast = (title,message,type) =>{
@@ -157,9 +176,102 @@ const Page = () => {
     [],
   );
 
+  const colTrans = useMemo(
+    () => [
+      {
+        accessorKey: 'categoria_cuenta',
+        header: 'Categoría Cuenta',
+      },
+      {
+        accessorKey: 'tipo_cuenta',
+        header: 'Tipo Cuenta',
+      },
+      {
+        accessorKey: 'nombre_cuenta',
+        header: 'Nombre Cuenta',
+      },
+      {
+        accessorKey: 'cliente',
+        header: 'Cliente',
+      },
+      {
+        accessorKey: 'tipo_cliente',
+        header: 'Tipo Cliente',
+      },
+      {
+        accessorKey: 'fecha',
+        header: 'Fecha',
+      },
+      {
+        accessorKey: 'cantidad_entregada',
+        header: 'Cantidad Entregada',
+      },
+      {
+        accessorKey: 'producto',
+        header: 'Producto',
+      },
+      {
+        accessorKey: 'monto',
+        header: 'Monto',
+      },
+      {
+        accessorKey: 'descuento',
+        header: 'Descuento',
+      },
+      {
+        accessorKey: 'fecha_entrega',
+        header: 'Fecha Entrega',
+      },
+      {
+        accessorKey: 'metodo_pago',
+        header: 'Metodo Pago',
+      },
+      {
+        accessorKey: 'Metodo Entrega',
+        header: 'Metodo Entrega',
+      },
+      {
+        accessorKey: 'zona',
+        header: 'Zona',
+      },
+    ],
+    [],
+  );
+
   const table = useMantineReactTable({
     columns,
     data: cuentas, 
+    defaultColumn: {
+      minSize: 50, 
+      maxSize: 200, 
+      size: 100,
+    },
+    initialState: {
+      density: 'xs',
+    },
+    enableRowActions: true,
+    renderRowActions: ({ row }) => (
+      <Box style={{gap:'0.8rem',display:'flex'}}>
+        <ActionIcon variant="subtle" onClick={() => mostrarRegistro(row.original)}>
+          <IconEdit color='orange' />
+        </ActionIcon>
+        <ActionIcon variant="subtle" onClick={() => confirmar(row.original)}>
+          <IconTrash color='red' />
+        </ActionIcon>
+      </Box>
+    ),
+    mantineTableHeadCellProps:{
+      color:'cyan'
+    },
+    mantineTableProps:{
+      striped: true,
+    },
+    localization:MRT_Localization_ES
+  });
+
+  const tableTrans = useMantineReactTable({
+    columns:colTrans,
+    data: transacciones, 
     defaultColumn: {
       minSize: 50, 
       maxSize: 200, 
@@ -193,9 +305,15 @@ const Page = () => {
     setId(null)
     form.reset()
   }
+  const nuevoTrans = ()=>{
+    setVerTrans(true)
+    setIdtrans(null)
+    formTrans.reset()
+  }
 
   const cargarTransaciones = ()=>{
     console.log('las fechas',f1,f2);
+    cargarData();
   }
 
   return (
@@ -214,7 +332,7 @@ const Page = () => {
           overlayProps={{ radius: 'lg', blur: 4 }}
           loaderProps={{ color: 'cyan', type: 'dots',size:'xl' }}
         />
-        <Modal opened={opened} onClose={close} title={id?'Actualizar Cuenta: '+ id:'Registrar Cuenta'}
+        <Modal opened={opened} onClose={close} title={idTrans?'Actualizar Cuenta: '+ idTrans:'Registrar Cuenta'}
           size='lg' zIndex={20} overlayProps={{
             backgroundOpacity: 0.55,
             blur: 3,
@@ -271,25 +389,71 @@ const Page = () => {
         </Modal>
         <Button onClick={nuevo} style={{marginBottom:'1rem'}} size='sm'>Nueva Cuenta</Button>
         <MantineReactTable table={table} />
-      </Box>
-      <Box style={{display:'flex',justifyContent:'start',gap:'1rem'}}>
-        <DatePickerInput
-          value={f1}
-          onChange={setF1}
-          label="Fecha Inicio"
-          placeholder="Fecha Inicio"
-          size='sm'
-          valueFormat='DD MMM YYYY'
-        />
-        <DatePickerInput
-          value={f2}
-          onChange={setF2}
-          label="Fecha Fin"
-          placeholder="Fecha Fin"
-          size='sm'
-          valueFormat='DD MMM YYYY'
-        />
-        <Button onClick={cargarTransaciones} size='sm' style={{marginTop:'1.5rem'}} >Cargar Transacciones</Button>
+
+        {/* <Modal opened={verTrans} onClose={setVerTrans(false)} title={idTrans?'Actualizar Transacción: '+ idTrans:'Registrar Transacción'}
+          size='md' zIndex={20} overlayProps={{
+            backgroundOpacity: 0.55,
+            blur: 3,
+          }}>
+          <formTrans onSubmit={formTrans.onSubmit((values) => registrarCuenta(values))}>
+            <NativeSelect
+              label="Cuenta:"
+              // data={['OPERATIVO','VENTA DE PRODUCTOS','ALQUILER EQUIPOS','SALARIOS','SERVICIOS','INVERSIÓN','DESCUENTOS']}
+              data={cuentas.map(e=>e.descripcion)}
+              required
+              leftSection={<IconSection size={16} />}
+              key={form.key('nombre_cuenta')}
+              {...form.getInputProps('nombre_cuenta')}
+            />
+            <TextInput
+              label="Fecha:"
+              placeholder="Fecha de la transacción"
+              type='datetime-local'
+              maxLength={20}
+              leftSection={<IconCalendar size={16} />}
+              key={form.key('fecha')}
+              {...form.getInputProps('fecha')}
+            />
+            <NumberInput
+              label="Monto:"
+              placeholder="0"
+              prefix='Bs. '
+              defaultValue={0.00}
+              decimalScale={2}
+              fixedDecimalScale
+              thousandSeparator=','
+              maxLength={15}
+              leftSection={<IconCashBanknote size={16} />}
+              key={form.key('monto')}
+              {...form.getInputProps('monto')}
+            />
+            <Group justify="flex-end" mt="md">
+              {!id && <Button fullWidth leftSection={<IconDeviceFloppy/>} type='submit'>Registrar Transacción</Button>}
+              {id && <Button fullWidth leftSection={<IconRefresh/>} type='submit'>Actualizar Transacción</Button>}
+            </Group>
+          </formTrans>
+        </Modal> */}
+        <Button onClick={nuevoTrans} style={{marginBottom:'1rem'}} size='sm'>Registrar Transacción</Button>
+        <Box style={{display:'flex',justifyContent:'start',gap:'1rem'}}>
+          <DatePickerInput
+            value={f1}
+            onChange={setF1}
+            label="Fecha Inicio"
+            placeholder="Fecha Inicio"
+            size='sm'
+            valueFormat='DD MMM YYYY'
+          />
+          <DatePickerInput
+            value={f2}
+            onChange={setF2}
+            label="Fecha Fin"
+            placeholder="Fecha Fin"
+            size='sm'
+            valueFormat='DD MMM YYYY'
+          />
+          <Button onClick={cargarTransaciones} size='sm' style={{marginTop:'1.5rem'}} >Cargar Transacciones</Button>
+        </Box>
+        <MantineReactTable table={tableTrans} />
       </Box>
     </div>
   )

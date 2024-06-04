@@ -2,7 +2,7 @@
 import { useSupa } from '@/app/context/SupabaseContext';
 import { ActionIcon, Autocomplete, Box, Button, Center, Group, Kbd, LoadingOverlay, Modal, NativeSelect, NumberInput, Switch, Text, TextInput } from '@mantine/core'
 import { useForm } from '@mantine/form';
-import { IconAlignLeft, IconBox, IconCalendar, IconCar, IconCheck, IconDeviceFloppy, IconEdit, IconEye, IconFileBarcode, IconFolder, IconMoneybag, IconPlusMinus, IconReceipt2, IconRefresh, IconStack2, IconTrash, IconUser } from '@tabler/icons-react';
+import { IconAlignLeft, IconBox, IconCalendar, IconCar, IconCheck, IconDeviceFloppy, IconEdit, IconEye, IconFileBarcode, IconFolder, IconMoneybag, IconNumber, IconPlusMinus, IconProgressCheck, IconReceipt2, IconRefresh, IconStack2, IconTrash, IconUser } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import { useMemo } from 'react';
 import { MantineReactTable, useMantineReactTable} from 'mantine-react-table';
@@ -551,7 +551,7 @@ const Page = () => {
             />
             <NativeSelect
               label="Método Pago:"
-              data={['CONTADO', 'DESCUENTO', 'QR','TRASNFERENCIA','TARJETA']}
+              data={['EFECTIVO', 'DESCUENTO', 'QR','TRASNFERENCIA','TARJETA']}
               leftSection={<IconFolder size={16} />}
               key={form.key('metodo_pago')}
               {...form.getInputProps('metodo_pago')}
@@ -597,7 +597,7 @@ const Page = () => {
           </form>
         </Modal>
 
-        <Modal opened={verDetalle} onClose={()=>setVerDetalle(false)} title={idDetalle?'Actualizar Detalle: '+ id:'Registrar Detalle'}
+        <Modal opened={verDetalle} onClose={()=>setVerDetalle(false)} title={idDetalle?'Actualizar Detalle: '+ idDetalle:'Registrar Detalle'}
           size='md' zIndex={20} overlayProps={{
             backgroundOpacity: 0.55,
             blur: 3,
@@ -619,7 +619,7 @@ const Page = () => {
               required
               onValueChange={handdleCantidad}
               maxLength={15}
-              leftSection={<IconPlusMinus size={16} />}
+              leftSection={<IconProgressCheck size={16} />}
               key={formDetalle.key('cantidad_solicitada')}
               {...formDetalle.getInputProps('cantidad_solicitada')}
             />
@@ -643,7 +643,7 @@ const Page = () => {
               max={500}
               min={1}
               maxLength={15}
-              leftSection={<IconPlusMinus size={16} />}
+              leftSection={<IconProgressCheck size={16} />}
               key={formDetalle.key('cantidad_entregada')}
               {...formDetalle.getInputProps('cantidad_entregada')}
             />

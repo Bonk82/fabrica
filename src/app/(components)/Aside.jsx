@@ -1,8 +1,11 @@
 import { Box } from '@mantine/core'
 import { IconCashBanknote, IconDiabolo, IconGasStation, IconTir } from '@tabler/icons-react'
 import '../cards.css'
+import { useSupa } from '../context/SupabaseContext';
 
 const Aside = () => {
+  const { loading,transacciones } = useSupa();
+
   return (
     <Box style={{justifyContent:'space-between',gap:'1rem',display:'flex',flexDirection:'column'}} >
       <div className="card-box bg-primary">
