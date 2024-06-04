@@ -2,7 +2,7 @@
 import { useSupa } from '@/app/context/SupabaseContext';
 import { ActionIcon, Box, Button, Center, Group, LoadingOverlay, Modal, NativeSelect, NumberInput, Text, TextInput } from '@mantine/core'
 import { useForm } from '@mantine/form';
-import {  IconCalendar, IconCashBanknote, IconCode, IconDeviceFloppy, IconEdit, IconGps, IconRefresh, IconSection, IconTrash } from '@tabler/icons-react';
+import {  IconBubble, IconCalendar, IconCashBanknote, IconCode, IconDeviceFloppy, IconEdit, IconGps, IconRefresh, IconSection, IconTrash } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import { useMemo } from 'react';
 import { MantineReactTable, useMantineReactTable} from 'mantine-react-table';
@@ -115,27 +115,48 @@ const Page = () => {
     }
   }
 
+  const registrarTransaccion = async (data) => {
+    data.concepto=data.concepto?.toUpperCase(),
+    data.usuario_registro = usuario?.id
+    console.log('la data',data);
+    console.log('new transacaacion',data,id);
+    try {
+      id ? await updateReg('transaccion',data) : await createReg(data,'transaccion');
+      cargarData();
+      toast('Control Transaccion',`Transaccion ${idTrans? 'actualziada': 'registrada'} satisfactoriamente!`,'success')
+    } catch (error) {
+      toast('Control Transaccion',error.message || error,'error')
+      console.log(error);
+    }finally{
+      formTrans.reset();
+      setVerTrans(false)
+      setIdtrans(null)
+    }
+  }
+
   const confirmar = (e)=>{
     modals.openConfirmModal({
       title: 'Confirmar Eliminación',
       centered: true,
       children: (
         <Text size="sm">
-        Está seguro de ELIMINAR la cuenta: <strong>{e.descripcion.toUpperCase()}</strong>
+        Está seguro de ELIMINAR la {e.id_transaccion ? 'transacción':'cuenta'}: <strong>{e.id_transaccion ? e.concepto.toUpperCase(): e.descripcion.toUpperCase()}</strong>
         </Text>
       ),
-      labels: { confirm: 'Eliminar Cuenta', cancel: "Cancelar" },
+      labels: { confirm: `Eliminar ${e.id_transaccion ? 'Transacción':'Cuenta'}`, cancel: "Cancelar" },
       confirmProps: { color: 'red' },
       onCancel: () => console.log('Cancel'),
-      onConfirm: () => onDeleteCuenta(e),
+      onConfirm: () => onDelete(e),
     });
   }
 
-  const onDeleteCuenta = async(e) => {
-    console.log('delete cuenta',e);
+  const onDelete = async(e) => {
+    console.log('delete',e);
+    const tabla = e.id_cuenta ? 'cuenta':'transaccion'
+    const elId = e.id_cuenta ? e.id_cuenta:e.id_transaccion
     try {
-      await deleteReg('cuenta',e.id_cuenta);
-      toast('Control Cuenta',`Cuenta eliminada satisfactoriamente!`,'success')
+      await deleteReg(tabla,elId);
+      toast('Control Cuenta',`${e.id_cuenta ? 'Cuenta' : 'Transacción'} eliminada satisfactoriamente!`,'success')
     } catch (error) {
       toast('Control Cuenta',error.message || error,'error')
     } finally{
@@ -148,6 +169,13 @@ const Page = () => {
     open()
     setId(data.id_cuenta);
     form.setValues(data)
+  }
+
+  const mostrarTransaccion = (data) =>{
+    console.log('cargando data',data);
+    setVerTrans(true)
+    setIdtrans(data.id_transaccion);
+    formTrans.setValues(data)
   }
 
   const columns = useMemo(
@@ -283,7 +311,7 @@ const Page = () => {
     enableRowActions: true,
     renderRowActions: ({ row }) => (
       <Box style={{gap:'0.8rem',display:'flex'}}>
-        <ActionIcon variant="subtle" onClick={() => mostrarRegistro(row.original)}>
+        <ActionIcon variant="subtle" onClick={() => mostrarTransaccion(row.original)}>
           <IconEdit color='orange' />
         </ActionIcon>
         <ActionIcon variant="subtle" onClick={() => confirmar(row.original)}>
@@ -390,7 +418,7 @@ const Page = () => {
         <Button onClick={nuevo} style={{marginBottom:'1rem'}} size='sm'>Nueva Cuenta</Button>
         <MantineReactTable table={table} />
 
-        {/* <Modal opened={verTrans} onClose={setVerTrans(false)} title={idTrans?'Actualizar Transacción: '+ idTrans:'Registrar Transacción'}
+        <Modal opened={verTrans} onClose={()=>setVerTrans(false)} title={idTrans?'Actualizar Transacción: '+ idTrans:'Registrar Transacción'}
           size='md' zIndex={20} overlayProps={{
             backgroundOpacity: 0.55,
             blur: 3,
@@ -427,12 +455,22 @@ const Page = () => {
               key={form.key('monto')}
               {...form.getInputProps('monto')}
             />
+            <TextInput
+              label="Concepto:"
+              placeholder='Detalle de la transacción'
+              type='text'
+              required
+              maxLength={100}
+              leftSection={<IconBubble size={16} />}
+              key={form.key('concepto')}
+              {...form.getInputProps('concepto')}
+            />
             <Group justify="flex-end" mt="md">
               {!id && <Button fullWidth leftSection={<IconDeviceFloppy/>} type='submit'>Registrar Transacción</Button>}
               {id && <Button fullWidth leftSection={<IconRefresh/>} type='submit'>Actualizar Transacción</Button>}
             </Group>
           </formTrans>
-        </Modal> */}
+        </Modal>
         <Button onClick={nuevoTrans} style={{marginBottom:'1rem'}} size='sm'>Registrar Transacción</Button>
         <Box style={{display:'flex',justifyContent:'start',gap:'1rem'}}>
           <DatePickerInput
