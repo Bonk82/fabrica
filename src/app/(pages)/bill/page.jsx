@@ -19,7 +19,7 @@ const Page = () => {
   const [opened, { open, close }] = useDisclosure(false);
   const [verTrans, setVerTrans] = useState(false)
   const [id, setId] = useState(null)
-  const [idTrans, setIdtrans] = useState(null)
+  const [idTrans, setIdTrans] = useState(null)
   const [f1, setF1] = useState(dayjs().startOf('month'))
   const [f2, setF2] = useState(dayjs().endOf('month'))
 
@@ -30,7 +30,7 @@ const Page = () => {
   
   const cargarData = async () =>{
     await getReg('cuenta','id_cuenta',true);
-    await getRegFilter('vw_transaccion','fecha_entrega',dayjs(f1).format('YYYY-MM-DD 04:00:00'),'between',dayjs(f2).format('YYYY-MM-DD 23:59:59'))
+    await getRegFilter('vw_transaccion','fecha',dayjs(f1).format('YYYY-MM-DD 04:00:00'),'between',dayjs(f2).format('YYYY-MM-DD 23:59:59'))
   }
 
   const form = useForm({
@@ -47,20 +47,21 @@ const Page = () => {
   const formTrans = useForm({
     mode: 'uncontrolled',
     initialValues: {
-      categoria_cuenta:'',
-      tipo_cuenta:'',
+      // categoria_cuenta:'',
+      // tipo_cuenta:'',
+      concepto:'',
       nombre_cuenta:'',
-      cliente:'',
-      tipo_cliente:'',
+      // cliente:'',
+      // tipo_cliente:'',
       fecha:'',
-      cantidad_entregada:0,
-      producto:'',
+      // cantidad_entregada:0,
+      // producto:'',
       monto:0,
-      descuento:0,
-      fecha_entrega:'',
-      metodo_pago:'',
-      metodo_entrega:'',
-      zona:''
+      // descuento:0,
+      // fecha_entrega:'',
+      // metodo_pago:'',
+      // metodo_entrega:'',
+      // zona:''
     },
   });
 
@@ -118,10 +119,13 @@ const Page = () => {
   const registrarTransaccion = async (data) => {
     data.concepto=data.concepto?.toUpperCase(),
     data.usuario_registro = usuario?.id
+    data.fid_cuenta = cuentas.filter(f=>f.descripcion == data.nombre_cuenta)[0]?.id_cuenta;
+    if(idTrans) data.id_transaccion = idTrans
+    delete data.nombre_cuenta
     console.log('la data',data);
     console.log('new transacaacion',data,id);
     try {
-      id ? await updateReg('transaccion',data) : await createReg(data,'transaccion');
+      idTrans ? await updateReg('transaccion',data) : await createReg(data,'transaccion');
       cargarData();
       toast('Control Transaccion',`Transaccion ${idTrans? 'actualziada': 'registrada'} satisfactoriamente!`,'success')
     } catch (error) {
@@ -130,7 +134,7 @@ const Page = () => {
     }finally{
       formTrans.reset();
       setVerTrans(false)
-      setIdtrans(null)
+      setIdTrans(null)
     }
   }
 
@@ -172,10 +176,16 @@ const Page = () => {
   }
 
   const mostrarTransaccion = (data) =>{
+    const soloTrans={
+      nombre_cuenta:data.nombre_cuenta,
+      fecha:data.fecha,
+      monto:data.monto,
+      concepto:data.concepto,
+    }
     console.log('cargando data',data);
     setVerTrans(true)
-    setIdtrans(data.id_transaccion);
-    formTrans.setValues(data)
+    setIdTrans(data.id_transaccion);
+    formTrans.setValues(soloTrans)
   }
 
   const columns = useMemo(
@@ -229,6 +239,9 @@ const Page = () => {
       {
         accessorKey: 'fecha',
         header: 'Fecha',
+        Cell:({cell})=>(
+          <span>{dayjs(cell.getValue()).format('DD/MM/YYYY HH:mm:ss')}</span>
+        )
       },
       {
         accessorKey: 'cantidad_entregada',
@@ -249,6 +262,9 @@ const Page = () => {
       {
         accessorKey: 'fecha_entrega',
         header: 'Fecha Entrega',
+        Cell:({cell})=>(
+          <span>{dayjs(cell.getValue()).format('DD/MM/YYYY HH:mm:ss')}</span>
+        )
       },
       {
         accessorKey: 'metodo_pago',
@@ -311,12 +327,12 @@ const Page = () => {
     enableRowActions: true,
     renderRowActions: ({ row }) => (
       <Box style={{gap:'0.8rem',display:'flex'}}>
-        <ActionIcon variant="subtle" onClick={() => mostrarTransaccion(row.original)}>
+        {!row.original.fid_pedido && <ActionIcon variant="subtle" onClick={() => mostrarTransaccion(row.original)}>
           <IconEdit color='orange' />
-        </ActionIcon>
-        <ActionIcon variant="subtle" onClick={() => confirmar(row.original)}>
+        </ActionIcon>}
+        {!row.original.fid_pedido && <ActionIcon variant="subtle" onClick={() => confirmar(row.original)}>
           <IconTrash color='red' />
-        </ActionIcon>
+        </ActionIcon>}
       </Box>
     ),
     mantineTableHeadCellProps:{
@@ -335,7 +351,7 @@ const Page = () => {
   }
   const nuevoTrans = ()=>{
     setVerTrans(true)
-    setIdtrans(null)
+    setIdTrans(null)
     formTrans.reset()
   }
 
@@ -423,15 +439,15 @@ const Page = () => {
             backgroundOpacity: 0.55,
             blur: 3,
           }}>
-          <formTrans onSubmit={formTrans.onSubmit((values) => registrarCuenta(values))}>
+          <form onSubmit={formTrans.onSubmit((values) => registrarTransaccion(values))}>
             <NativeSelect
               label="Cuenta:"
               // data={['OPERATIVO','VENTA DE PRODUCTOS','ALQUILER EQUIPOS','SALARIOS','SERVICIOS','INVERSIÓN','DESCUENTOS']}
               data={cuentas.map(e=>e.descripcion)}
               required
               leftSection={<IconSection size={16} />}
-              key={form.key('nombre_cuenta')}
-              {...form.getInputProps('nombre_cuenta')}
+              key={formTrans.key('nombre_cuenta')}
+              {...formTrans.getInputProps('nombre_cuenta')}
             />
             <TextInput
               label="Fecha:"
@@ -439,8 +455,8 @@ const Page = () => {
               type='datetime-local'
               maxLength={20}
               leftSection={<IconCalendar size={16} />}
-              key={form.key('fecha')}
-              {...form.getInputProps('fecha')}
+              key={formTrans.key('fecha')}
+              {...formTrans.getInputProps('fecha')}
             />
             <NumberInput
               label="Monto:"
@@ -452,8 +468,8 @@ const Page = () => {
               thousandSeparator=','
               maxLength={15}
               leftSection={<IconCashBanknote size={16} />}
-              key={form.key('monto')}
-              {...form.getInputProps('monto')}
+              key={formTrans.key('monto')}
+              {...formTrans.getInputProps('monto')}
             />
             <TextInput
               label="Concepto:"
@@ -462,34 +478,36 @@ const Page = () => {
               required
               maxLength={100}
               leftSection={<IconBubble size={16} />}
-              key={form.key('concepto')}
-              {...form.getInputProps('concepto')}
+              key={formTrans.key('concepto')}
+              {...formTrans.getInputProps('concepto')}
             />
             <Group justify="flex-end" mt="md">
-              {!id && <Button fullWidth leftSection={<IconDeviceFloppy/>} type='submit'>Registrar Transacción</Button>}
-              {id && <Button fullWidth leftSection={<IconRefresh/>} type='submit'>Actualizar Transacción</Button>}
+              {!idTrans && <Button fullWidth leftSection={<IconDeviceFloppy/>} type='submit'>Registrar Transacción</Button>}
+              {idTrans && <Button fullWidth leftSection={<IconRefresh/>} type='submit'>Actualizar Transacción</Button>}
             </Group>
-          </formTrans>
+          </form>
         </Modal>
-        <Button onClick={nuevoTrans} style={{marginBottom:'1rem'}} size='sm'>Registrar Transacción</Button>
-        <Box style={{display:'flex',justifyContent:'start',gap:'1rem'}}>
-          <DatePickerInput
-            value={f1}
-            onChange={setF1}
-            label="Fecha Inicio"
-            placeholder="Fecha Inicio"
-            size='sm'
-            valueFormat='DD MMM YYYY'
-          />
-          <DatePickerInput
-            value={f2}
-            onChange={setF2}
-            label="Fecha Fin"
-            placeholder="Fecha Fin"
-            size='sm'
-            valueFormat='DD MMM YYYY'
-          />
-          <Button onClick={cargarTransaciones} size='sm' style={{marginTop:'1.5rem'}} >Cargar Transacciones</Button>
+        <Box style={{display:'flex',justifyContent:'space-between',margin:'1rem 0'}}>
+          <Button onClick={nuevoTrans} style={{marginTop:'1.5rem'}} size='sm'>Nueva Transacción</Button>
+          <div style={{display:'flex',gap:'1rem'}}>
+            <DatePickerInput
+              value={f1}
+              onChange={setF1}
+              label="Fecha Inicio"
+              placeholder="Fecha Inicio"
+              size='sm'
+              valueFormat='DD MMM YYYY'
+            />
+            <DatePickerInput
+              value={f2}
+              onChange={setF2}
+              label="Fecha Fin"
+              placeholder="Fecha Fin"
+              size='sm'
+              valueFormat='DD MMM YYYY'
+            />
+            <Button color='blue.2' variant='light' onClick={cargarTransaciones} size='sm' style={{marginTop:'1.5rem'}} >Cargar Transacciones</Button>
+          </div>
         </Box>
         <MantineReactTable table={tableTrans} />
       </Box>
