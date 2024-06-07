@@ -2,7 +2,7 @@
 
 import 'dayjs/locale/es';
 import { ActionIcon,AppShell, Burger, Group, Image } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
+import { useDisclosure,useViewportSize } from '@mantine/hooks';
 import { IconRipple } from '@tabler/icons-react';
 import { useState } from "react";
 import Navbar from '../(components)/Navbar';
@@ -11,11 +11,12 @@ import Header from '../(components)/Header';
 import Aside from '../(components)/Aside';
 import Footer from '../(components)/Footer';
 import { DatesProvider } from '@mantine/dates';
-// import { MantineLogo } from '@mantinex/mantine-logo';
 
 export function Model({ children }) {
   const [opened, { toggle }] = useDisclosure();
   const [nav, setNav] = useState(true)
+  // const [width, setWidth] = useState((window || {}).innerWidth);
+  const { width } = useViewportSize();
 
   const toggleNav = () =>{
     setNav(!nav);
@@ -40,7 +41,8 @@ export function Model({ children }) {
         </Group>
       </AppShell.Header>
       <AppShell.Navbar p="sm" style={{overflow:'hidden',backgroundColor:'transparent'}}>
-        {(window?.innerWidth >= 768) &&
+        {/* {(window?.innerWidth >= 768) && */}
+        {(width >= 768) &&
           <div style={{display:'flex',justifyContent:'space-between', fontSize:'x-large',marginBottom:'2rem'}}>{nav ? 'Menú de opciones' : ''}
             <ActionIcon style={{width:'50px'}} onClick={toggleNav}><IconRipple/></ActionIcon>
           </div>

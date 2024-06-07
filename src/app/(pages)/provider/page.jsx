@@ -1,6 +1,6 @@
 'use client'
 import { useSupa } from '@/app/context/SupabaseContext';
-import { ActionIcon, Box, Button, Center, Group, LoadingOverlay, Modal, NativeSelect, NumberInput, Text, TextInput } from '@mantine/core'
+import { ActionIcon, Box, Button, Center, Group, LoadingOverlay, Modal, NumberInput, Text, TextInput } from '@mantine/core'
 import { useForm } from '@mantine/form';
 import { IconBuilding, IconCashBanknote, IconCheck, IconDeviceFloppy, IconEdit, IconEye, IconGps, IconPhone, IconRefresh, IconTrash, IconUser } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';

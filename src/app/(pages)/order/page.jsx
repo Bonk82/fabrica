@@ -15,7 +15,7 @@ import dayjs from 'dayjs';
 
 
 const Page = () => {
-  const { loading,usuario,createReg,pedidos,pedidosDetalle,clientes,productos,getReg,getRegFilter,updateReg,deleteReg } = useSupa();
+  const { loading,usuario,createReg,parametricas,pedidos,pedidosDetalle,clientes,productos,getReg,getRegFilter,updateReg,deleteReg } = useSupa();
   const [opened, { open, close }] = useDisclosure(false);
   const [verDetalle, setVerDetalle] = useState(false);
   const [verGrillaDetalle, setVerGrillaDetalle] = useState(false);
@@ -422,17 +422,29 @@ const Page = () => {
     const elPrecio =  productos.filter(f=> f.id_producto == v)[0]?.precio;
     // formDetalle.setValues({precio:formDetalle.getValues().cantidad_solicitada * (elPrecio || 0)})
     formDetalle.setFieldValue('precio_unidad', elPrecio)
-    formDetalle.setFieldValue('monto_total', (elPrecio || 0) * formDetalle.getValues().cantidad_solicitada )
+    formDetalle.setFieldValue('monto_total', (elPrecio || 0) * formDetalle.getValues().cantidad_entregada )
     setElProducto(v)
-    console.log('handdlerProduct-el precio',elPrecio,formDetalle.getValues(),v);
+    console.log('handdlerProduct',elPrecio,formDetalle.getValues(),v);
   }
 
   const handdleCantidad = ()=>{
-    const elPrecio =  productos.filter(f=> f.id_producto == elProducto)[0]?.precio;
+    const elPrecio =  formDetalle.getValues().precio_unidad;
     console.log('el precio',elPrecio,formDetalle.getValues());
     // form.setFieldValue('precio', form.getValues().cantidad_solicitada * (elPrecio || 0))
     formDetalle.setFieldValue('cantidad_entregada', formDetalle.getValues().cantidad_solicitada)
-    formDetalle.setFieldValue('monto_total', (elPrecio || 0) * formDetalle.getValues().cantidad_solicitada )
+    formDetalle.setFieldValue('monto_total', (elPrecio || 0) * formDetalle.getValues().cantidad_entregada )
+  }
+
+  const handdlePrecio = ()=>{
+    const elPrecio = formDetalle.getValues().precio_unidad;
+    console.log('el precio',elPrecio,formDetalle.getValues());
+    formDetalle.setFieldValue('monto_total', (elPrecio || 0) * formDetalle.getValues().cantidad_entregada )
+  }
+
+  const handdleEntregado = ()=>{
+    const elPrecio = formDetalle.getValues().precio_unidad;
+    console.log('el precio',elPrecio,formDetalle.getValues());
+    formDetalle.setFieldValue('monto_total', (elPrecio || 0) * formDetalle.getValues().cantidad_entregada )
   }
 
   const nuevo = ()=>{
@@ -510,7 +522,8 @@ const Page = () => {
             />
             <NativeSelect
               label="Estado Pedido:"
-              data={['SOLICITADO', 'PENDIENTE', 'ENTREGADO']}
+              // data={['SOLICITADO', 'PENDIENTE', 'ENTREGADO']}
+              data={parametricas.filter(f=>f.tipo === 'ESTADO_PEDIDO').map(e=>e.nombre)}
               required
               withAsterisk
               leftSection={<IconFolder size={16} />}
@@ -533,7 +546,7 @@ const Page = () => {
             />
             <NativeSelect
               label="Estado Pago:"
-              data={['PENDIENTE','PAGADO', 'DESCUENTO']}
+              data={['SLECCIONE...','PENDIENTE','PAGADO', 'DESCUENTO']}
               required
               withAsterisk
               leftSection={<IconFolder size={16} />}
@@ -551,14 +564,16 @@ const Page = () => {
             />
             <NativeSelect
               label="Método Pago:"
-              data={['EFECTIVO', 'DESCUENTO', 'QR','TRASNFERENCIA','TARJETA']}
+              // data={['EFECTIVO', 'DESCUENTO', 'QR','TRASNFERENCIA','TARJETA']}
+              data={parametricas.filter(f=>f.tipo === 'METODO_PAGO').map(e=>e.nombre)}
               leftSection={<IconFolder size={16} />}
               key={form.key('metodo_pago')}
               {...form.getInputProps('metodo_pago')}
             />
             <NativeSelect
               label="Método Entrega:"
-              data={['EN FABRICA', 'DELIVERY', 'ENVÍO','ENTREGA PROGRAMDA']}
+              // data={['EN FABRICA', 'DELIVERY', 'ENVÍO','ENTREGA PROGRAMDA']}
+              data={parametricas.filter(f=>f.tipo === 'METODO_ENTREGA').map(e=>e.nombre)}
               leftSection={<IconFolder size={16} />}
               key={form.key('metodo_entrega')}
               {...form.getInputProps('metodo_entrega')}
@@ -633,6 +648,7 @@ const Page = () => {
               thousandSeparator=','
               leftSection={<IconReceipt2 size={16} />}
               required
+              onValueChange={handdlePrecio}
               maxLength={15}
               key={formDetalle.key('precio_unidad')}
               {...formDetalle.getInputProps('precio_unidad')}
@@ -643,6 +659,8 @@ const Page = () => {
               max={500}
               min={1}
               maxLength={15}
+              onValueChange={handdleEntregado}
+              required
               leftSection={<IconProgressCheck size={16} />}
               key={formDetalle.key('cantidad_entregada')}
               {...formDetalle.getInputProps('cantidad_entregada')}

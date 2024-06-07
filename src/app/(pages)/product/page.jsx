@@ -239,7 +239,7 @@ const Page = () => {
             />
             <NativeSelect
               label="Categoría"
-              data={['SÓLIDOS', 'LÍQUIDOS','SERVICIOS','DERIVADOS']}
+              data={['SELECCIONE...','SÓLIDOS', 'LÍQUIDOS','SERVICIOS','DERIVADOS']}
               leftSection={<IconBox size={16} />}
               key={form.key('categoria')}
               {...form.getInputProps('categoria')}
@@ -255,7 +255,7 @@ const Page = () => {
             />
             <NativeSelect
               label="Tipo Unidad"
-              data={['KILO', 'BOLSA', 'PAQUETE','LITRO','BOTELLON','UNIDAD']}
+              data={['SELECCIONE...','KILO', 'BOLSA', 'PAQUETE','LITRO','BOTELLON','UNIDAD']}
               key={form.key('unidad')}
               leftSection={<IconBox size={16} />}
               {...form.getInputProps('unidad')}

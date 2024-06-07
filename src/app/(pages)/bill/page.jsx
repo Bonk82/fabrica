@@ -411,7 +411,8 @@ const Page = () => {
             />
             <NativeSelect
               label="Tipo Cuenta:"
-              data={['NEGOCIO','INGRESO','EGRESO','TRASPASO']}
+              // data={['NEGOCIO','INGRESO','EGRESO','TRASPASO']}
+              data={parametricas.filter(f=>f.tipo === 'TIPO_CUENTA').map(e=>e.nombre)}
               required
               leftSection={<IconSection size={16} />}
               key={form.key('tipo_cuenta')}

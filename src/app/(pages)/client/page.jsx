@@ -297,7 +297,7 @@ const Page = () => {
             />
             <NativeSelect
               label="Estado"
-              data={['COMPRA','NO COMPRA']}
+              data={['SLECCIONE...','COMPRA','NO COMPRA']}
               leftSection={<IconFolder size={16} />}
               key={form.key('estado')}
               {...form.getInputProps('estado')}
@@ -403,21 +403,22 @@ const Page = () => {
             />
             <NativeSelect
               label="Equipo:"
-              data={['PROPIO', 'PRÉSTAMO']}
+              data={['SLECCIONE...','PROPIO', 'PRÉSTAMO']}
               leftSection={<IconFolder size={16} />}
               key={form.key('equipo')}
               {...form.getInputProps('equipo')}
             />
             <NativeSelect
               label="Letrero:"
-              data={['SI', 'NO']}
+              data={['SLECCIONE...','SI', 'NO']}
               leftSection={<IconFolder size={16} />}
               key={form.key('letrero')}
               {...form.getInputProps('letrero')}
             />
             <NativeSelect
               label="Tipo Cliente"
-              data={['EVENTUAL', 'DESCUENTO', 'PAGO SEMANAL']}
+              // data={['EVENTUAL', 'DESCUENTO', 'PAGO SEMANAL']}
+              data={parametricas.filter(f=>f.tipo === 'TIPO_CLIENTE').map(e=>e.nombre)}
               leftSection={<IconFolder size={16} />}
               key={form.key('tipo_cliente')}
               {...form.getInputProps('tipo_cliente')}

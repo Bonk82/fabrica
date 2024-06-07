@@ -352,7 +352,7 @@ const Page = () => {
             />
             <NativeSelect
               label="Condición:"
-              data={['NUEVO','USADO']}
+              data={['SELECCIONE...','NUEVO','USADO']}
               required
               leftSection={<IconSection size={16} />}
               key={form.key('condicion')}

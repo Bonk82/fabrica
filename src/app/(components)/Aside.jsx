@@ -21,15 +21,17 @@ const Aside = () => {
 
   return (
     <Box style={{justifyContent:'space-between',gap:'1rem',display:'flex',flexDirection:'column'}} >
-      <div className="card-box bg-primary">
-        <div className="content">
-          <div className='title'>{productos[0]?.descripcion || 'Hielo bolsa 3Kg.'}</div>
-          <h2>{(productos[0]?.existencia) || 0}</h2>
+      {productos.map(p=>(
+        <div className="card-box bg-primary" key={p.id_producto}>
+          <div className="content">
+            <div className='title'>{p.descripcion || 'PRODUCTO'}</div>
+            <h2>{(p.existencia) || 0}</h2>
+          </div>
+          <div className="icon">
+            <IconDiabolo size={50}/>
+          </div>
         </div>
-        <div className="icon">
-          <IconDiabolo size={50}/>
-        </div>
-      </div>
+      ))}
       <div className="card-box bg-success">
         <div className="content">
           <div className='title'>Monto Ventas</div>
