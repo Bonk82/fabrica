@@ -11,11 +11,16 @@ import { notifications } from '@mantine/notifications';
 import classes from '../../toast.module.css';
 import { modals } from '@mantine/modals';
 import { BarChart } from '@mantine/charts';
+import dayjs from 'dayjs';
+import { DatePickerInput } from '@mantine/dates';
+import {render} from 'carbone'
 
 const Page = () => {
-  const { loading,getReg,transacciones,pedidos,productos} = useSupa();
+  const { loading,getReg,getRegFilter,transacciones,pedidos,productos} = useSupa();
   const [listaProductos, setListaProductos] = useState([])
   const colores = ['violet.6','green.6','red.6'];
+  const [f1, setF1] = useState(dayjs().startOf('month'))
+  const [f2, setF2] = useState(dayjs().endOf('month'))
 
   // const data = [
   //   { month: 'January', Smartphones: 1200, Laptops: 900, Tablets: 200 },
@@ -35,6 +40,7 @@ const Page = () => {
   const getData = async ()=>{
     await getReg('vw_pedido','id_pedido',false);
     await getReg('producto','id_producto',false);
+    await getRegFilter('vw_transaccion','fecha',dayjs(f1).format('YYYY-MM-DD 04:00:00'),'between',dayjs(f2).format('YYYY-MM-DD 23:59:59'))
     armarData()
   }
 
@@ -48,15 +54,96 @@ const Page = () => {
     console.log('listaProductos',listaProductos);
   }
 
+
+  const generarReporte = (tipoReporte) =>{
+    const pathTemplate = ``
+    const optionsReport = {
+      convertTo : 'pdf', //can be docx, txt, ...
+      reportName:  `Cristales_report${tipoReporte}_${new Date().getTime()}.pdf`, //'Reporte01' + new Date().getTime() + '.pdf',
+      lang: "es",
+      timezone: "America/Caracas",
+    };
+    const miData = transacciones
+    try {
+      render(
+        pathTemplate,
+        miData,
+        optionsReport,
+        (err, buffer, filename) => {
+          if (err) console.log(err);
+          if (!buffer) console.log('sin buffer',err);
+          console.log('el buff',buffer,filename);
+          const result = Buffer.from(buffer, 'binary');
+          const url = window.URL.createObjectURL(new Blob([result]));
+          const link = document.createElement("a");
+          link.href = url;
+          link.setAttribute("download", nombreReporte);
+          document.body.appendChild(link);
+          link.click();
+
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
+        }
+      );
+    } catch (error) {
+      console.log(error);
+      respuesta.send(error);
+    }
+  }
+
   return (
-    <BarChart
-      h={300}
-      data={productos}
-      dataKey="descripcion"
-      series={[{name:'existencia',color:'violet.6'}]}
-      tickLine="y"
-    />
-    // <h1>dashboard</h1>
+    <div>
+      <Center>
+        <Text c="cyan.4" size='30px' fw={900}
+          variant="gradient"
+          gradient={{ from: 'lightblue', to: 'cyan', deg: 90 }}>
+          Datos del {dayjs().startOf('month').format('DD-MM-YYYY')} al {dayjs().endOf('month').format('DD-MM-YYYY')}
+        </Text>
+      </Center>
+      <Box pos='relative'>
+        <LoadingOverlay
+          visible={loading}
+          zIndex={39}
+          overlayProps={{ radius: 'lg', blur: 4 }}
+          loaderProps={{ color: 'cyan', type: 'dots',size:'xl' }}
+        />
+        <Box style={{display:'flex',justifyContent:'flex-end',gap:'1rem',margin:'1rem 0'}}>
+          <DatePickerInput
+            value={f1}
+            onChange={setF1}
+            label="Fecha Inicio"
+            placeholder="Fecha Inicio"
+            size='sm'
+            valueFormat='DD MMM YYYY'
+          />
+          <DatePickerInput
+            value={f2}
+            onChange={setF2}
+            label="Fecha Fin"
+            placeholder="Fecha Fin"
+            size='sm'
+            valueFormat='DD MMM YYYY'
+          />
+          <Button color='blue.2' variant='light' onClick={cargarTransaciones} size='sm' style={{marginTop:'1.5rem'}} >Cargar Transacciones</Button>
+        </Box>
+        <Box>
+          <BarChart
+            h={300}
+            data={productos}
+            dataKey="descripcion"
+            series={[{name:'existencia',color:'teal.6'}]}
+            tickLine="y"
+          />
+          <BarChart
+            h={300}
+            data={productos}
+            dataKey="descripcion"
+            series={[{name:'existencia',color:'teal.8'}]}
+            tickLine="y"
+          />
+        </Box>
+      </Box>
+    </div>
   )
 }
 

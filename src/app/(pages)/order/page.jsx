@@ -382,7 +382,7 @@ const Page = () => {
         <h2>{row.original.nombre}</h2>
         <p>{row.original.direccion} {row.original.referencia}</p>
         <strong>{row.original.telefonos}</strong><br />
-        <Kbd>{row.original.tipo_cliente}</Kbd>
+        <Kbd color='orange'>{row.original.tipo_cliente}</Kbd>
       </Box>
     )
   });

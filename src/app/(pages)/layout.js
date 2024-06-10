@@ -55,7 +55,7 @@ export function Model({ children }) {
         </DatesProvider>
       </AppShell.Main>
       <AppShell.Aside p="md" style={{overflow:'hidden',backgroundColor:'transparent'}}><Aside/></AppShell.Aside>
-      <AppShell.Footer style={{fontSize:'small',backgroundColor:'#0c8599', padding:'0 2rem'}}><Footer/></AppShell.Footer>
+      {/* <AppShell.Footer style={{fontSize:'small',backgroundColor:'#0c8599', padding:'0 2rem'}}><Footer/></AppShell.Footer> */}
     </AppShell>
   );
 }

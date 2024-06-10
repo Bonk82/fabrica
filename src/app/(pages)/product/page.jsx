@@ -2,7 +2,7 @@
 import { useSupa } from '@/app/context/SupabaseContext';
 import { ActionIcon, Box, Button, Center, Group, LoadingOverlay, Modal, NativeSelect, NumberInput, Text, TextInput } from '@mantine/core'
 import { useForm } from '@mantine/form';
-import { IconAlignLeft, IconBox, IconCheck, IconCircle1, IconCircleNumber1, IconDeviceFloppy, IconEdit, IconEye, IconFileBarcode, IconPlusMinus, IconReceipt2, IconRefresh, IconStack2, IconTrash } from '@tabler/icons-react';
+import { IconAlignLeft, IconBox, IconCheck, IconCircle1, IconCircleNumber1, IconDeviceFloppy, IconEdit, IconEye, IconFileBarcode, IconPlus, IconPlusMinus, IconReceipt2, IconRefresh, IconStack2, IconTrash } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import { useMemo } from 'react';
 import { MantineReactTable, useMantineReactTable} from 'mantine-react-table';
@@ -178,6 +178,9 @@ const Page = () => {
     },
     initialState: {
       density: 'xs',
+      columnPinning: {
+        left: ['mrt-row-expand'],
+      },
     },
     enableRowActions: true,
     renderRowActions: ({ row }) => (
@@ -196,13 +199,33 @@ const Page = () => {
     mantineTableProps:{
       striped: true,
     },
-    localization:MRT_Localization_ES
+    localization:MRT_Localization_ES,
+    renderDetailPanel:({row}) => (
+      <Box
+        sx={{
+          alignItems: 'center',
+          display: 'flex',
+          justifyContent: 'space-around',
+          width: '100%',
+        }}
+      >
+        <Button size='xl' color='blue.5' leftSection={<IconPlus/>} onClick={()=>agregarStock(row.original,10)}>10</Button>
+        <Button size='xl' color='blue.8' leftSection={<IconPlus/>} onClick={()=>agregarStock(row.original,20)}>20</Button>
+        <Button size='xl' color='yellow.6' leftSection={<IconPlus/>} onClick={()=>agregarStock(row.original,50)}>50</Button>
+        <Button size='xl' color='orange.6' leftSection={<IconPlus/>} onClick={()=>agregarStock(row.original,100)}>100</Button>
+      </Box>
+    )
   });
 
   const nuevo = ()=>{
     open()
     setId(null)
     form.reset()
+  }
+
+  const agregarStock = (elProducto,cantidad) =>{
+    elProducto.existencia = cantidad
+    registrarProducto(elProducto)
   }
 
 
