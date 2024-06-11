@@ -155,3 +155,9 @@ input{
 .mantine-BarChart-tooltipLabel, .mantine-BarChart-tooltip, .mantine-BarChart-tooltipItemBody{
   background-color: #031321;
 }
+
+grid-dash{
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit,minmax(200px,1fr));
+}

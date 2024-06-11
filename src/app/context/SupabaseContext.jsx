@@ -162,7 +162,7 @@ export const SupabaseContextProvider = ({ children }) => {
   };
 
   const getRegFilter = async (table,col,value,type,value2) => {
-    console.log('lo q llega',table,col,value,type);
+    console.log('lo q llega',table,col,value,type,value2);
     try {
       setLoading(true);
       let respuesta;

@@ -13,7 +13,9 @@ import { modals } from '@mantine/modals';
 import { BarChart } from '@mantine/charts';
 import dayjs from 'dayjs';
 import { DatePickerInput } from '@mantine/dates';
-import {render} from 'carbone'
+import axios from 'axios';
+// import {  } from '@/app/api/reports/carbone';
+// import {render} from 'carbone'
 
 const Page = () => {
   const { loading,getReg,getRegFilter,transacciones,pedidos,productos} = useSupa();
@@ -51,45 +53,92 @@ const Page = () => {
     productos.forEach((p,i) => {
       listaProductos.push({name:p.existencia,color:colores[i]})
     });
+    obtnerReporte('UNO',listaProductos)
     console.log('listaProductos',listaProductos);
   }
 
-
-  const generarReporte = (tipoReporte) =>{
-    const pathTemplate = ``
-    const optionsReport = {
-      convertTo : 'pdf', //can be docx, txt, ...
-      reportName:  `Cristales_report${tipoReporte}_${new Date().getTime()}.pdf`, //'Reporte01' + new Date().getTime() + '.pdf',
-      lang: "es",
-      timezone: "America/Caracas",
-    };
-    const miData = transacciones
+  const obtnerReporte = async (tipo,d) =>{
+    console.log('obteneinedo report',tipo,d);
     try {
-      render(
-        pathTemplate,
-        miData,
-        optionsReport,
-        (err, buffer, filename) => {
-          if (err) console.log(err);
-          if (!buffer) console.log('sin buffer',err);
-          console.log('el buff',buffer,filename);
-          const result = Buffer.from(buffer, 'binary');
-          const url = window.URL.createObjectURL(new Blob([result]));
-          const link = document.createElement("a");
-          link.href = url;
-          link.setAttribute("download", nombreReporte);
-          document.body.appendChild(link);
-          link.click();
+      const response = await axios.get(`/api/reports`, {
+        params: { tipo }
+      });
+      // const response2 = await axios.post('/api/reports', [{a:1,b:25,c:23},{a:10,b:250,c:230},{a:15,b:255,c:235}], {
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //   },
+      // });
+      const templateData = {
+        filename: 'report-template.docx', // Cambia el nombre de la plantilla según tu caso
+      };
+      const data = [
+        { id: 1, name: 'Item 1', value: 'Value 1' },
+        { id: 2, name: 'Item 2', value: 'Value 2' },
+        // Puedes agregar más objetos aquí
+      ];
+      const response2 = await axios.post('/api/reports', { templateData, data }, {
+        responseType: 'blob',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
 
-          document.body.removeChild(link);
-          URL.revokeObjectURL(url);
-        }
-      );
+      // Crear un enlace para descargar el archivo
+      const url = window.URL.createObjectURL(new Blob([response2.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'report.docx'); // Ajusta el nombre del archivo según tu caso
+      document.body.appendChild(link);
+      link.click();
+      // setMessage(response.data.message);
+      console.log('la respuesta API',response,response2);
     } catch (error) {
-      console.log(error);
-      respuesta.send(error);
+      // setError('Error fetching data');
+      console.error('Error fetching data:', error);
+    } finally {
+      // setLoading(false);
     }
+    // const r = await generarReporte.bind(tipo)
+    // const s = await handler.bind('x');
+    // console.log('facil',r,s);
   }
+
+
+  // const generarReporte = (tipoReporte) =>{
+  //   const pathTemplate = ``
+  //   const optionsReport = {
+  //     convertTo : 'pdf', //can be docx, txt, ...
+  //     reportName:  `Cristales_report${tipoReporte}_${new Date().getTime()}.pdf`, //'Reporte01' + new Date().getTime() + '.pdf',
+  //     lang: "es",
+  //     timezone: "America/Caracas",
+  //   };
+  //   const miData = transacciones
+  //   try {
+  //     render(
+  //       pathTemplate,
+  //       miData,
+  //       optionsReport,
+  //       (err, buffer, filename) => {
+  //         if (err) console.log(err);
+  //         if (!buffer) console.log('sin buffer',err);
+  //         console.log('el buff',buffer,filename);
+  //         const result = Buffer.from(buffer, 'binary');
+  //         const url = window.URL.createObjectURL(new Blob([result]));
+  //         const link = document.createElement("a");
+  //         link.href = url;
+  //         link.setAttribute("download", nombreReporte);
+  //         document.body.appendChild(link);
+  //         link.click();
+
+  //         document.body.removeChild(link);
+  //         URL.revokeObjectURL(url);
+  //       }
+  //     );
+  //   } catch (error) {
+  //     console.log(error);
+  //     respuesta.send(error);
+  //   }
+  // }
 
   return (
     <div>
@@ -97,7 +146,7 @@ const Page = () => {
         <Text c="cyan.4" size='30px' fw={900}
           variant="gradient"
           gradient={{ from: 'lightblue', to: 'cyan', deg: 90 }}>
-          Datos del {dayjs().startOf('month').format('DD-MM-YYYY')} al {dayjs().endOf('month').format('DD-MM-YYYY')}
+          Datos del {dayjs().startOf('month').format('DD MMM YYYY')} al {dayjs().endOf('month').format('DD MMM YYYY')}
         </Text>
       </Center>
       <Box pos='relative'>
@@ -124,9 +173,9 @@ const Page = () => {
             size='sm'
             valueFormat='DD MMM YYYY'
           />
-          <Button color='blue.2' variant='light' onClick={cargarTransaciones} size='sm' style={{marginTop:'1.5rem'}} >Cargar Transacciones</Button>
+          <Button color='blue.2' variant='light' onClick={()=>getData()} size='sm' style={{marginTop:'1.5rem'}} >Cargar Transacciones</Button>
         </Box>
-        <Box>
+        <Box style={{display:'flex', gap:'1rem',gridTemplateColumns:'repeat(auto-fill, minmax(200px, 1fr))'}}>
           <BarChart
             h={300}
             data={productos}

@@ -65,14 +65,14 @@ const Page = () => {
     data.descripcion=data.descripcion?.toUpperCase(),
     console.log('la data',data);
     let newProduct
-    if(id){
+    if(id || data.id_producto){
       newProduct = {
         ...data,
         usuario_modifica:usuario?.id,
         fecha_modifica:dayjs().add(-4,'hours'),
       }
     }
-    if(!id){
+    if(!id && !data.id_producto){
       newProduct = {
         ...data,
         usuario_registro:usuario?.id,
@@ -82,7 +82,7 @@ const Page = () => {
     }
     console.log('new producto',newProduct,id);
     try {
-      id ? await updateReg('producto',newProduct) : await createReg(newProduct,'producto');
+      id || data.id_producto ? await updateReg('producto',newProduct) : await createReg(newProduct,'producto');
       cargarData();
       toast('Control Producto',`Producto ${id? 'actualziado': 'registrado'} satisfactoriamente!`,'success')
     } catch (error) {
@@ -201,19 +201,12 @@ const Page = () => {
     },
     localization:MRT_Localization_ES,
     renderDetailPanel:({row}) => (
-      <Box
-        sx={{
-          alignItems: 'center',
-          display: 'flex',
-          justifyContent: 'space-around',
-          width: '100%',
-        }}
-      >
-        <Button size='xl' color='blue.5' leftSection={<IconPlus/>} onClick={()=>agregarStock(row.original,10)}>10</Button>
-        <Button size='xl' color='blue.8' leftSection={<IconPlus/>} onClick={()=>agregarStock(row.original,20)}>20</Button>
-        <Button size='xl' color='yellow.6' leftSection={<IconPlus/>} onClick={()=>agregarStock(row.original,50)}>50</Button>
-        <Button size='xl' color='orange.6' leftSection={<IconPlus/>} onClick={()=>agregarStock(row.original,100)}>100</Button>
-      </Box>
+      <div style={{display:'flex',justifyContent:'space-around'}} >
+        <Button size='md' color='blue.5' leftSection={<IconPlus/>} onClick={()=>agregarStock(row.original,10)}>10</Button>
+        <Button size='md' color='blue.8' leftSection={<IconPlus/>} onClick={()=>agregarStock(row.original,20)}>20</Button>
+        <Button size='md' color='yellow.6' leftSection={<IconPlus/>} onClick={()=>agregarStock(row.original,50)}>50</Button>
+        <Button size='md' color='orange.6' leftSection={<IconPlus/>} onClick={()=>agregarStock(row.original,100)}>100</Button>
+      </div>
     )
   });
 
@@ -224,7 +217,9 @@ const Page = () => {
   }
 
   const agregarStock = (elProducto,cantidad) =>{
-    elProducto.existencia = cantidad
+    setId(elProducto.id_producto)
+    elProducto.existencia += cantidad
+    console.log('revisando',elProducto,id);
     registrarProducto(elProducto)
   }
 
