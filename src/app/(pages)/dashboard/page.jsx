@@ -10,16 +10,16 @@ import { MRT_Localization_ES } from 'mantine-react-table/locales/es';
 import { notifications } from '@mantine/notifications';
 import classes from '../../toast.module.css';
 import { modals } from '@mantine/modals';
-import { BarChart } from '@mantine/charts';
+import { BarChart,LineChart } from '@mantine/charts';
 import dayjs from 'dayjs';
 import { DatePickerInput } from '@mantine/dates';
 import axios from 'axios';
-// import {  } from '@/app/api/reports/carbone';
-// import {render} from 'carbone'
 
 const Page = () => {
-  const { loading,getReg,getRegFilter,transacciones,pedidos,productos} = useSupa();
+  const { loading,setLoading,getReg,getRegFilter,transacciones,pedidos,productos} = useSupa();
   const [listaProductos, setListaProductos] = useState([])
+  const [listaPedidos, setListaPedidos] = useState([])
+  const [pedidosDia, setPedidosDia] = useState([])
   const colores = ['violet.6','green.6','red.6'];
   const [f1, setF1] = useState(dayjs().startOf('month'))
   const [f2, setF2] = useState(dayjs().endOf('month'))
@@ -35,34 +35,48 @@ const Page = () => {
   // name: 'Smartphones', color: 'violet.6'
 
   useEffect(() => {
-    getData()
+    cargarData()
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const getData = async ()=>{
-    await getReg('vw_pedido','id_pedido',false);
-    await getReg('producto','id_producto',false);
-    await getRegFilter('vw_transaccion','fecha',dayjs(f1).format('YYYY-MM-DD 04:00:00'),'between',dayjs(f2).format('YYYY-MM-DD 23:59:59'))
-    armarData()
+  const cargarData = async ()=>{
+    const ped = await getReg('vw_pedido','id_pedido',false);
+    const prod = await getReg('producto','id_producto',false);
+    const tran = await getRegFilter('vw_transaccion','fecha_entrega',dayjs(dayjs().startOf('month')).format('YYYY-MM-DD 04:00:00'),'between',dayjs(dayjs().endOf('month')).format('YYYY-MM-DD 23:59:59'))
+    armarData(ped,prod,tran)
   }
 
-  const armarData=()=>{
-    console.log('productos',productos);
-    console.log('transacciones',transacciones);
-    console.log('pedidos',pedidos);
-    productos.forEach((p,i) => {
+  const armarData= async (ped,prod,tran)=>{
+    console.log('productos',prod);
+    console.log('transacciones',tran);
+    console.log('pedidos',ped);
+    prod.forEach((p,i) => {
       listaProductos.push({name:p.existencia,color:colores[i]})
     });
-    obtnerReporte('UNO',listaProductos)
-    console.log('listaProductos',listaProductos);
+    const pivot = []
+    const pivotDia = []
+    await tran.forEach(t => {
+      pivot.filter(f=>f.cliente == t.cliente)[0]
+        ? pivot.filter(f=>f.cliente == t.cliente)[0].monto_pago += t.monto_pago
+        : pivot.push({cliente:t.cliente,monto_pago:t.monto_pago});
+
+      pivotDia.filter(f=>f.fecha_entrega == t.fecha_entrega)[0]
+        ? pivotDia.filter(f=>f.fecha_entrega == t.fecha_entrega)[0].cantidad_entregada += t.cantidad_entregada
+        : pivotDia.push({fecha_entrega:t.fecha_entrega,cantidad_entregada:t.cantidad_entregada})
+    });
+    setListaPedidos(pivot)
+    setPedidosDia(pivotDia)
+    // obtenerReporte('UNO',listaProductos)
+    console.log('listaProductos',listaProductos,pivot,pivotDia);
   }
 
-  const obtnerReporte = async (tipo,d) =>{
-    console.log('obteneinedo report',tipo,d);
+  const obtenerReporte = async (tipo,data) =>{
+    console.log('obteneinedo report',tipo,data);
+    setLoading(true)
     try {
-      const response = await axios.get(`/api/reports`, {
-        params: { tipo }
-      });
+      // const response = await axios.get(`/api/reports`, {
+      //   params: { tipo }
+      // });
       // const response2 = await axios.post('/api/reports', [{a:1,b:25,c:23},{a:10,b:250,c:230},{a:15,b:255,c:235}], {
       //   headers: {
       //     'Content-Type': 'application/json',
@@ -71,11 +85,16 @@ const Page = () => {
       const templateData = {
         filename: 'report-template.docx', // Cambia el nombre de la plantilla según tu caso
       };
-      const data = [
-        { id: 1, name: 'Item 1', value: 'Value 1' },
-        { id: 2, name: 'Item 2', value: 'Value 2' },
-        // Puedes agregar más objetos aquí
-      ];
+      // const data = [
+      //   { id: 1, name: 'Item 1', value: 'Value 1' },
+      //   { id: 2, name: 'Item 2', value: 'Value 2' },
+      //   // Puedes agregar más objetos aquí
+      // ];
+      await data.map(e => {
+        e.f1 = f1;
+        e.f2 = f2;
+        return e;
+      });
       const response2 = await axios.post('/api/reports', { templateData, data }, {
         responseType: 'blob',
         headers: {
@@ -91,12 +110,12 @@ const Page = () => {
       document.body.appendChild(link);
       link.click();
       // setMessage(response.data.message);
-      console.log('la respuesta API',response,response2);
+      console.log('la respuesta API',response2);
     } catch (error) {
       // setError('Error fetching data');
       console.error('Error fetching data:', error);
     } finally {
-      // setLoading(false);
+      setLoading(false);
     }
     // const r = await generarReporte.bind(tipo)
     // const s = await handler.bind('x');
@@ -156,25 +175,30 @@ const Page = () => {
           overlayProps={{ radius: 'lg', blur: 4 }}
           loaderProps={{ color: 'cyan', type: 'dots',size:'xl' }}
         />
-        <Box style={{display:'flex',justifyContent:'flex-end',gap:'1rem',margin:'1rem 0'}}>
-          <DatePickerInput
-            value={f1}
-            onChange={setF1}
-            label="Fecha Inicio"
-            placeholder="Fecha Inicio"
-            size='sm'
-            valueFormat='DD MMM YYYY'
-          />
-          <DatePickerInput
-            value={f2}
-            onChange={setF2}
-            label="Fecha Fin"
-            placeholder="Fecha Fin"
-            size='sm'
-            valueFormat='DD MMM YYYY'
-          />
-          <Button color='blue.2' variant='light' onClick={()=>getData()} size='sm' style={{marginTop:'1.5rem'}} >Cargar Transacciones</Button>
-        </Box>
+        <div style={{display:'flex', justifyContent:'space-between',marginBottom:'1rem'}}>
+          <Box style={{display:'flex',justifyContent:'flex-start',gap:'1rem',margin:'1rem 0'}}>
+            <Button color='green.5' variant='light' onClick={()=>obtenerReporte('DOS',transacciones)} size='sm' style={{marginTop:'1.5rem'}}> Histórico Pedidos</Button>
+          </Box>
+          <Box style={{display:'flex',justifyContent:'flex-end',gap:'1rem',margin:'1rem 0'}}>
+            <DatePickerInput
+              value={f1}
+              onChange={setF1}
+              label="Fecha Inicio"
+              placeholder="Fecha Inicio"
+              size='sm'
+              valueFormat='DD MMM YYYY'
+            />
+            <DatePickerInput
+              value={f2}
+              onChange={setF2}
+              label="Fecha Fin"
+              placeholder="Fecha Fin"
+              size='sm'
+              valueFormat='DD MMM YYYY'
+            />
+            <Button color='blue.2' variant='light' onClick={()=>cargarData()} size='sm' style={{marginTop:'1.5rem'}} >Cargar Transacciones</Button>
+          </Box>
+        </div>
         <Box style={{display:'flex', gap:'1rem',gridTemplateColumns:'repeat(auto-fill, minmax(200px, 1fr))'}}>
           <BarChart
             h={300}
@@ -185,12 +209,21 @@ const Page = () => {
           />
           <BarChart
             h={300}
-            data={productos}
-            dataKey="descripcion"
-            series={[{name:'existencia',color:'teal.8'}]}
+            data={listaPedidos}
+            dataKey="cliente"
+            series={[{name:'monto_pago',color:'orange.4'}]}
             tickLine="y"
           />
         </Box>
+        <LineChart
+        style={{marginTop:'1rem'}}
+          h={400}
+          data={pedidosDia}
+          dataKey="fecha_entrega"
+          series={[{ name: 'cantidad_entregada', color: 'indigo.4' }]}
+          curveType="bump"
+          connectNulls
+        />
       </Box>
     </div>
   )

@@ -15,7 +15,7 @@ const Aside = () => {
 
   const cargarData = async () =>{
     await getReg('producto','id_producto',true);
-    await getRegFilter('vw_transaccion','fecha',dayjs(dayjs().startOf('month')).format('YYYY-MM-DD 04:00:00'),'between',dayjs(dayjs().endOf('month')).format('YYYY-MM-DD 23:59:59'))
+    await getRegFilter('vw_transaccion','fecha_entrega',dayjs(dayjs().startOf('month')).format('YYYY-MM-DD 04:00:00'),'between',dayjs(dayjs().endOf('month')).format('YYYY-MM-DD 23:59:59'))
   }
   
 

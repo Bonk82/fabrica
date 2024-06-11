@@ -20,7 +20,7 @@
     "@supabase/supabase-js": "^2.43.2",
     "@tabler/icons-react": "^3.3.0",
     "axios": "^1.7.2",
-    "carbone": "^3.5.5",
+    "carbone": "^3.2.3",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.11",
     "mantine-datatable": "^7.9.1",

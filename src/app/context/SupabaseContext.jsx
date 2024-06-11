@@ -246,6 +246,7 @@ export const SupabaseContextProvider = ({ children }) => {
         parametricas,
         transacciones,
         loading,
+        setLoading,
         loginWithMagicLink,
         singUpWithPassword,
         signInWithEmail,

@@ -60,37 +60,41 @@ export async function POST(request) {
       throw new Error('Template file does not exist or cannot be read');
     }
     const options = {
-      // convertTo : pdf, //can be docx, txt, ...
-      reportName: `mi repotre_` + new Date().getTime() + '.docx',
+      // convertTo : 'pdf', //can be docx, txt, ...
+      reportName: `mireporte_` + new Date().getTime() + '.docx',
       lang: 'es',
+      timezone:'America/Caracas',
     };
 
     // Generar el reporte usando carbone.render
     return new Promise((resolve, reject) => {
       console.log('antes del promise',data);
-      carbone.render(pathTemplate, data,options, (err, result,reportName) => {
+      carbone.render(templatePath, data,options, (err, buffer, filename) => {
         if (err) {
-          console.error('con error', reportName,data);
+          console.error('con error',data);
           console.error('Error generating report:', err);
           reject(new Response(JSON.stringify({ message: 'Error generating report' }), {
             status: 500,
             headers: { 'Content-Type': 'application/json' },
           }));
         } else {
-          console.log('mira el resultado',result);
-          resolve(new Response(result, {
+          console.log('mira el resultado',buffer);
+          resolve(new Response(Buffer.from(buffer, 'binary'), {
             status: 200,
-            headers: {
-              // 'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // Ajusta el tipo MIME según el formato de tu reporte
-              // 'Content-Disposition': 'attachment; filename="report.xlsx"',
-              'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // Tipo MIME para DOCX
-              'Content-Disposition': 'attachment; filename="report.docx"', // Nombre del archivo para la descarga
-            },
+            // headers: {
+            //   // 'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // Ajusta el tipo MIME según el formato de tu reporte
+            //   // 'Content-Disposition': 'attachment; filename="report.xlsx"',
+
+            //   // 'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // Tipo MIME para DOCX
+            //   // 'Content-Disposition': 'attachment; filename="report.docx"', // Nombre del archivo para la descarga
+
+            //   'Content-Type': 'application/pdf', // Tipo MIME para DOCX
+            //   'Content-Disposition': 'attachment; filename="report.pdf"', // Nombre del archivo para la descarga
+            // },
           }));
         }
       });
     });
-
   } catch (error) {
     console.error('Error processing request:', error);
     return new Response(JSON.stringify({ message: 'Error processing request' }), {
