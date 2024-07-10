@@ -222,7 +222,7 @@ grid-dash{
   font-weight: 500;
 }
 
-.bg-new {
+.bg-admin {
   background: linear-gradient(90deg, #ab8918, #442906);
 }
 
@@ -230,7 +230,13 @@ grid-dash{
   background: linear-gradient(90deg,#188eab, #022333);
 }
 
-.bg-admin {
-  background: linear-gradient(90deg,#1858ab, #020738);
+.bg-new {
+  background: linear-gradient(90deg,#202833, #020e1b);
 }
+
+/* .bg-admin {
+  background: linear-gradient(90deg,#1858ab, #020738);
+} */
+
+
 

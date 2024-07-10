@@ -25,6 +25,7 @@ export const SupabaseContextProvider = ({ children }) => {
   const [parametricas, setParametricas] = useState([]);
   const [transacciones, setTransacciones] = useState([]);
   const [funcionarios, setFuncionarios] = useState([]);
+  const [roles, setRoles] = useState([]);
   const [menu, setMenu] = useState([]);
   const [loading, setLoading] = useState(false);
   const [avatar, setAvatar] = useState('');
@@ -153,6 +154,7 @@ export const SupabaseContextProvider = ({ children }) => {
       if(table == 'insumo') setInsumos(data);
       if(table == 'parametrica') setParametricas(data);
       if(table == 'vw_funcionario') setFuncionarios(data);
+      if(table == 'rol') setRoles(data);
       // if(['prestamo','vw_prestamos'].includes(table)) setProductos(data);
       return data;
     } catch (error) {
@@ -248,6 +250,7 @@ export const SupabaseContextProvider = ({ children }) => {
         parametricas,
         transacciones,
         funcionarios,
+        roles,
         loading,
         setLoading,
         loginWithMagicLink,

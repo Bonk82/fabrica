@@ -13,7 +13,7 @@ import { modals } from '@mantine/modals';
 import { useDisclosure } from '@mantine/hooks';
 import dayjs from 'dayjs';
 const Page = () => {
-  const { loading,usuario,createReg,funcionarios,getReg,updateReg } = useSupa();
+  const { loading,usuario,createReg,parametricas,funcionarios,roles,getReg,updateReg } = useSupa();
   const [opened, { open, close }] = useDisclosure(false);
   const [id, setId] = useState(null)
 
@@ -24,6 +24,7 @@ const Page = () => {
   
   const cargarData = async () =>{
     await getReg('vw_funcionario','id_funcionario',false);
+    await getReg('rol','id_rol',false);
   }
 
   const form = useForm({
@@ -54,9 +55,15 @@ const Page = () => {
 
   const registrarFuncionario = async (data) => {
     // event.preventDefault();
-    data.nombre=data.nombre?.toUpperCase(),
     console.log('la data',data);
-    const newFuncionario = { ...data,}
+    const newFuncionario = {
+      fid_user:data.id,
+      nombre:data.nombre.toUpperCase(),
+      telefono:data.telefono,
+      fid_rol:roles.filter(f=>f.descripcion == data.rol)[0].id_rol ,
+      estado:data.estado,
+    }
+    if(id) newFuncionario.id_funcionario = id;
     console.log('new funcionario',newFuncionario,id);
     try {
       id ? await updateReg('funcionario',newFuncionario) : await createReg(newFuncionario,'funcionario');
@@ -157,27 +164,27 @@ const Page = () => {
             />
             <NativeSelect
               label="Estado:"
-              data={['SELECCIONE...','PENDIENTE','ACTIVO','BAJA']}
+              data={['SELECCIONE...',...parametricas.filter(f=>f.tipo === 'ESTADO_FUNCIONARIO').map(e=>e.nombre)]}
               leftSection={<IconFolder size={16} />}
               key={form.key('estado')}
               {...form.getInputProps('estado')}
             />
             <NativeSelect
               label="Rol:"
-              data={['SELECCIONE...','ADMIN','USUARIO','REPARTIDOR']}
+              data={['SELECCIONE...',...roles.map(r=>r.descripcion)]}
               leftSection={<IconCar size={16} />}
               key={form.key('rol')}
               {...form.getInputProps('rol')}
             />
             <Group justify="flex-end" mt="md">
-              {!id && <Button fullWidth leftSection={<IconDeviceFloppy/>} type='submit'>Registrar Proveedor</Button>}
-              {id && <Button fullWidth leftSection={<IconRefresh/>} type='submit'>Actualizar Proveedor</Button>}
+              {!id && <Button fullWidth leftSection={<IconDeviceFloppy/>} type='submit'>Registrar Usuario</Button>}
+              {id && <Button fullWidth leftSection={<IconRefresh/>} type='submit'>Actualizar Usuario</Button>}
             </Group>
           </form>
         </Modal>
         <Box component='div' className='grid-usuarios'>
           {funcionarios.map(f=>(
-            <div className={'card-usuario '+ (f.rol == 'ADMIN' ? 'bg-admin':f.rol == 'USUARIO'? 'bg-user':'bg-new')} key={f.email} onClick={()=>mostrarregistro(f)}>
+            <div className={'card-usuario '+ (f.rol == 'ADMIN' ? 'bg-admin':f.rol == 'USUARIO'? 'bg-user':'bg-new')} key={f.email} onClick={()=>mostrarRegistro(f)}>
               <div className='content'>
                 <div style={{width:'100%', display:'flex',justifyContent:'center'}}>
                   <Avatar src={f.data.avatar_url} alt="no image here" color="dark.0" size={'xl'} radius={'md'} />
