@@ -76,9 +76,9 @@ const Login = () => {
           {...form.getInputProps('password')}
         />
         <Group justify="flex-end" mt="md">
-          <Button leftSection={<IconRegistered/>} onClick={()=>signUp(form.values) }>Registrar</Button>
-          <Button leftSection={<IconBrandGoogle/>} onClick={signInWithGoogle}>GOOGLE</Button>
-          <Button leftSection={<IconLogin/>} type="submit">Ingresar</Button>
+          <Button leftSection={<IconRegistered/>} onClick={()=>signUp(form.values) }> Registrar</Button>
+          <Button leftSection={<IconBrandGoogle/>} onClick={signInWithGoogle}> GOOGLE</Button>
+          <Button leftSection={<IconLogin/>} type="submit"> Ingresar</Button>
         </Group>
       </form>
     </Box>

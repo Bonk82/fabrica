@@ -297,7 +297,7 @@ const Page = () => {
             />
             <NativeSelect
               label="Estado"
-              data={['SLECCIONE...','COMPRA','NO COMPRA']}
+              data={['SELECCIONE...','COMPRA','NO COMPRA']}
               leftSection={<IconFolder size={16} />}
               key={form.key('estado')}
               {...form.getInputProps('estado')}
@@ -403,14 +403,14 @@ const Page = () => {
             />
             <NativeSelect
               label="Equipo:"
-              data={['SLECCIONE...','PROPIO', 'PRÉSTAMO']}
+              data={['SELECCIONE...','PROPIO', 'PRÉSTAMO']}
               leftSection={<IconFolder size={16} />}
               key={form.key('equipo')}
               {...form.getInputProps('equipo')}
             />
             <NativeSelect
               label="Letrero:"
-              data={['SLECCIONE...','SI', 'NO']}
+              data={['SELECCIONE...','SI', 'NO']}
               leftSection={<IconFolder size={16} />}
               key={form.key('letrero')}
               {...form.getInputProps('letrero')}

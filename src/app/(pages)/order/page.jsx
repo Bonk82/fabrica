@@ -546,7 +546,7 @@ const Page = () => {
             />
             <NativeSelect
               label="Estado Pago:"
-              data={['SLECCIONE...','PENDIENTE','PAGADO', 'DESCUENTO']}
+              data={['SELECCIONE...','PENDIENTE','PAGADO', 'DESCUENTO']}
               required
               withAsterisk
               leftSection={<IconFolder size={16} />}
