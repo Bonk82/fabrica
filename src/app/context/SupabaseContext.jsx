@@ -114,8 +114,8 @@ export const SupabaseContextProvider = ({ children }) => {
       if (pivotUser.data.user){
         getReg('vw_menu_rol','id_menu','asc')
         const elFunc =  await getRegFilter('vw_funcionario','fid_user',pivotUser.data.user.id,'eq','')
-        console.log('elfunc',elFunc);
-        setUsuario(elFunc)//|| pivotUser.data.user
+        console.log('elfunc',elFunc[0]);
+        setUsuario(elFunc[0])//|| pivotUser.data.user
         router.push('/dashboard')
       } 
     } catch (error) {

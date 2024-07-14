@@ -6,7 +6,6 @@ import { useDisclosure,useViewportSize } from '@mantine/hooks';
 import { IconRipple } from '@tabler/icons-react';
 import { useState } from "react";
 import Navbar from '../(components)/Navbar';
-import { MantineLogo } from '@mantinex/mantine-logo';
 import Header from '../(components)/Header';
 import Aside from '../(components)/Aside';
 import Footer from '../(components)/Footer';
@@ -35,7 +34,6 @@ export function Model({ children }) {
       <AppShell.Header style={{backgroundColor:'#0c8599'}}>
         <Group h="100%" px="md">
           <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
-          {/* <MantineLogo size={30} /> */}
           <Image radius="lg" src="/assets/icono3.jpg" h={50} w="auto" fit='contain' alt=''/>
           <Header/>
         </Group>

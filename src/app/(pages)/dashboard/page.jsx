@@ -42,7 +42,8 @@ const Page = () => {
   const cargarData = async ()=>{
     const ped = await getReg('vw_pedido','id_pedido',false);
     const prod = await getReg('producto','id_producto',false);
-    const tran = await getRegFilter('vw_transaccion','fecha_entrega',dayjs(dayjs().startOf('month')).format('YYYY-MM-DD 04:00:00'),'between',dayjs(dayjs().endOf('month')).format('YYYY-MM-DD 23:59:59'))
+    // const tran = await getRegFilter('vw_transaccion','fecha_entrega',dayjs(dayjs().startOf('month')).format('YYYY-MM-DD 04:00:00'),'between',dayjs(dayjs().endOf('month')).format('YYYY-MM-DD 23:59:59'))
+    const tran = await getRegFilter('vw_transaccion','fecha_entrega',dayjs(f1).format('YYYY-MM-DD 04:00:00'),'between',dayjs(f2).format('YYYY-MM-DD 23:59:59'))
     armarData(ped,prod,tran)
   }
 
@@ -200,30 +201,30 @@ const Page = () => {
           </Box>
         </div>
         <Box style={{display:'flex', gap:'1rem',gridTemplateColumns:'repeat(auto-fill, minmax(200px, 1fr))'}}>
-          <BarChart
+          {productos.length>0 && <BarChart
             h={300}
             data={productos}
             dataKey="descripcion"
             series={[{name:'existencia',color:'teal.6'}]}
             tickLine="y"
-          />
-          <BarChart
+          />}
+          {listaPedidos.length>0 && <BarChart
             h={300}
             data={listaPedidos}
             dataKey="cliente"
             series={[{name:'monto_pago',color:'orange.4'}]}
             tickLine="y"
-          />
+          />}
         </Box>
-        <LineChart
-        style={{marginTop:'1rem'}}
+        {pedidosDia.length>0 && <LineChart
+          style={{marginTop:'1rem'}}
           h={400}
           data={pedidosDia}
           dataKey="fecha_entrega"
           series={[{ name: 'cantidad_entregada', color: 'indigo.4' }]}
           curveType="bump"
           connectNulls
-        />
+        />}
       </Box>
     </div>
   )
