@@ -2,7 +2,7 @@
 import { useSupa } from '@/app/context/SupabaseContext';
 import { ActionIcon, Box, Button, Center, Group, LoadingOverlay, Modal, NumberInput, Text, TextInput } from '@mantine/core'
 import { useForm } from '@mantine/form';
-import { IconBuilding, IconCashBanknote, IconCheck, IconDeviceFloppy, IconEdit, IconEye, IconGps, IconPhone, IconRefresh, IconTrash, IconUser } from '@tabler/icons-react';
+import { IconBuilding, IconCashBanknote, IconCheck, IconDeviceFloppy, IconEdit, IconEye, IconGps, IconPhone, IconRefresh, IconTools, IconTrash, IconUser } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import { useMemo } from 'react';
 import { MantineReactTable, useMantineReactTable} from 'mantine-react-table';
@@ -35,6 +35,7 @@ const Page = () => {
       referencia:'',
       telefonos:'',
       cuenta:'',
+      tipos_insumos:'',
     },
     // validate: {
     //   tipo_cliente: (value) => (/^\S+@\S+$/.test(value) ? null : 'Correo Inválido'),
@@ -61,6 +62,7 @@ const Page = () => {
     data.nombre=data.nombre?.toUpperCase(),
     data.direccion=data.direccion?.toUpperCase(),
     data.referencia=data.referencia?.toUpperCase(),
+    data.tipos_insumos=data.tipos_insumos?.toUpperCase(),
     console.log('la data',data);
     let newProveedor
     if(id){
@@ -149,6 +151,10 @@ const Page = () => {
       {
         accessorKey: 'cuenta',
         header: 'Cuenta Bancaria',
+      },
+      {
+        accessorKey: 'tipos_insumos',
+        header: 'Tipos Insumos',
       },
     ],
     [],
@@ -257,6 +263,15 @@ const Page = () => {
               leftSection={<IconCashBanknote size={16} />}
               key={form.key('cuenta')}
               {...form.getInputProps('cuenta')}
+            />
+            <TextInput
+              label="Tipos Insumos:"
+              placeholder="Tipos de sinsumos los cuales provee"
+              leftSection={<IconTools size={16} />}
+              type='text'
+              maxLength={400}
+              key={form.key('tipos_insumos')}
+              {...form.getInputProps('tipos_insumos')}
             />
             <Group justify="flex-end" mt="md">
               {!id && <Button fullWidth leftSection={<IconDeviceFloppy/>} type='submit'>Registrar Proveedor</Button>}

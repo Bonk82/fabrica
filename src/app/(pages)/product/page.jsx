@@ -273,7 +273,7 @@ const Page = () => {
             />
             <NativeSelect
               label="Tipo Unidad"
-              data={['SELECCIONE...','KILO', 'BOLSA', 'PAQUETE','LITRO','BOTELLON','UNIDAD']}
+              data={['SELECCIONE...','KILO', 'BOLSA', 'PAQUETE','LITRO','BOTELLON','BOTELLA','UNIDAD']}
               key={form.key('unidad')}
               leftSection={<IconBox size={16} />}
               {...form.getInputProps('unidad')}

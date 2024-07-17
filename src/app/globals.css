@@ -238,5 +238,9 @@ grid-dash{
   background: linear-gradient(90deg,#1858ab, #020738);
 } */
 
+#cliente-correo{
+  text-transform: lowercase;
+}
+
 
 

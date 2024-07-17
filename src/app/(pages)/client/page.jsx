@@ -279,7 +279,7 @@ const Page = () => {
           }}>
           <form onSubmit={form.onSubmit((values) => registrarCliente(values))}>
             <TextInput
-              label="Nombre:"
+              label="Nombre del Establecimiento:"
               placeholder="Nombre"
               type='text'
               maxLength={100}
@@ -342,6 +342,7 @@ const Page = () => {
               label="Correo:"
               placeholder="sucorreo@gmail.com"
               type='text'
+              id='cliente-correo'
               maxLength={50}
               leftSection={<IconMail size={16} />}
               key={form.key('correo')}
@@ -392,7 +393,7 @@ const Page = () => {
               key={form.key('referencia')}
               {...form.getInputProps('referencia')}
             />
-            <TextInput
+            {/* <TextInput
               label="Teléfonos:"
               placeholder="Teléfonos"
               type='text'
@@ -400,7 +401,7 @@ const Page = () => {
               leftSection={<IconPhone size={16} />}
               key={form.key('telefonos')}
               {...form.getInputProps('telefonos')}
-            />
+            /> */}
             <NativeSelect
               label="Equipo:"
               data={['SELECCIONE...','PROPIO', 'PRÉSTAMO']}

@@ -1,6 +1,6 @@
 'use client'
 import { useSupa } from '@/app/context/SupabaseContext';
-import { ActionIcon, Box, Button, Center, Group, LoadingOverlay, NativeSelect, Text, TextInput } from '@mantine/core'
+import { ActionIcon, Box, Button, Center, Chip, Group, LoadingOverlay, NativeSelect, Text, TextInput } from '@mantine/core'
 import { useForm } from '@mantine/form';
 import { IconCheck, IconDeviceFloppy, IconEdit, IconEye, IconRefresh, IconTrash } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
@@ -16,7 +16,7 @@ import { DatePickerInput } from '@mantine/dates';
 import axios from 'axios';
 
 const Page = () => {
-  const { loading,setLoading,getReg,getRegFilter,transacciones,pedidos,productos} = useSupa();
+  const { loading,setLoading,getReg,getRegFilter,transacciones,pedidos,productos,parametricas} = useSupa();
   const [listaProductos, setListaProductos] = useState([])
   const [listaPedidos, setListaPedidos] = useState([])
   const [pedidosDia, setPedidosDia] = useState([])
@@ -176,6 +176,11 @@ const Page = () => {
           overlayProps={{ radius: 'lg', blur: 4 }}
           loaderProps={{ color: 'cyan', type: 'dots',size:'xl' }}
         />
+        <Box style={{display: 'flex',justifyContent:'space-between',gap:'2rem'}}>
+          {parametricas.filter(f=>f.tipo == 'OBJETIVOS').map(p=>(
+            <Chip key={p.id_parametrica} checked color="cyan">{p.nombre} - {p.codigo}</Chip>
+          ))}
+        </Box>
         <div style={{display:'flex', justifyContent:'space-between',marginBottom:'1rem'}}>
           <Box style={{display:'flex',justifyContent:'flex-start',gap:'1rem',margin:'1rem 0'}}>
             <Button color='green.5' variant='light' onClick={()=>obtenerReporte('DOS',transacciones)} size='sm' style={{marginTop:'1.5rem'}}> Histórico Pedidos</Button>

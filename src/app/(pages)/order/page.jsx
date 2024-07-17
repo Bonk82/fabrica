@@ -1,8 +1,8 @@
 'use client'
 import { useSupa } from '@/app/context/SupabaseContext';
-import { ActionIcon, Autocomplete, Box, Button, Center, Group, Kbd, LoadingOverlay, Modal, NativeSelect, NumberInput, Switch, Text, TextInput } from '@mantine/core'
+import { ActionIcon, Autocomplete, Box, Button, Center, Group, Kbd, LoadingOverlay, Modal, NativeSelect, NumberInput, Switch, Text, Textarea, TextInput } from '@mantine/core'
 import { useForm } from '@mantine/form';
-import { IconAlignLeft, IconBox, IconCalendar, IconCar, IconCheck, IconDeviceFloppy, IconEdit, IconEye, IconFileBarcode, IconFolder, IconMoneybag, IconNumber, IconPlusMinus, IconProgressCheck, IconReceipt2, IconRefresh, IconStack2, IconTrash, IconUser } from '@tabler/icons-react';
+import { IconAlignLeft, IconBox, IconCalendar, IconCar, IconCheck, IconDeviceFloppy, IconEdit, IconEye, IconFileBarcode, IconFolder, IconMessage, IconMoneybag, IconNumber, IconPlusMinus, IconProgressCheck, IconReceipt2, IconRefresh, IconStack2, IconTrash, IconUser } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import { useMemo } from 'react';
 import { MantineReactTable, useMantineReactTable} from 'mantine-react-table';
@@ -70,6 +70,7 @@ const Page = () => {
       factura:false,
       delivery:0,
       fecha_registro:null,
+      observacion:'',
     },
     // validate: {
     //   tipo_cliente: (value) => (/^\S+@\S+$/.test(value) ? null : 'Correo Inválido'),
@@ -102,6 +103,7 @@ const Page = () => {
 
   const registrarPedido = async (data) => {
     // event.preventDefault();
+    data.observacion = data.observacion?.toUpperCase();
     if(!data.id_pedido) data.id_pedido = null;
     console.log('la data',data)
     let newPedido
@@ -284,6 +286,10 @@ const Page = () => {
         Cell:({cell})=>(
           <span>{dayjs(cell.getValue()).format('DD/MM/YYYY HH:mm:ss')}</span>
         )
+      },
+      {
+        accessorKey: 'observacion',
+        header: 'Observación',
       },
     ],
     [],
@@ -546,7 +552,7 @@ const Page = () => {
             />
             <NativeSelect
               label="Estado Pago:"
-              data={['SELECCIONE...','PENDIENTE','PAGADO', 'DESCUENTO']}
+              data={['SELECCIONE...','PENDIENTE','PAGADO']}
               required
               withAsterisk
               leftSection={<IconFolder size={16} />}
@@ -604,6 +610,14 @@ const Page = () => {
               leftSection={<IconCalendar size={16} />}
               key={form.key('fecha_registro')}
               {...form.getInputProps('fecha_registro')}
+            />
+            <Textarea
+              label="Observación:"
+              placeholder='La observacion sobre el pedido'
+              leftSection={<IconMessage size={16} />}
+              rows={2}
+              key={form.key('observacion')}
+              {...form.getInputProps('observacion')}
             />
             <Group justify="flex-end" mt="md">
               {!id && <Button fullWidth leftSection={<IconDeviceFloppy/>} type='submit'>Registrar Pedido</Button>}
