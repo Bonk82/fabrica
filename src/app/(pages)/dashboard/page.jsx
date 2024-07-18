@@ -176,9 +176,9 @@ const Page = () => {
           overlayProps={{ radius: 'lg', blur: 4 }}
           loaderProps={{ color: 'cyan', type: 'dots',size:'xl' }}
         />
-        <Box style={{display: 'flex',justifyContent:'space-between',gap:'2rem'}}>
+        <Box style={{display: 'flex',justifyContent:'left',gap:'2rem',marginTop:'2rem'}}>
           {parametricas.filter(f=>f.tipo == 'OBJETIVOS').map(p=>(
-            <Chip key={p.id_parametrica} checked color="cyan">{p.nombre} - {p.codigo}</Chip>
+            <Chip key={p.id_parametrica} checked color="cyan">{p.nombre}: {p.agrupador}</Chip>
           ))}
         </Box>
         <div style={{display:'flex', justifyContent:'space-between',marginBottom:'1rem'}}>

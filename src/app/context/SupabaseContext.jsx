@@ -112,7 +112,7 @@ export const SupabaseContextProvider = ({ children }) => {
 
       // pivotUser.data.user.email === 'bonkalvarado@gmail.com' ? pivotUser.data.user.rol =  'ADMIN': 'USUARIO';
       if (pivotUser.data.user){
-        getReg('vw_menu_rol','id_menu','asc')
+        await getReg('vw_menu_rol','id_menu','asc')
         const elFunc =  await getRegFilter('vw_funcionario','fid_user',pivotUser.data.user.id,'eq','')
         console.log('elfunc',elFunc[0]);
         setUsuario(elFunc[0])//|| pivotUser.data.user

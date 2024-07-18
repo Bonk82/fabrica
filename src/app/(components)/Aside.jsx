@@ -1,12 +1,13 @@
-import { Box } from '@mantine/core'
-import { IconCashBanknote, IconDiabolo, IconGasStation, IconTir } from '@tabler/icons-react'
+import { Box, NativeSelect } from '@mantine/core'
+import { IconCalendar, IconCashBanknote, IconDiabolo, IconGasStation, IconTir } from '@tabler/icons-react'
 import '../cards.css'
 import { useSupa } from '../context/SupabaseContext';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 
 const Aside = () => {
   const { loading,transacciones,productos,getReg,getRegFilter } = useSupa();
+  const [periodo, setPeriodo] = useState('DÍA')
 
   useEffect(() => {
     cargarData()
@@ -17,10 +18,39 @@ const Aside = () => {
     await getReg('producto','id_producto',true);
     await getRegFilter('vw_transaccion','fecha_entrega',dayjs(dayjs().startOf('month')).format('YYYY-MM-DD 04:00:00'),'between',dayjs(dayjs().endOf('month')).format('YYYY-MM-DD 23:59:59'))
   }
+
+  const onChangePeriodo = (e)=>{
+    setPeriodo(e)
+    let f1,f2
+    if(e == 'DÍA'){
+      f1 = dayjs()
+      f2 = dayjs()
+    } 
+    if(e == 'SEMANA'){
+      f1 = dayjs().startOf('week');
+      f2 = dayjs().endOf('week')
+    } 
+    if(e == 'MES'){
+      f1 = dayjs().startOf('month');
+      f2 = dayjs().endOf('month')
+    } 
+    if(e == 'AÑO'){
+      f1 = dayjs().startOf('year');
+      f2 = dayjs().endOf('year')
+    } 
+    getRegFilter('vw_transaccion','fecha_entrega',dayjs(f1).format('YYYY-MM-DD 04:00:00'),'between',dayjs(f2).format('YYYY-MM-DD 23:59:59'))
+  }
   
 
   return (
     <Box style={{justifyContent:'space-between',gap:'1rem',display:'flex',flexDirection:'column'}} >
+      <NativeSelect
+        label="Periodo:"
+        data={['SELECCIONE...','DÍA', 'SEMANA','MES','AÑO']}
+        value={periodo}
+        leftSection={<IconCalendar size={16} />}
+        onChange={(event) => onChangePeriodo(event.currentTarget.value)}
+      />
       {productos.map(p=>(
         <div className="card-box bg-primary" key={p.id_producto}>
           <div className="content">

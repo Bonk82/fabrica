@@ -6,7 +6,7 @@ import { IconUsersGroup,IconBuildingFactory2,IconBriefcase,IconUserCog,IconUserC
 
 const Navbar = () => {
   const { menu,usuario} = useSupa();
-  const menues = menu.filter(f=>f.rol==usuario.rol).sort((a,b)=>a.orden-b.orden);
+  const menues = menu.filter(f=>f.rol==usuario?.rol).sort((a,b)=>a.orden-b.orden);
   console.log('en navbar',menu,usuario);
   const router = useRouter()
 
@@ -15,14 +15,14 @@ const Navbar = () => {
   }
 
   const icons = [
+    <IconBriefcase key={3} />,
     <IconUsersGroup key={1}/>,
     <IconBuildingFactory2 key={2}/>,
-    <IconBriefcase key={3} />,
-    <IconUserCog key={4} />,
     <IconUserCheck key={5} />,
+    <IconListCheck key={8} />,
     <IconTimeline key={6} />,
     <IconBusinessplan key={7} />,
-    <IconListCheck key={8} />,
+    <IconUserCog key={4} />,
     <IconTools key={9} />,
   ]
 
@@ -30,7 +30,7 @@ const Navbar = () => {
     <div style={{textAlign:'left'}}>
       {menues.map((e,i)=>(
         <Button key={e.id_menu}
-          leftSection={icons[e.id_menu]}
+          leftSection={icons[e.orden -1]}
           onClick={()=>navegar(e.ruta)}
           fullWidth style={{marginBottom:'1rem'}}
           justify='flex-start'

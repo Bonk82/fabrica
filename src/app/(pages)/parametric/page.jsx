@@ -63,13 +63,13 @@ const Page = () => {
     data.agrupador=data.agrupador?.toUpperCase(),
     console.log('la data',data);
     const newParametrica = data
-    console.log('new prametrica',newParametrica,id);
+    console.log('new parametrica',newParametrica,id);
     try {
-      id ? await updateReg('prametrica',newParametrica) : await createReg(newParametrica,'prametrica');
+      id ? await updateReg('parametrica',newParametrica) : await createReg(newParametrica,'parametrica');
       cargarData();
-      toast('Control Pramétrica',`Prametrica ${id? 'actualziada': 'registrada'} satisfactoriamente!`,'success')
+      toast('Control Pramétrica',`Paramétrica ${id? 'actualziada': 'registrada'} satisfactoriamente!`,'success')
     } catch (error) {
-      toast('Control Pramétrica',error.message || error,'error')
+      toast('Control Paramétrica',error.message || error,'error')
       console.log(error);
     }finally{
       form.reset();
