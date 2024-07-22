@@ -297,7 +297,8 @@ const Page = () => {
             />
             <NativeSelect
               label="Estado"
-              data={['SELECCIONE...','COMPRA','NO COMPRA']}
+              // data={['SELECCIONE...','COMPRA','NO COMPRA']}
+              data={parametricas.filter(f=>f.tipo === 'ESTADO_CLIENTE').map(e=>e.nombre)}
               leftSection={<IconFolder size={16} />}
               key={form.key('estado')}
               {...form.getInputProps('estado')}
