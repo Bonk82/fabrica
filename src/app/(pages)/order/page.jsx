@@ -425,7 +425,7 @@ const Page = () => {
   });
 
   const handdlerProduct = (v)=>{
-    const elPrecio =  productos.filter(f=> f.id_producto == v)[0]?.precio;
+    const elPrecio = productos.filter(f=> f.id_producto == v)[0]?.promocion || productos.filter(f=> f.id_producto == v)[0]?.precio;
     // formDetalle.setValues({precio:formDetalle.getValues().cantidad_solicitada * (elPrecio || 0)})
     formDetalle.setFieldValue('precio_unidad', elPrecio)
     formDetalle.setFieldValue('monto_total', (elPrecio || 0) * formDetalle.getValues().cantidad_entregada )
