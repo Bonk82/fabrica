@@ -1,17 +1,13 @@
 'use client'
 import { useSupa } from '@/app/context/SupabaseContext';
-import { ActionIcon, Avatar, Box, Button, Center, Group, LoadingOverlay, Modal, NativeSelect, NumberInput, Text, TextInput } from '@mantine/core'
+import { Avatar, Box, Button, Center, Group, LoadingOverlay, Modal, NativeSelect, NumberInput, Text, TextInput } from '@mantine/core'
 import { useForm } from '@mantine/form';
-import { IconBuilding, IconCar, IconCashBanknote, IconCheck, IconDeviceFloppy, IconEdit, IconEye, IconFolder, IconGps, IconMail, IconPhone, IconRefresh, IconTrash, IconUser } from '@tabler/icons-react';
+import { IconCar, IconDeviceFloppy,  IconFolder, IconMail, IconPhone, IconRefresh, IconUser } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
-import { useMemo } from 'react';
-import { MantineReactTable, useMantineReactTable} from 'mantine-react-table';
-import { MRT_Localization_ES } from 'mantine-react-table/locales/es';
 import { notifications } from '@mantine/notifications';
 import classes from '../../toast.module.css';
 import { modals } from '@mantine/modals';
 import { useDisclosure } from '@mantine/hooks';
-import dayjs from 'dayjs';
 const Page = () => {
   const { loading,usuario,createReg,parametricas,funcionarios,roles,getReg,updateReg } = useSupa();
   const [opened, { open, close }] = useDisclosure(false);
