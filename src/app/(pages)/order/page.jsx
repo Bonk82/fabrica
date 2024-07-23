@@ -528,8 +528,7 @@ const Page = () => {
             />
             <NativeSelect
               label="Estado Pedido:"
-              // data={['SOLICITADO', 'PENDIENTE', 'ENTREGADO']}
-              data={parametricas.filter(f=>f.tipo === 'ESTADO_PEDIDO').map(e=>e.nombre)}
+              data={['SELECCIONE...',...parametricas.filter(f=>f.tipo === 'ESTADO_PEDIDO').map(e=>e.nombre)]}
               required
               withAsterisk
               leftSection={<IconFolder size={16} />}
@@ -570,16 +569,14 @@ const Page = () => {
             />
             <NativeSelect
               label="Método Pago:"
-              // data={['EFECTIVO', 'DESCUENTO', 'QR','TRASNFERENCIA','TARJETA']}
-              data={parametricas.filter(f=>f.tipo === 'METODO_PAGO').map(e=>e.nombre)}
+              data={['SELECCIONE...',...parametricas.filter(f=>f.tipo === 'METODO_PAGO').map(e=>e.nombre)]}
               leftSection={<IconFolder size={16} />}
               key={form.key('metodo_pago')}
               {...form.getInputProps('metodo_pago')}
             />
             <NativeSelect
               label="Método Entrega:"
-              // data={['EN FABRICA', 'DELIVERY', 'ENVÍO','ENTREGA PROGRAMDA']}
-              data={parametricas.filter(f=>f.tipo === 'METODO_ENTREGA').map(e=>e.nombre)}
+              data={['SELECCIONE...',...parametricas.filter(f=>f.tipo === 'METODO_ENTREGA').map(e=>e.nombre)]}
               leftSection={<IconFolder size={16} />}
               key={form.key('metodo_entrega')}
               {...form.getInputProps('metodo_entrega')}
@@ -634,7 +631,7 @@ const Page = () => {
           <form onSubmit={formDetalle.onSubmit((values) => registrarPedidoDetalle(values))}>
             <NativeSelect
               label="Producto:"
-              data={listaProductos}
+              data={['SELECCIONE...',...listaProductos]}
               leftSection={<IconBox size={16} />}
               value={elProducto}
               onChange={e=>handdlerProduct(e.currentTarget.value)}

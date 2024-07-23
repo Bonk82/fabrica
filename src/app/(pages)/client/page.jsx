@@ -289,16 +289,14 @@ const Page = () => {
             />
             <NativeSelect
               label="Categoría"
-              // data={['BAR', 'CAFETERÍA', 'COMPLEJO DEPORTIVO', 'SALÓN DE EVENTOS', 'DISCOTECA','PUB','KARAOKE']}
-              data={parametricas.filter(f=>f.tipo === 'CAT_CLIENTE').map(e=>e.nombre)}
+              data={['SELECCIONE...',...parametricas.filter(f=>f.tipo === 'CAT_CLIENTE').map(e=>e.nombre)]}
               leftSection={<IconFolder size={16} />}
               key={form.key('categoria')}
               {...form.getInputProps('categoria')}
             />
             <NativeSelect
               label="Estado"
-              // data={['SELECCIONE...','COMPRA','NO COMPRA']}
-              data={parametricas.filter(f=>f.tipo === 'ESTADO_CLIENTE').map(e=>e.nombre)}
+              data={['SELECCIONE...',...parametricas.filter(f=>f.tipo === 'ESTADO_CLIENTE').map(e=>e.nombre)]}
               leftSection={<IconFolder size={16} />}
               key={form.key('estado')}
               {...form.getInputProps('estado')}
@@ -419,8 +417,7 @@ const Page = () => {
             />
             <NativeSelect
               label="Tipo Cliente"
-              // data={['EVENTUAL', 'DESCUENTO', 'PAGO SEMANAL']}
-              data={parametricas.filter(f=>f.tipo === 'TIPO_CLIENTE').map(e=>e.nombre)}
+              data={['SELECCIONE...',...parametricas.filter(f=>f.tipo === 'TIPO_CLIENTE').map(e=>e.nombre)]}
               leftSection={<IconFolder size={16} />}
               key={form.key('tipo_cliente')}
               {...form.getInputProps('tipo_cliente')}

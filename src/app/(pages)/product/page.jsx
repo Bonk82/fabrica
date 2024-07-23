@@ -14,7 +14,7 @@ import { useDisclosure } from '@mantine/hooks';
 import dayjs from 'dayjs';
 
 const Page = () => {
-  const { loading,usuario,createReg,productos,getReg,updateReg,deleteReg } = useSupa();
+  const { loading,usuario,createReg,productos,getReg,updateReg,deleteReg,parametricas } = useSupa();
   const [opened, { open, close }] = useDisclosure(false);
   const [id, setId] = useState(null)
   // const iAward = <IconAward/>
@@ -257,7 +257,7 @@ const Page = () => {
             />
             <NativeSelect
               label="Categoría"
-              data={['SELECCIONE...','SÓLIDOS', 'LÍQUIDOS','SERVICIOS','DERIVADOS']}
+              data={['SELECCIONE...',...parametricas.filter(f=>f.tipo === 'CAT_PRODUCTO').map(e=>e.nombre)]}
               leftSection={<IconBox size={16} />}
               key={form.key('categoria')}
               {...form.getInputProps('categoria')}
@@ -273,7 +273,7 @@ const Page = () => {
             />
             <NativeSelect
               label="Tipo Unidad"
-              data={['SELECCIONE...','KILO', 'BOLSA', 'PAQUETE','LITRO','BOTELLON','BOTELLA','UNIDAD']}
+              data={['SELECCIONE...',...parametricas.filter(f=>f.tipo === 'UNIDAD').map(e=>e.nombre)]}
               key={form.key('unidad')}
               leftSection={<IconBox size={16} />}
               {...form.getInputProps('unidad')}

@@ -85,18 +85,14 @@ const Page = () => {
           overlayProps={{ radius: 'lg', blur: 4 }}
           loaderProps={{ color: 'cyan', type: 'dots',size:'xl' }}
         />
-        <Box component='div' className='grid-usuarios'>
-          {funcionarios.map(f=>(
-            <div className={'card-usuario '+ (f.rol == 'ADMIN' ? 'bg-admin':f.rol == 'USUARIO'? 'bg-user':'bg-new')} key={f.email} onClick={()=>mostrarRegistro(f)}>
-              <div className='content'>
-                <div style={{width:'100%', display:'flex',justifyContent:'center'}}>
-                  <Avatar src={f.data.avatar_url} alt="no image here" color="dark.0" size={'xl'} radius={'md'} />
-                </div>
-                <strong className='nombre'>{f.nombre || 'SIN NOMBRE'}</strong>
-                <h2>{f.rol || 'SIN ROL'}</h2>
-                <h3>{f.estado || 'PENDIENTE'}</h3>
-                <p>{f.email || 'SIN CORREO'}</p>
-              </div>
+        <Box component='div' className='grid-cards'>
+          {pedidos.map(p=>(
+            <div key={p.id_pedido} className="card-order bg-order">
+              <h1>{p.nombre}</h1>
+              <strong>{p.detalle.cantidad_solicitada}</strong> <label>{p.detalle.descripcion}</label>
+              {/* jueves, 01 de julio 2024 22:14 */}
+              <h5>{dayjs(p.fecha_registro).format('dddd, dd MMM YYYY HH:mm')}</h5> 
+              <h3>p.direccion</h3>
             </div>
           ))}
         </Box>

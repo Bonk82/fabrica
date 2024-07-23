@@ -243,4 +243,45 @@ grid-dash{
 }
 
 
+/*************DELIVERYS********************/
+.bg-order {
+  background: linear-gradient(90deg,#188eab, #022333);
+}
+.grid-cards {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fill,minmax(300px,1fr));
+}
+
+.card-order {
+  border-radius: 10px;
+  color: whitesmoke;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2), 0 6px 6px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease-out;
+  font-family: 'Roboto', sans-serif;
+  padding: 8px;
+}
+.card-order h1{
+  margin: 0;
+}
+.card-order strong{
+  font-size: 2.8rem;
+  font-weight: 700;
+  font-style: italic;
+  margin-right: 1.5rem;
+}
+
+.card-order h3{
+  margin: 0;
+  text-align: right;
+  font-style: italic;
+}
+.card-order h5{
+  margin: 0;
+  text-align: right;
+  font-style: italic;
+}
+
 

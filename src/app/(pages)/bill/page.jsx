@@ -402,8 +402,7 @@ const Page = () => {
             />
             <NativeSelect
               label="Categoría:"
-              // data={['OPERATIVO','VENTA DE PRODUCTOS','ALQUILER EQUIPOS','SALARIOS','SERVICIOS','INVERSIÓN','DESCUENTOS']}
-              data={parametricas.filter(f=>f.tipo === 'CAT_CUENTA').map(e=>e.nombre)}
+              data={['SELECCIONE...',...parametricas.filter(f=>f.tipo === 'CAT_CUENTA').map(e=>e.nombre)]}
               required
               leftSection={<IconSection size={16} />}
               key={form.key('categoria')}
@@ -411,8 +410,7 @@ const Page = () => {
             />
             <NativeSelect
               label="Tipo Cuenta:"
-              // data={['NEGOCIO','INGRESO','EGRESO','TRASPASO']}
-              data={parametricas.filter(f=>f.tipo === 'TIPO_CUENTA').map(e=>e.nombre)}
+              data={['SELECCIONE...',...parametricas.filter(f=>f.tipo === 'TIPO_CUENTA').map(e=>e.nombre)]}
               required
               leftSection={<IconSection size={16} />}
               key={form.key('tipo_cuenta')}
@@ -443,8 +441,7 @@ const Page = () => {
           <form onSubmit={formTrans.onSubmit((values) => registrarTransaccion(values))}>
             <NativeSelect
               label="Cuenta:"
-              // data={['OPERATIVO','VENTA DE PRODUCTOS','ALQUILER EQUIPOS','SALARIOS','SERVICIOS','INVERSIÓN','DESCUENTOS']}
-              data={cuentas.map(e=>e.descripcion)}
+              data={['SELECCIONE...',...cuentas.map(e=>e.descripcion)]}
               required
               leftSection={<IconSection size={16} />}
               key={formTrans.key('nombre_cuenta')}

@@ -46,7 +46,7 @@ const Aside = () => {
     <Box style={{justifyContent:'space-between',gap:'1rem',display:'flex',flexDirection:'column'}} >
       <NativeSelect
         label="Periodo:"
-        data={['SELECCIONE...','DÍA', 'SEMANA','MES','AÑO']}
+        data={['DÍA', 'SEMANA','MES','AÑO']}
         value={periodo}
         leftSection={<IconCalendar size={16} />}
         onChange={(event) => onChangePeriodo(event.currentTarget.value)}
