@@ -107,7 +107,8 @@
   background: linear-gradient(90deg, #1864ab, #062644);
 }
 .bg-success {
-  background: linear-gradient(90deg, #0c8a21, #06440e);
+  /* background: linear-gradient(90deg, #0c8a21, #06440e);*/
+  background: linear-gradient(90deg,#508b03, #182b01);
 }
 .bg-warning {
   background: linear-gradient(90deg, #ab8918, #442906);

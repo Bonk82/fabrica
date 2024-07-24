@@ -180,7 +180,7 @@ const Page = () => {
         </Modal>
         <Box component='div' className='grid-usuarios'>
           {funcionarios.map(f=>(
-            <div className={'card-usuario '+ (f.rol == 'ADMIN' ? 'bg-admin':f.rol == 'USUARIO'? 'bg-user':'bg-new')} key={f.email} onClick={()=>mostrarRegistro(f)}>
+            <div className={'card-usuario '+ (f.rol == 'ADMIN' ? 'bg-admin':f.rol == 'USUARIO'? 'bg-user':f.rol == 'REPARTIDOR'? 'bg-delivery':'bg-new')} key={f.email} onClick={()=>mostrarRegistro(f)}>
               <div className='content'>
                 <div style={{width:'100%', display:'flex',justifyContent:'center'}}>
                   <Avatar src={f.data.avatar_url} alt="no image here" color="dark.0" size={'xl'} radius={'md'} />

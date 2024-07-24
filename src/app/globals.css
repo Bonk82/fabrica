@@ -234,9 +234,9 @@ grid-dash{
   background: linear-gradient(90deg,#202833, #020e1b);
 }
 
-/* .bg-admin {
-  background: linear-gradient(90deg,#1858ab, #020738);
-} */
+.bg-delivery {
+  background: linear-gradient(90deg,#508b03, #182b01);
+}
 
 #cliente-correo{
   text-transform: lowercase;
@@ -251,6 +251,7 @@ grid-dash{
   display: grid;
   gap: 1rem;
   grid-template-columns: repeat(auto-fill,minmax(300px,1fr));
+  margin-top: 2rem;
 }
 
 .card-order {
@@ -263,6 +264,9 @@ grid-dash{
   font-family: 'Roboto', sans-serif;
   padding: 8px;
 }
+.card-order:hover{
+  transform: scale(1.05);
+}
 .card-order h1{
   margin: 0;
 }
@@ -271,6 +275,7 @@ grid-dash{
   font-weight: 700;
   font-style: italic;
   margin-right: 1.5rem;
+  text-align: right;
 }
 
 .card-order h3{
@@ -282,6 +287,17 @@ grid-dash{
   margin: 0;
   text-align: right;
   font-style: italic;
+}
+
+.grid-productos{
+  display: grid;
+  grid-template-columns: 80px 1fr;
+}
+
+.card-order label{
+  display: flex;
+  align-items: center;
+  letter-spacing: 0.2rem;
 }
 
 

@@ -63,7 +63,7 @@ const Page = () => {
       descuento:0,
       estado_pedido:'',
       monto_pago:0,
-      estado_pago:'',
+      estado_pago:'PENDIENTE',
       fecha_pago:null,
       metodo_pago: '',
       metodo_entrega:'',
@@ -213,7 +213,7 @@ const Page = () => {
     setId(data.id_pedido);
     setFacturado(data.factura);
     form.setValues(data)
-    form.setFieldValue('estado_pedido','SOLICITADO')
+    // form.setFieldValue('estado_pedido','PENDIENTE')
     // setElProducto(data.fid_producto)
   }
 
@@ -457,7 +457,8 @@ const Page = () => {
     open()
     setId(null)
     form.reset()
-    form.setFieldValue('estado_pedido','SOLICITADO')
+    form.setFieldValue('estado_pedido','PENDIENTE')
+    form.setFieldValue('estado_pago','PENDIENTE')
   }
   const nuevoDetalle = ()=>{
     console.log('nuevo detalle');
@@ -526,16 +527,15 @@ const Page = () => {
               key={form.key('descuento')}
               {...form.getInputProps('descuento')}
             />
-            <NativeSelect
+            {id && <NativeSelect
               label="Estado Pedido:"
               data={['SELECCIONE...',...parametricas.filter(f=>f.tipo === 'ESTADO_PEDIDO').map(e=>e.nombre)]}
               required
-              withAsterisk
               leftSection={<IconFolder size={16} />}
               key={form.key('estado_pedido')}
               {...form.getInputProps('estado_pedido')}
-            />
-            <NumberInput
+            />}
+            {id && <NumberInput
               label="Monto Pago:"
               placeholder="Monto pago"
               prefix='Bs. '
@@ -548,17 +548,16 @@ const Page = () => {
               leftSection={<IconReceipt2 size={16} />}
               key={form.key('monto_pago')}
               {...form.getInputProps('monto_pago')}
-            />
-            <NativeSelect
+            />}
+            {id && <NativeSelect
               label="Estado Pago:"
               data={['SELECCIONE...','PENDIENTE','PAGADO']}
               required
-              withAsterisk
               leftSection={<IconFolder size={16} />}
               key={form.key('estado_pago')}
               {...form.getInputProps('estado_pago')}
-            />
-            <TextInput
+            />}
+            {id && <TextInput
               label="Fecha Pago:"
               placeholder='Fecha Pago'
               type='date'
@@ -566,7 +565,7 @@ const Page = () => {
               leftSection={<IconCalendar size={16} />}
               key={form.key('fecha_pago')}
               {...form.getInputProps('fecha_pago')}
-            />
+            />}
             <NativeSelect
               label="Método Pago:"
               data={['SELECCIONE...',...parametricas.filter(f=>f.tipo === 'METODO_PAGO').map(e=>e.nombre)]}
@@ -599,7 +598,7 @@ const Page = () => {
               key={form.key('delivery')}
               {...form.getInputProps('delivery')}
             />
-            <TextInput
+            {id && <TextInput
               label="Fecha Pedido:"
               placeholder='Fecha Pedido'
               type='date'
@@ -607,7 +606,7 @@ const Page = () => {
               leftSection={<IconCalendar size={16} />}
               key={form.key('fecha_registro')}
               {...form.getInputProps('fecha_registro')}
-            />
+            />}
             <Textarea
               label="Observación:"
               placeholder='La observacion sobre el pedido'

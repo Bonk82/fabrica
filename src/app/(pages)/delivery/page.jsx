@@ -9,9 +9,12 @@ import classes from '../../toast.module.css';
 import { modals } from '@mantine/modals';
 import { useDisclosure } from '@mantine/hooks';
 import dayjs from 'dayjs';
+import { es } from "dayjs/locale/es";
 const Page = () => {
-  const { loading,usuario,pedidos,getReg,updateReg } = useSupa();
+  const { loading,usuario,entregas,getReg,updateReg } = useSupa();
   const [id, setId] = useState(null)
+
+  dayjs.locale("es");
 
   useEffect(() => {
     cargarData()
@@ -19,7 +22,7 @@ const Page = () => {
   }, [])
   
   const cargarData = async () =>{
-    await getReg('vw_pedido','id_pedido',true);
+    await getReg('vw_entregas','id_pedido',true);
   }
 
   const toast = (title,message,type) =>{
@@ -86,13 +89,16 @@ const Page = () => {
           loaderProps={{ color: 'cyan', type: 'dots',size:'xl' }}
         />
         <Box component='div' className='grid-cards'>
-          {pedidos.map(p=>(
+          {entregas.map(p=>(
             <div key={p.id_pedido} className="card-order bg-order">
               <h1>{p.nombre}</h1>
-              <strong>{p.detalle.cantidad_solicitada}</strong> <label>{p.detalle.descripcion}</label>
-              {/* jueves, 01 de julio 2024 22:14 */}
-              <h5>{dayjs(p.fecha_registro).format('dddd, dd MMM YYYY HH:mm')}</h5> 
-              <h3>p.direccion</h3>
+              {p.detalle.map(d=>(
+                <div key={d.id_detalle_pedido} className='grid-productos'>
+                  <strong>{d.cantidad_solicitada}</strong> <label>{d.producto}</label>
+                </div>
+              ))}
+              <h5>{dayjs(p.fecha_registro).format('dddd, DD MMM YYYY')}</h5> 
+              <h3>{p.direccion || p.referencia}</h3>
             </div>
           ))}
         </Box>

@@ -20,6 +20,7 @@ export const SupabaseContextProvider = ({ children }) => {
   const [proveedores, setProveedores] = useState([]);
   const [pedidos, setPedidos] = useState([]);
   const [pedidosDetalle, setPedidosDetalle] = useState([]);
+  const [entregas, setEntregas] = useState([]);
   const [cuentas, setCuentas] = useState([]);
   const [insumos, setInsumos] = useState([]);
   const [parametricas, setParametricas] = useState([]);
@@ -116,7 +117,7 @@ export const SupabaseContextProvider = ({ children }) => {
         const elFunc =  await getRegFilter('vw_funcionario','fid_user',pivotUser.data.user.id,'eq','')
         console.log('elfunc',elFunc[0]);
         setUsuario(elFunc[0])//|| pivotUser.data.user
-        router.push('/dashboard')
+        elFunc[0].rol == 'REPARTIDOR' ? router.push('/delivery') : router.push('/dashboard')
       } 
     } catch (error) {
       console.log('erro al cargar usuario',error);
@@ -157,6 +158,7 @@ export const SupabaseContextProvider = ({ children }) => {
       if(table == 'parametrica') setParametricas(data);
       if(table == 'vw_funcionario') setFuncionarios(data);
       if(table == 'rol') setRoles(data);
+      if(table == 'vw_entregas') setEntregas(data);
       // if(['prestamo','vw_prestamos'].includes(table)) setProductos(data);
       return data;
     } catch (error) {
@@ -247,6 +249,7 @@ export const SupabaseContextProvider = ({ children }) => {
         proveedores,
         pedidos,
         pedidosDetalle,
+        entregas,
         cuentas,
         insumos,
         parametricas,
