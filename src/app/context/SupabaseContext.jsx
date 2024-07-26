@@ -2,6 +2,9 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "../supabase/client";
 import { useRouter } from "next/navigation";
+import { notifications } from '@mantine/notifications';
+import classes from '../toast.module.css';
+
 
 export const SupaContext = createContext();
 
@@ -33,12 +36,28 @@ export const SupabaseContextProvider = ({ children }) => {
   const [usuario, setUsuario] = useState(null);
 
   const router = useRouter()
+
+  const toast = (title,message,type) =>{
+    // return <Toast title='el totulo' message='el mensaje' type='error'/>
+    let color = type
+    if(type == 'success') color = 'lime.8';
+    if(type == 'info') color = 'cyan.8';
+    if(type == 'warning') color = 'yellow.8';
+    if(type == 'error') color = 'red.8';
+    notifications.show({
+      title,
+      message,
+      color,
+      classNames: classes,
+    })
+  }
   
   useEffect(()=>{
     getUser();
     getReg('parametrica','nombre',true)
     // if(!usuario) router.push('/login')
   // eslint-disable-next-line react-hooks/exhaustive-deps
+    // console.log('iniciando context',usuario);
   },[])
 
   const loginWithMagicLink = async (email) => {
@@ -61,28 +80,34 @@ export const SupabaseContextProvider = ({ children }) => {
       email,
       password
     })
-    console.log(data,error),email,password;
+    console.log(data,error,email,password);
   }
 
   const signInWithEmail = async(email,password) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
-    if(data.user){
-      setUsuario(data.user)
-      router.push('/dashboard')
-    } 
-    console.log(data,error);
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
+      if(data) getUser();
+      if(error) throw new Error(error)
+    } catch (error) {
+      console.log('error signInWithEmail:'+ error);
+      toast('Control Login',error.message || error,'error')
+    }
   };
 
   const signInWithGoogle = async ()=> {
-    console.log('enrtando a singGoogle');
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-    })
-    // console.log('login google',data,error);
-    // if(data) router.push('/dashboard')
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+      })
+      if(data) getUser();
+      if (error) throw new Error(error)
+    } catch (error) {
+      console.log('error signInWithGoogle:'+ error);
+      toast('Control Login',error.message || error,'error')
+    }
   }
 
   const logout = async () => {
@@ -120,7 +145,7 @@ export const SupabaseContextProvider = ({ children }) => {
         elFunc[0].rol == 'REPARTIDOR' ? router.push('/delivery') : router.push('/dashboard')
       } 
     } catch (error) {
-      console.log('erro al cargar usuario',error);
+      console.log('error al cargar usuario',error);
     }
   }
 
@@ -146,7 +171,7 @@ export const SupabaseContextProvider = ({ children }) => {
         .from(table)
         .select("*")
         .order(col, { ascending})
-      console.log(table,data,error);
+      // console.log(table,data,error);
       if (error) throw new Error(error.message);
       if(table == 'cliente') setClientes(data);
       if(table == 'producto') setProductos(data);
@@ -191,7 +216,7 @@ export const SupabaseContextProvider = ({ children }) => {
        }
 
       const {data, error} = respuesta
-      console.log(table,data,error);
+      // console.log(table,data,error);
       if (error) throw new Error(error.message);
       if(table == 'vw_pedido_detalle') setPedidosDetalle(data);
       if(table == 'vw_transaccion') setTransacciones(data);

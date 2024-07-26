@@ -166,7 +166,7 @@ const Page = () => {
         <Text c="cyan.4" size='30px' fw={900}
           variant="gradient"
           gradient={{ from: 'lightblue', to: 'cyan', deg: 90 }}>
-          Datos del {dayjs().startOf('month').format('DD MMM YYYY')} al {dayjs().endOf('month').format('DD MMM YYYY')}
+          Datos del {dayjs(f1).format('DD MMM YYYY')} al {dayjs(f2).format('DD MMM YYYY')}
         </Text>
       </Center>
       <Box pos='relative'>

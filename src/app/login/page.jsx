@@ -32,9 +32,7 @@ const Login = () => {
   const signUp = async(valores)=>{
     console.log('signUp',valores);
     try {
-      // const r = await singUpWithPassword(valores.email,valores.password)
-      const r = await singUpWithPassword('cristian.bonk@hotmail.com','123456')
-      console.log('respuesta',r);
+      await singUpWithPassword(valores.email,valores.password)
     } catch (error) {
       console.log(error);
     }
@@ -43,15 +41,14 @@ const Login = () => {
   const login = async(valores)=>{
     console.log('login',valores);
     try {
-      const r = await signInWithEmail(valores.email,valores.password)
-      console.log('respuesta',r);
+      await signInWithEmail(valores.email,valores.password)
     } catch (error) {
       console.log(error);
     }
   }
 
   return (
-    <Box maw={540} mx="auto" style={{marginTop:'12vh'}}>
+    <Box maw={540} mx="auto" style={{marginTop:'12vh',padding: '0 1rem'}}>
       <Center>
         <Text c="cyan.4" size='50px' fw={900}
           variant="gradient"
@@ -62,6 +59,7 @@ const Login = () => {
       <form onSubmit={form.onSubmit((values) => login(values))}>
         <TextInput
           withAsterisk
+          id='elogin'
           label="Email"
           placeholder="your@email.com"
           key={form.key('email')}
@@ -75,7 +73,7 @@ const Login = () => {
           type='password'
           {...form.getInputProps('password')}
         />
-        <Group justify="flex-end" mt="md">
+        <Group justify="space-between" mt="md" gap={4}>
           <Button leftSection={<IconRegistered/>} onClick={()=>signUp(form.values) }> Registrar</Button>
           <Button leftSection={<IconBrandGoogle/>} onClick={signInWithGoogle}> GOOGLE</Button>
           <Button leftSection={<IconLogin/>} type="submit"> Ingresar</Button>
