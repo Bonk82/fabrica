@@ -1,7 +1,7 @@
 'use client'
 
 import 'dayjs/locale/es';
-import { ActionIcon,AppShell, Burger, Group, Image } from '@mantine/core';
+import { ActionIcon,AppShell, Box, Burger, Group, Image } from '@mantine/core';
 import { useDisclosure,useViewportSize } from '@mantine/hooks';
 import { IconRipple } from '@tabler/icons-react';
 import { useState } from "react";
@@ -32,10 +32,16 @@ export function Model({ children }) {
       transitionTimingFunction="ease"
     >
       <AppShell.Header style={{backgroundColor:'#0c8599'}}>
-        <Group h="100%" px="md">
-          <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
-          <Image radius="lg" src="/assets/icono3.jpg" h={50} w="auto" fit='contain' alt=''/>
-          <Header/>
+        <Group h="100%" w='100%' px="md" justify='space-between'>
+          <Box component='div' style={{display:'flex',justifyContent:'flex-start',height:'58px',alignItems:'center',gap:'0.5rem'}}>
+            <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
+            <Image radius="lg" src="/assets/icono3.jpg" h={40} w="auto" fit='contain' alt=''/>
+            <Box component='h1' visibleFrom='md'>Cristales Ice®</Box>
+            <Box component='h4' hiddenFrom='md'>Cristales Ice®</Box>
+          </Box>
+          <Box component='div' style={{display:'flex',justifyContent:'flex-end',height:'58px',alignItems:'center',gap:'0.5rem'}}>
+            <Header/>
+          </Box>
         </Group>
       </AppShell.Header>
       <AppShell.Navbar p="sm" style={{overflow:'hidden',backgroundColor:'transparent'}}>

@@ -1,6 +1,6 @@
 'use client'
 import { useSupa } from '@/app/context/SupabaseContext';
-import { ActionIcon, Box, Button, Center, Chip, Group, LoadingOverlay, NativeSelect, Text, TextInput } from '@mantine/core'
+import { ActionIcon, Box, Button, Center, Chip, Flex, Grid, Group, LoadingOverlay, NativeSelect, Text, TextInput } from '@mantine/core'
 import { useForm } from '@mantine/form';
 import { IconCheck, IconDeviceFloppy, IconEdit, IconEye, IconRefresh, IconTrash } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
@@ -23,16 +23,6 @@ const Page = () => {
   const colores = ['violet.6','green.6','red.6'];
   const [f1, setF1] = useState(dayjs().startOf('month'))
   const [f2, setF2] = useState(dayjs().endOf('month'))
-
-  // const data = [
-  //   { month: 'January', Smartphones: 1200, Laptops: 900, Tablets: 200 },
-  //   { month: 'February', Smartphones: 1900, Laptops: 1200, Tablets: 400 },
-  //   { month: 'March', Smartphones: 400, Laptops: 1000, Tablets: 200 },
-  //   { month: 'April', Smartphones: 1000, Laptops: 200, Tablets: 800 },
-  //   { month: 'May', Smartphones: 800, Laptops: 1400, Tablets: 1200 },
-  //   { month: 'June', Smartphones: 750, Laptops: 600, Tablets: 1000 },
-  // ]
-  // name: 'Smartphones', color: 'violet.6'
 
   useEffect(() => {
     cargarData()
@@ -75,22 +65,9 @@ const Page = () => {
     console.log('obteneinedo report',tipo,data);
     setLoading(true)
     try {
-      // const response = await axios.get(`/api/reports`, {
-      //   params: { tipo }
-      // });
-      // const response2 = await axios.post('/api/reports', [{a:1,b:25,c:23},{a:10,b:250,c:230},{a:15,b:255,c:235}], {
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      // });
       const templateData = {
         filename: 'report-template.docx', // Cambia el nombre de la plantilla según tu caso
       };
-      // const data = [
-      //   { id: 1, name: 'Item 1', value: 'Value 1' },
-      //   { id: 2, name: 'Item 2', value: 'Value 2' },
-      //   // Puedes agregar más objetos aquí
-      // ];
       await data.map(e => {
         e.f1 = f1;
         e.f2 = f2;
@@ -118,47 +95,8 @@ const Page = () => {
     } finally {
       setLoading(false);
     }
-    // const r = await generarReporte.bind(tipo)
-    // const s = await handler.bind('x');
-    // console.log('facil',r,s);
   }
 
-
-  // const generarReporte = (tipoReporte) =>{
-  //   const pathTemplate = ``
-  //   const optionsReport = {
-  //     convertTo : 'pdf', //can be docx, txt, ...
-  //     reportName:  `Cristales_report${tipoReporte}_${new Date().getTime()}.pdf`, //'Reporte01' + new Date().getTime() + '.pdf',
-  //     lang: "es",
-  //     timezone: "America/Caracas",
-  //   };
-  //   const miData = transacciones
-  //   try {
-  //     render(
-  //       pathTemplate,
-  //       miData,
-  //       optionsReport,
-  //       (err, buffer, filename) => {
-  //         if (err) console.log(err);
-  //         if (!buffer) console.log('sin buffer',err);
-  //         console.log('el buff',buffer,filename);
-  //         const result = Buffer.from(buffer, 'binary');
-  //         const url = window.URL.createObjectURL(new Blob([result]));
-  //         const link = document.createElement("a");
-  //         link.href = url;
-  //         link.setAttribute("download", nombreReporte);
-  //         document.body.appendChild(link);
-  //         link.click();
-
-  //         document.body.removeChild(link);
-  //         URL.revokeObjectURL(url);
-  //       }
-  //     );
-  //   } catch (error) {
-  //     console.log(error);
-  //     respuesta.send(error);
-  //   }
-  // }
 
   return (
     <div>
@@ -176,12 +114,12 @@ const Page = () => {
           overlayProps={{ radius: 'lg', blur: 4 }}
           loaderProps={{ color: 'cyan', type: 'dots',size:'xl' }}
         />
-        <Box style={{display: 'flex',justifyContent:'left',gap:'2rem',marginTop:'2rem'}}>
+        <Flex gap='xs' direction='row' wrap='wrap' mt={8}>
           {parametricas.filter(f=>f.tipo == 'OBJETIVOS').map(p=>(
-            <Chip key={p.id_parametrica} checked color="cyan">{p.nombre}: {p.agrupador}</Chip>
-          ))}
-        </Box>
-        <div style={{display:'flex', justifyContent:'space-between',marginBottom:'1rem'}}>
+              <Chip key={p.id_parametrica} checked color="cyan">{p.nombre}: {p.agrupador}</Chip>
+            ))}
+        </Flex>
+        {/* <Box style={{display:'flex', justifyContent:'space-between',marginBottom:'1rem'}} hiddenFrom='sm'>
           <Box style={{display:'flex',justifyContent:'flex-start',gap:'1rem',margin:'1rem 0'}}>
             <Button color='green.5' variant='light' onClick={()=>obtenerReporte('DOS',transacciones)} size='sm' style={{marginTop:'1.5rem'}}> Histórico Pedidos</Button>
           </Box>
@@ -204,7 +142,31 @@ const Page = () => {
             />
             <Button color='blue.2' variant='light' onClick={()=>cargarData()} size='sm' style={{marginTop:'1.5rem'}} >Cargar Transacciones</Button>
           </Box>
-        </div>
+        </Box> */}
+        <Grid my={12} display='flex' align='end'>
+          <Grid.Col span={{ base: 12, lg: 2 }}>
+            <DatePickerInput
+              value={f1}
+              onChange={setF1}
+              label="Fecha Inicio"
+              placeholder="Fecha Inicio"
+              size='sm'
+              valueFormat='DD MMM YYYY'
+            />
+          </Grid.Col>
+          <Grid.Col span={{ base: 12, lg: 2 }}>
+            <DatePickerInput
+              value={f2}
+              onChange={setF2}
+              label="Fecha Fin"
+              placeholder="Fecha Fin"
+              size='sm'
+              valueFormat='DD MMM YYYY'
+            />
+          </Grid.Col>
+          <Grid.Col span={{ base: 12, lg: 3 }}><Button color='blue.2' variant='light' fullWidth onClick={()=>cargarData()} size='sm'>Cargar Transacciones</Button></Grid.Col>
+          <Grid.Col span={{ base: 12, lg: 3 }}><Button color='green.5' variant='light' fullWidth onClick={()=>obtenerReporte('DOS',transacciones)} size='sm'> Histórico Pedidos</Button></Grid.Col>
+        </Grid>
         <Box style={{display:'flex', gap:'1rem',gridTemplateColumns:'repeat(auto-fill, minmax(200px, 1fr))'}}>
           {productos.length>0 && <BarChart
             h={300}

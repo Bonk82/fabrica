@@ -29,10 +29,10 @@ const Login = () => {
     },
   });
 
-  const signUp = async(valores)=>{
-    console.log('signUp',valores);
+  const signUp = async()=>{
+    console.log('signUp',form.getValues().email,form.getValues().password);
     try {
-      await singUpWithPassword(valores.email,valores.password)
+      await singUpWithPassword(form.getValues().email,form.getValues().password)
     } catch (error) {
       console.log(error);
     }
@@ -74,7 +74,7 @@ const Login = () => {
           {...form.getInputProps('password')}
         />
         <Group style={{display:'flex',flexWrap:'wrap',gap:'1rem',marginTop:'2rem'}}>
-          <Button style={{flexGrow:'1',flexBasis:'200'}} leftSection={<IconRegistered/>} onClick={()=>signUp(form.values) }>Registrar</Button>
+          <Button style={{flexGrow:'1',flexBasis:'200'}} leftSection={<IconRegistered/>} onClick={(values)=>signUp(values) }>Registrar</Button>
           <Button style={{flexGrow:'1',flexBasis:'200'}} leftSection={<IconLogin/>} type="submit">Ingresar</Button>
           <Button style={{flexGrow:'1',flexBasis:'200'}} leftSection={<IconBrandGoogle/>} onClick={signInWithGoogle}>Google</Button>
         </Group>

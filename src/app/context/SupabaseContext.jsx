@@ -76,11 +76,17 @@ export const SupabaseContextProvider = ({ children }) => {
   };
 
   const singUpWithPassword = async (email,password)=>{
-    const {data,error} = await supabase.auth.signUp({
-      email,
-      password
-    })
-    console.log(data,error,email,password);
+    try {
+      const {data,error} = await supabase.auth.signUp({
+        email,
+        password
+      })
+      console.log(data,error,email,password);
+      toast('Control Registro',`Correo ${email} registrado con éxito`,'success');
+      toast('Control Registro','Solicite un ROL VÁLIDO para poder ingresar al sistema','warning');
+    } catch (error) {
+      toast('Control Registro',error.message || error,'error')
+    }
   }
 
   const signInWithEmail = async(email,password) => {
@@ -141,8 +147,12 @@ export const SupabaseContextProvider = ({ children }) => {
         await getReg('vw_menu_rol','id_menu','asc')
         const elFunc =  await getRegFilter('vw_funcionario','fid_user',pivotUser.data.user.id,'eq','')
         console.log('elfunc',elFunc[0]);
-        setUsuario(elFunc[0])//|| pivotUser.data.user
-        elFunc[0].rol == 'REPARTIDOR' ? router.push('/delivery') : router.push('/dashboard')
+        if(elFunc[0]?.rol){
+          setUsuario(elFunc[0])//|| pivotUser.data.user
+          elFunc[0].rol == 'REPARTIDOR' ? router.push('/delivery') : router.push('/dashboard')
+        }else{
+          toast('Control Login','Debe solictar un ROL VÁLIDO con el administrador','warning')
+        }
       } 
     } catch (error) {
       console.log('error al cargar usuario',error);
