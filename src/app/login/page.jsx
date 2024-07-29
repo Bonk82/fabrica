@@ -53,7 +53,7 @@ const Login = () => {
         <Text c="cyan.4" size='50px' fw={900}
           variant="gradient"
           gradient={{ from: 'lightblue', to: 'cyan', deg: 90 }}>
-          Cristales Ice 
+          Cristales Ice®
         </Text>
       </Center>
       <form onSubmit={form.onSubmit((values) => login(values))}>
@@ -73,10 +73,10 @@ const Login = () => {
           type='password'
           {...form.getInputProps('password')}
         />
-        <Group justify="space-between" mt="md" gap={4}>
-          <Button leftSection={<IconRegistered/>} onClick={()=>signUp(form.values) }> Registrar</Button>
-          <Button leftSection={<IconBrandGoogle/>} onClick={signInWithGoogle}> GOOGLE</Button>
-          <Button leftSection={<IconLogin/>} type="submit"> Ingresar</Button>
+        <Group style={{display:'flex',flexWrap:'wrap',gap:'1rem',marginTop:'2rem'}}>
+          <Button style={{flexGrow:'1',flexBasis:'200'}} leftSection={<IconRegistered/>} onClick={()=>signUp(form.values) }>Registrar</Button>
+          <Button style={{flexGrow:'1',flexBasis:'200'}} leftSection={<IconLogin/>} type="submit">Ingresar</Button>
+          <Button style={{flexGrow:'1',flexBasis:'200'}} leftSection={<IconBrandGoogle/>} onClick={signInWithGoogle}>Google</Button>
         </Group>
       </form>
     </Box>
