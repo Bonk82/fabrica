@@ -44,7 +44,8 @@ export function Model({ children }) {
           </Box>
         </Group>
       </AppShell.Header>
-      <AppShell.Navbar p="sm" style={{overflow:'hidden',backgroundColor:'transparent'}}>
+      {/* <AppShell.Navbar p="sm" style={{overflow:'hidden',backgroundColor:'transparent'}} bg={{base:'cyan.2'}}> */}
+      <AppShell.Navbar p="sm" style={{overflow:'hidden'}} bg={{base:'#072e4e',md:'transparent'}}>
         {/* {(window?.innerWidth >= 768) && */}
         {(width >= 768) &&
           <div style={{display:'flex',justifyContent:'space-between', fontSize:'x-large',marginBottom:'2rem'}}>{nav ? 'Menú de opciones' : ''}

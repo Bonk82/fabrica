@@ -56,8 +56,8 @@ export const SupabaseContextProvider = ({ children }) => {
     getUser();
     getReg('parametrica','nombre',true)
     // if(!usuario) router.push('/login')
-  // eslint-disable-next-line react-hooks/exhaustive-deps
     // console.log('iniciando context',usuario);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   },[])
 
   const loginWithMagicLink = async (email) => {
