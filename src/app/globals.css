@@ -89,7 +89,8 @@ body {
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
+  /* color: rgb(var(--foreground-rgb)); */
+  color: whitesmoke;
   height: 100vh;
   background: rgb(2,9,19);
   background: linear-gradient(90deg, #020913 0%, #072e4e 100%); 
