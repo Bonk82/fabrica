@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@ducanh2912/next-pwa": "^10.2.8",
     "@mantine/charts": "^7.11.2",
     "@mantine/core": "^7.11.2",
     "@mantine/dates": "^7.11.2",
@@ -33,6 +34,7 @@
     "eslint-config-next": "14.2.3",
     "postcss": "^8.4.38",
     "postcss-preset-mantine": "^1.15.0",
-    "postcss-simple-vars": "^7.0.1"
+    "postcss-simple-vars": "^7.0.1",
+    "webpack": "^5.93.0"
   }
 }
