@@ -10,10 +10,12 @@ import Header from '../(components)/Header';
 import Aside from '../(components)/Aside';
 import Footer from '../(components)/Footer';
 import { DatesProvider } from '@mantine/dates';
+import { useSupa } from '../context/SupabaseContext';
 
 export function Model({ children }) {
   const [opened, { toggle }] = useDisclosure();
   const [nav, setNav] = useState(true)
+  const {desplegar,setDesplegar} = useSupa();
   // const [width, setWidth] = useState((window || {}).innerWidth);
   const { width } = useViewportSize();
 
@@ -25,7 +27,8 @@ export function Model({ children }) {
     <AppShell
       header={{ height: 60 }}
       footer={{ height: 20 }}
-      navbar={{ width: nav ? 300:70, breakpoint: 'sm', collapsed: {mobile: !opened }}}
+      // navbar={{ width: nav ? 300:70, breakpoint: 'sm', collapsed: {mobile: !opened }}}
+      navbar={{ width: nav ? 300:70, breakpoint: 'sm', collapsed: {mobile: !desplegar }}}
       aside={{ width: 200, breakpoint: 'md', collapsed: { desktop: false, mobile: true } }}
       padding="md"
       transitionDuration={500}
@@ -34,7 +37,8 @@ export function Model({ children }) {
       <AppShell.Header style={{backgroundColor:'#0c8599'}}>
         <Group h="100%" w='100%' px="md" justify='space-between'>
           <Box component='div' style={{display:'flex',justifyContent:'flex-start',height:'58px',alignItems:'center',gap:'0.5rem'}}>
-            <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
+            {/* <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" /> */}
+            <Burger opened={desplegar} onClick={()=>setDesplegar(!desplegar)} hiddenFrom="sm" size="sm" />
             <Image radius="lg" src="/assets/icono3.jpg" h={40} w="auto" fit='contain' alt=''/>
             <Box component='h1' visibleFrom='md'>Cristales Ice®</Box>
             <Box component='h4' hiddenFrom='md'>Cristales Ice®</Box>

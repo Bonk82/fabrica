@@ -5,12 +5,15 @@ import { IconUsersGroup,IconBuildingFactory2,IconBriefcase,IconUserCog,IconUserC
 
 
 const Navbar = () => {
-  const { menu,usuario} = useSupa();
+  const { menu,usuario,setDesplegar} = useSupa();
   const menues = menu.filter(f=>f.rol==usuario?.rol).sort((a,b)=>a.orden-b.orden);
   console.log('en navbar',menu,usuario);
   const router = useRouter()
 
   const navegar = (url) =>{
+    setTimeout(() => {
+      setDesplegar(false);
+    }, 500);
     if(url) router.push(url);
   }
 

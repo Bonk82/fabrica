@@ -34,6 +34,7 @@ export const SupabaseContextProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [avatar, setAvatar] = useState('');
   const [usuario, setUsuario] = useState(null);
+  const [desplegar, setDesplegar] = useState(null);
 
   const router = useRouter()
 
@@ -307,6 +308,8 @@ export const SupabaseContextProvider = ({ children }) => {
         getRegFilter,
         updateReg,
         deleteReg,
+        desplegar,
+        setDesplegar,
       }}
     >
       {children}

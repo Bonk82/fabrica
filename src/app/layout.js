@@ -66,7 +66,7 @@ export default function RootLayout({ children }) {
         <ColorSchemeScript />
       </head>
       <body>
-        <MantineProvider defaultColorScheme="dark" theme={{primaryColor:'cyan'}}>
+        <MantineProvider defaultColorScheme="dark" forceColorScheme="dark" theme={{primaryColor:'cyan'}}>
             <Notifications position="top-right" zIndex={400}/>
             {/* <Model>{children}</Model> */}
             <AuthProvider>
