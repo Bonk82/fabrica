@@ -26,6 +26,8 @@ const Page = () => {
   const [elCliente, setElCliente] = useState('')
   const [elProducto, setElProducto] = useState('')
   const [facturado, setFacturado] = useState(false)
+  const [detalleBloq, setDetalleBloq] = useState(false)
+
 
   useEffect(() => {
     cargarData()
@@ -83,6 +85,7 @@ const Page = () => {
       precio_unidad:0,
       cantidad_entregada:0,
       monto_total:0,
+      estado_pedido:''
     }
   });
 
@@ -212,6 +215,9 @@ const Page = () => {
     open()
     setId(data.id_pedido);
     setFacturado(data.factura);
+    data.fecha_entrega = dayjs(data.fecha_entrega).isValid() ?  dayjs(data.fecha_entrega).format('YYYY-MM-DD HH:mm:ss'):null
+    data.fecha_pago = dayjs(data.fecha_pago).isValid() ? dayjs(data.fecha_pago).format('YYYY-MM-DD HH:mm:ss') : null
+    data.fecha_registro = dayjs(data.fecha_registro).format('YYYY-MM-DD HH:mm:ss')
     form.setValues(data)
     // form.setFieldValue('estado_pedido','PENDIENTE')
     // setElProducto(data.fid_producto)
@@ -327,8 +333,9 @@ const Page = () => {
     [],
   );
 
-  const mostrarGrillaPedido = (data,tipo)=>{
+  const mostrarGrillaPedido = (data)=>{
     console.log('ladata',data);
+    data.estado_pedido == 'ENTREGADO' ? setDetalleBloq(true): setDetalleBloq(false);
     if(id == data.id_pedido && verGrillaDetalle){
       setVerGrillaDetalle(false)
       setId(null)
@@ -337,8 +344,6 @@ const Page = () => {
     setId(data.id_pedido)
     setVerGrillaDetalle(true)
     cargarDetallePedido(data.id_pedido)
-    // if(tipo=='nuevo') setVerDetalle(true)
-    // if(tipo=='grilla') setVerGrillaDetalle(true)
   }
   const table = useMantineReactTable({
     columns,
@@ -404,7 +409,7 @@ const Page = () => {
     initialState: {
       density: 'xs',
     },
-    enableRowActions: true,
+    enableRowActions: !detalleBloq,
     renderRowActions: ({ row }) => (
       <Box style={{gap:'0.8rem',display:'flex'}}>
         <ActionIcon variant="subtle" onClick={() => mostrarRegistroDetalle(row.original)} title='Editar porducto en pedido'>
@@ -505,10 +510,10 @@ const Page = () => {
             <TextInput
               label="Fecha Entrega:"
               placeholder='Fecha Entrega'
-              type='date'
+              type='datetime-local'
               required
               withAsterisk
-              maxLength={15}
+              maxLength={20}
               min={hoy}
               leftSection={<IconCalendar size={16} />}
               key={form.key('fecha_entrega')}
@@ -543,7 +548,6 @@ const Page = () => {
               decimalScale={2}
               fixedDecimalScale
               thousandSeparator=','
-              value={0}
               maxLength={15}
               leftSection={<IconReceipt2 size={16} />}
               key={form.key('monto_pago')}
@@ -560,8 +564,8 @@ const Page = () => {
             {id && <TextInput
               label="Fecha Pago:"
               placeholder='Fecha Pago'
-              type='date'
-              maxLength={10}
+              type='datetime-local'
+              maxLength={20}
               leftSection={<IconCalendar size={16} />}
               key={form.key('fecha_pago')}
               {...form.getInputProps('fecha_pago')}
@@ -601,7 +605,7 @@ const Page = () => {
             {id && <TextInput
               label="Fecha Pedido:"
               placeholder='Fecha Pedido'
-              type='date'
+              type='datetime-local'
               readOnly
               leftSection={<IconCalendar size={16} />}
               key={form.key('fecha_registro')}
@@ -617,7 +621,7 @@ const Page = () => {
             />
             <Group justify="flex-end" mt="md">
               {!id && <Button fullWidth leftSection={<IconDeviceFloppy/>} type='submit'>Registrar Pedido</Button>}
-              {id && <Button fullWidth leftSection={<IconRefresh/>} type='submit'>Actualizar Pedido</Button>}
+              {id && <Button fullWidth leftSection={<IconRefresh/>} disabled={form.getValues().estado_pedido=='ENTREGADO' || !form.isTouched()} type='submit'>Actualizar Pedido</Button>}
             </Group>
           </form>
         </Modal>
@@ -689,7 +693,7 @@ const Page = () => {
             />
             <Group justify="flex-end" mt="md">
               {!idDetalle && <Button fullWidth leftSection={<IconDeviceFloppy/>} type='submit'>Registrar Detalle</Button>}
-              {idDetalle && <Button fullWidth leftSection={<IconRefresh/>} type='submit'>Actualizar Detalle</Button>}
+              {idDetalle && <Button fullWidth leftSection={<IconRefresh/>} type='submit' disabled={formDetalle.getValues().estado_pedido=='ENTREGADO' || !formDetalle.isTouched()}>Actualizar Detalle</Button>}
             </Group>
           </form>
         </Modal>
@@ -698,8 +702,9 @@ const Page = () => {
 
         <MantineReactTable table={table} />
 
-        {verGrillaDetalle && <Box>
-          <Button onClick={nuevoDetalle} style={{margin:'1rem 0'}} size='sm'>Agregar Producto</Button>
+        {verGrillaDetalle &&
+        <Box>
+          {!detalleBloq && <Button onClick={nuevoDetalle} style={{margin:'1rem 0'}} size='sm'>Agregar Producto</Button>}
 
           <MantineReactTable table={tableDetalle} />
         </Box>}

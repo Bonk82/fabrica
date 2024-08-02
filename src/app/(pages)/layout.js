@@ -16,7 +16,6 @@ export function Model({ children }) {
   const [opened, { toggle }] = useDisclosure();
   const [nav, setNav] = useState(true)
   const {desplegar,setDesplegar} = useSupa();
-  // const [width, setWidth] = useState((window || {}).innerWidth);
   const { width } = useViewportSize();
 
   const toggleNav = () =>{
@@ -27,7 +26,6 @@ export function Model({ children }) {
     <AppShell
       header={{ height: 60 }}
       footer={{ height: 20 }}
-      // navbar={{ width: nav ? 300:70, breakpoint: 'sm', collapsed: {mobile: !opened }}}
       navbar={{ width: nav ? 300:70, breakpoint: 'sm', collapsed: {mobile: !desplegar }}}
       aside={{ width: 200, breakpoint: 'md', collapsed: { desktop: false, mobile: true } }}
       padding="md"
@@ -48,9 +46,7 @@ export function Model({ children }) {
           </Box>
         </Group>
       </AppShell.Header>
-      {/* <AppShell.Navbar p="sm" style={{overflow:'hidden',backgroundColor:'transparent'}} bg={{base:'cyan.2'}}> */}
       <AppShell.Navbar p="sm" style={{overflow:'hidden'}} bg={{base:'#072e4e',md:'transparent'}}>
-        {/* {(window?.innerWidth >= 768) && */}
         {(width >= 768) &&
           <div style={{display:'flex',justifyContent:'space-between', fontSize:'x-large',marginBottom:'2rem'}}>{nav ? 'Menú de opciones' : ''}
             <ActionIcon style={{width:'50px'}} onClick={toggleNav}><IconRipple/></ActionIcon>

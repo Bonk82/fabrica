@@ -178,7 +178,7 @@ const Page = () => {
   const mostrarTransaccion = (data) =>{
     const soloTrans={
       nombre_cuenta:data.nombre_cuenta,
-      fecha:data.fecha,
+      fecha:dayjs(data.fecha).isValid() ? dayjs(data.fecha).format('YYYY-MM-DD HH:mm:ss') : null,
       monto:data.monto,
       concepto:data.concepto,
     }

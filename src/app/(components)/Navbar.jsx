@@ -7,7 +7,7 @@ import { IconUsersGroup,IconBuildingFactory2,IconBriefcase,IconUserCog,IconUserC
 const Navbar = () => {
   const { menu,usuario,setDesplegar} = useSupa();
   const menues = menu.filter(f=>f.rol==usuario?.rol).sort((a,b)=>a.orden-b.orden);
-  console.log('en navbar',menu,usuario);
+  // console.log('en navbar',menu,usuario);
   const router = useRouter()
 
   const navegar = (url) =>{

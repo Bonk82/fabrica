@@ -137,6 +137,7 @@ const Page = () => {
     console.log('cargando data',data);
     open()
     setId(data.id_insumo);
+    data.fecha_garantia = dayjs(data.fecha_garantia).isValid() ? dayjs(data.fecha_garantia).format('YYYY-MM-DD HH:mm:ss') : null
     form.setValues(data)
   }
 

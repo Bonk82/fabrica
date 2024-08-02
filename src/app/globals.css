@@ -268,23 +268,26 @@ grid-dash{
 .card-order:hover{
   transform: scale(1.05);
 }
-.card-order h1{
-  margin: 0;
+.card-order h2{
+  margin: 0 0 1rem 0;
+}
+.card-order label{
+  margin-top: -1rem;
 }
 .card-order strong{
-  font-size: 2.8rem;
+  font-size: 2.2rem;
   font-weight: 700;
   font-style: italic;
   margin-right: 1.5rem;
   text-align: right;
+  margin-top: -1rem;
 }
 
 .card-order h3{
   margin: 0;
-  text-align: right;
   font-style: italic;
 }
-.card-order h5{
+.card-order h4{
   margin: 0;
   text-align: right;
   font-style: italic;

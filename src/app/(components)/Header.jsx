@@ -5,7 +5,7 @@ import { IconDotsVertical } from '@tabler/icons-react';
 
 const Header = () => {
   const { usuario,avatar,logout} = useSupa();
-  console.log('usuario header',usuario);
+  // console.log('usuario header',usuario);
 
   return (
     <div style={{display:'flex',justifyContent:'space-between',alignItems:'center', gap:'0.5rem'}}>
