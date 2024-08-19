@@ -161,6 +161,7 @@ const Page = () => {
     delete newPedidoDetalle.promocion
     delete newPedidoDetalle.unidad
     delete newPedidoDetalle.pedido_minimo
+    delete newPedidoDetalle.estado_pedido
     if(!idDetalle) delete newPedidoDetalle.id_pedido
     newPedidoDetalle.fid_producto = productos.filter(f=>f.id_producto == elProducto)[0]?.id_producto;
     newPedidoDetalle.fid_pedido = id
@@ -470,6 +471,7 @@ const Page = () => {
     setVerDetalle(true)
     setIdDetalle(null)
     // setId(value.id_pedido)
+    setElProducto('')
     formDetalle.reset()
     // formDetalle.setFieldValue('estado_pedido','SOLICITADO')
   }
