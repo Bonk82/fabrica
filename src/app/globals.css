@@ -145,6 +145,10 @@ input{
   text-transform: uppercase;
 }
 
+textarea{
+  text-transform: uppercase;
+}
+
 
 .mantine-DatePickerInput-weekday{
   color: whitesmoke;
@@ -287,7 +291,7 @@ grid-dash{
   margin: 0;
   font-style: italic;
 }
-.card-order h4{
+.card-order h5{
   margin: 0;
   text-align: right;
   font-style: italic;

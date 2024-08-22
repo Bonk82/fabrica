@@ -2,7 +2,7 @@
 import { useSupa } from '@/app/context/SupabaseContext';
 import { Avatar, Box, Button, Center, Group, LoadingOverlay, Modal, NativeSelect, NumberInput, Text, Textarea, TextInput } from '@mantine/core'
 import { useForm } from '@mantine/form';
-import { IconCar, IconCheck, IconDeviceFloppy,  IconFolder, IconMail, IconMessage, IconPhone, IconReceipt2, IconRefresh, IconUser } from '@tabler/icons-react';
+import { IconCar, IconCheck, IconDeviceFloppy,  IconFolder, IconMail, IconMessage, IconPhone, IconProgressCheck, IconReceipt2, IconRefresh, IconUser } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import { notifications } from '@mantine/notifications';
 import classes from '../../toast.module.css';
@@ -14,6 +14,7 @@ const Page = () => {
   const { loading,usuario,entregas,getReg,updateReg,parametricas } = useSupa();
   const [id, setId] = useState(null)
   const [opened, { open, close }] = useDisclosure(false);
+  const [detalles, setDetalles] = useState([])
 
   dayjs.locale("es");
 
@@ -52,17 +53,25 @@ const Page = () => {
 
   const preConfirma = async (data)=>{
     open()
+    console.log('preconfirma',data);
+    setDetalles(data.detalle)
     const preform = {
       monto_pago:data.monto_pago,
       metodo_pago: data.metodo_pago,
       observacion:data.observacion,
     }
     form.setValues(preform)
+    setId(data.id_pedido)
   }
 
   const confirmarEntrega = async (data) => {
     // event.preventDefault();
     console.log('la data',data);
+    let cantidades = document.querySelectorAll("input[id^='p-']");
+    cantidades.forEach(e => {
+      console.log(e.value,e.id); // Muestra el valor de cada input
+    });
+    // return false;
     //estado_pedido,monto_pago,estado_pago,fecha_pago,metodo_pago,metodo_entrega,fecha_modifica,usuario_modifica,observaciones
     //cantidad_entregada
     const datosDelivery = {
@@ -74,22 +83,36 @@ const Page = () => {
       metodo_entrega:'REPARTIDOR',//todo: OJO colocar este en el claisifcador
       fecha_modifica:dayjs().add(-4,'hours'),
       usuario_modifica:usuario.id,
-      observaciones:data.observaciones
+      observacion:data.observacion,
+      id_pedido:id
     }
-    if(id) datosDelivery.id_funcionario = id;
-    console.log('new funcionario',datosDelivery,id);
+    // if(id) datosDelivery.id_funcionario = id;
+    console.log('new pedido',datosDelivery,id);
     try {
-      id ? await updateReg('funcionario',datosDelivery) : await createReg(datosDelivery,'funcionario');
+      await updateReg('pedido',datosDelivery);
       cargarData();
-      toast('Control Usuario',`Usuario ${id? 'actualziado': 'registrado'} satisfactoriamente!`,'success')
+      toast('Control Entrega',`Entrega registrada satisfactoriamente!`,'success')
+
+      cantidades.forEach( async d => {
+        await  updateReg('pedido_detalle',{cantidad_entregada:Number(d.value),id_pedido_detalle:Number(d.id.replace('p-',''))})
+      });
+
     } catch (error) {
-      toast('Control Usuario',error.message || error,'error')
+      toast('Control Entrega',error.message || error,'error')
       console.log(error);
     }finally{
       form.reset();
       close()
       setId(null)
     }
+  }
+
+  const handdleCantidad = (c,id) =>{let nuevo_monto =  0
+    detalles.forEach(d => {
+      if(d.id_pedido_detalle == id) d.cantidad_entregada = Number(c)
+      nuevo_monto += d.precio_unidad * d.cantidad_entregada
+    });
+    form.setFieldValue('monto_pago', nuevo_monto)
   }
 
   return (
@@ -117,6 +140,7 @@ const Page = () => {
             blur: 3,
           }}
         >
+        <form onSubmit={form.onSubmit((values) => confirmarEntrega(values))}>
           <NumberInput
             label="Monto Pago:"
             placeholder="Monto pago"
@@ -139,20 +163,38 @@ const Page = () => {
           />
           <Textarea
             label="Observación:"
-            placeholder='La observacion sobre el pedido'
+            placeholder='La observación sobre la entrega'
             leftSection={<IconMessage size={16} />}
             rows={2}
             key={form.key('observacion')}
             {...form.getInputProps('observacion')}
           />
+          {
+            detalles.map(d=>(
+              <div key={d.id_pedido_detalle}>
+                <NumberInput
+                  label={`${d.producto} - Bs.${d.precio_unidad}`}
+                  allowDecimal={false}
+                  maxLength={3}
+                  max={1000}
+                  min={0}
+                  leftSection={<IconProgressCheck size={16} />}
+                  value={d.cantidad_entregada}
+                  id={'p-' + d.id_pedido_detalle}
+                  onChange={e=>handdleCantidad(e,d.id_pedido_detalle)}
+                />
+              </div>
+            ))
+          }
           <Button fullWidth mt={16} leftSection={<IconCheck/>} type='submit'>Confirmar</Button>
+        </form>
         </Modal>
         <Box component='div' className='grid-cards'>
           {entregas.map(p=>(
             <div key={p.id_pedido} className="card-order bg-order" onClick={()=>preConfirma(p)}>
               <h2>{p.id_pedido} : {p.nombre}</h2>
               {(p.detalle || []).map(d=>(
-                <div key={d.id_detalle_pedido} className='grid-productos'>
+                <div key={d.id_pedido_detalle} className='grid-productos'>
                   <strong>{d.cantidad_solicitada}</strong> <label>{d.producto}</label>
                 </div>
               ))}
