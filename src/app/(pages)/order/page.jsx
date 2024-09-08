@@ -623,7 +623,7 @@ const Page = () => {
             />
             <Group justify="flex-end" mt="md">
               {!id && <Button fullWidth leftSection={<IconDeviceFloppy/>} type='submit'>Registrar Pedido</Button>}
-              {id && <Button fullWidth leftSection={<IconRefresh/>} disabled={form.getValues().estado_pedido=='ENTREGADO' || !form.isTouched()} type='submit'>Actualizar Pedido</Button>}
+              {id && <Button fullWidth leftSection={<IconRefresh/>} disabled={form.getValues().estado_pedido=='ENTREGADO' || !form.isValid()} type='submit'>Actualizar Pedido</Button>}
             </Group>
           </form>
         </Modal>

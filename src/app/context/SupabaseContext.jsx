@@ -149,8 +149,13 @@ export const SupabaseContextProvider = ({ children }) => {
         const elFunc =  await getRegFilter('vw_funcionario','fid_user',pivotUser.data.user.id,'eq','')
         console.log('elfunc',elFunc[0]);
         if(elFunc[0]?.rol){
-          setUsuario(elFunc[0])//|| pivotUser.data.user
-          elFunc[0].rol == 'REPARTIDOR' ? router.push('/delivery') : router.push('/dashboard')
+          if(elFunc[0]?.estado == 'ACTIVO'){
+            setUsuario(elFunc[0])//|| pivotUser.data.user
+            elFunc[0].rol == 'REPARTIDOR' ? router.push('/delivery') : router.push('/dashboard')
+          }
+          if(elFunc[0]?.estado == 'BAJA'){
+            toast('Control Login','Este usuario fue dado de baja por el administrador, solicite su reactivación','warning')
+          }
         }else{
           toast('Control Login','Debe solictar un ROL VÁLIDO con el administrador','warning')
         }
