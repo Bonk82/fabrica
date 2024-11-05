@@ -8,8 +8,10 @@ import dayjs from 'dayjs';
 const Aside = () => {
   const { loading,transacciones,productos,getReg,getRegFilter } = useSupa();
   const [periodo, setPeriodo] = useState('DÍA')
-
+  
   useEffect(() => {
+    console.log('va  cargar data en aside');
+    
     cargarData()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])

@@ -91,9 +91,12 @@ body {
 body {
   /* color: rgb(var(--foreground-rgb)); */
   color: whitesmoke;
-  height: 100vh;
+  height: 100dvh;
   background: rgb(2,9,19);
   background: linear-gradient(90deg, #020913 0%, #072e4e 100%); 
+
+  scrollbar-width: thin;          /* "auto" or "thin" */
+  scrollbar-color: #188eab #041d3a;   /* scroll thumb and track */
 }
 
 a {
@@ -307,5 +310,27 @@ grid-dash{
   align-items: center;
   letter-spacing: 0.2rem;
 }
+
+/* Estiliza la barra de scroll */
+body::-webkit-scrollbar {
+  width: 6px; /* Ajusta el ancho del scroll */
+}
+
+/* Estiliza la pista del scroll (el fondo de la barra de scroll) */
+body::-webkit-scrollbar-track {
+  background-color: #041d3a; /* Color de fondo de la pista */
+}
+
+/* Estiliza la propia barra de scroll */
+body::-webkit-scrollbar-thumb {
+  background-color: #188eab; /* Color de la barra de scroll */
+  border-radius: 10px; /* Redondea la barra */
+}
+
+/* Opcional: cambia el color de la barra cuando el usuario pasa el mouse */
+body::-webkit-scrollbar-thumb:hover {
+  background-color: #1aaace;
+}
+
 
 
