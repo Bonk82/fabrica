@@ -1,8 +1,8 @@
 'use client'
 import { useSupa } from '@/app/context/SupabaseContext';
-import { ActionIcon, Box, Button, Center, Chip, Flex, Grid, Group, LoadingOverlay, NativeSelect, Text, TextInput } from '@mantine/core'
+import { ActionIcon, Box, Button, Center, Chip, Flex, Grid, Group, LoadingOverlay, NativeSelect, NumberFormatter, Text, TextInput } from '@mantine/core'
 import { useForm } from '@mantine/form';
-import { IconCheck, IconDeviceFloppy, IconEdit, IconEye, IconRefresh, IconTrash } from '@tabler/icons-react';
+import { IconCalendar, IconCalendarEvent, IconCategoryPlus, IconCheck, IconCurrencyDollar, IconDeviceFloppy, IconEdit, IconEye, IconRefresh, IconShoppingCartPlus, IconTrash } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import { useMemo } from 'react';
 import { MantineReactTable, useMantineReactTable} from 'mantine-react-table';
@@ -23,6 +23,7 @@ const Page = () => {
   const colores = ['violet.6','green.6','red.6'];
   const [f1, setF1] = useState(dayjs().startOf('month'))
   const [f2, setF2] = useState(dayjs().endOf('month'))
+  const [periodo, setPeriodo] = useState('DÍA')
 
   useEffect(() => {
     cargarData()
@@ -32,7 +33,6 @@ const Page = () => {
   const cargarData = async ()=>{
     const ped = await getReg('vw_pedido','id_pedido',false);
     const prod = await getReg('producto','id_producto',false);
-    // const tran = await getRegFilter('vw_transaccion','fecha_entrega',dayjs(dayjs().startOf('month')).format('YYYY-MM-DD 04:00:00'),'between',dayjs(dayjs().endOf('month')).format('YYYY-MM-DD 23:59:59'))
     const tran = await getRegFilter('vw_transaccion','fecha_entrega',dayjs(f1).format('YYYY-MM-DD 04:00:00'),'between',dayjs(f2).format('YYYY-MM-DD 23:59:59'))
     armarData(ped,prod,tran)
   }
@@ -56,6 +56,10 @@ const Page = () => {
         : pivotDia.push({fecha_entrega:t.fecha_entrega,cantidad_entregada:t.cantidad_entregada})
     });
     setListaPedidos(pivot)
+    await pivotDia.map(d=>{
+      d.fecha_entrega = dayjs(d.fecha_entrega).format('DD MMM')
+      return d;
+    })
     setPedidosDia(pivotDia)
     // obtenerReporte('UNO',listaProductos)
     console.log('listaProductos',listaProductos,pivot,pivotDia);
@@ -97,11 +101,37 @@ const Page = () => {
     }
   }
 
+  const onChangePeriodo = (e)=>{
+      setPeriodo(e)
+      let f1,f2
+      if(e == 'DÍA'){
+        f1 = dayjs()
+        f2 = dayjs()
+      } 
+      if(e == 'SEMANA'){
+        f1 = dayjs().startOf('week').add(1,'day');
+        f2 = dayjs().endOf('week').add(5,'hours');
+      } 
+      if(e == 'MES'){
+        f1 = dayjs().startOf('month');
+        f2 = dayjs().endOf('month')
+      } 
+      if(e == 'AÑO'){
+        f1 = dayjs().startOf('year');
+        f2 = dayjs().endOf('year')
+      } 
+      setF1(f1)
+      setF2(f2)
+      cargarData()
+    }
+
 
   return (
     <div>
       <Center>
         <Text c="cyan.4" size='30px' fw={900}
+          mb={20}
+          pb={10}
           variant="gradient"
           gradient={{ from: 'lightblue', to: 'cyan', deg: 90 }}>
           Datos del {dayjs(f1).format('DD MMM YYYY')} al {dayjs(f2).format('DD MMM YYYY')}
@@ -116,33 +146,19 @@ const Page = () => {
         />
         <Flex gap='xs' direction='row' wrap='wrap' mt={8}>
           {parametricas.filter(f=>f.tipo == 'OBJETIVOS').map(p=>(
-              <Chip key={p.id_parametrica} checked color="cyan">{p.nombre}: {p.agrupador}</Chip>
+              <Chip key={p.id_parametrica} checked color="cyan">{p.nombre} : {p.agrupador}</Chip>
             ))}
         </Flex>
-        {/* <Box style={{display:'flex', justifyContent:'space-between',marginBottom:'1rem'}} hiddenFrom='sm'>
-          <Box style={{display:'flex',justifyContent:'flex-start',gap:'1rem',margin:'1rem 0'}}>
-            <Button color='green.5' variant='light' onClick={()=>obtenerReporte('DOS',transacciones)} size='sm' style={{marginTop:'1.5rem'}}> Histórico Pedidos</Button>
-          </Box>
-          <Box style={{display:'flex',justifyContent:'flex-end',gap:'1rem',margin:'1rem 0'}}>
-            <DatePickerInput
-              value={f1}
-              onChange={setF1}
-              label="Fecha Inicio"
-              placeholder="Fecha Inicio"
-              size='sm'
-              valueFormat='DD MMM YYYY'
-            />
-            <DatePickerInput
-              value={f2}
-              onChange={setF2}
-              label="Fecha Fin"
-              placeholder="Fecha Fin"
-              size='sm'
-              valueFormat='DD MMM YYYY'
-            />
-            <Button color='blue.2' variant='light' onClick={()=>cargarData()} size='sm' style={{marginTop:'1.5rem'}} >Cargar Transacciones</Button>
-          </Box>
-        </Box> */}
+        <Flex gap='xs' direction='row' wrap='wrap' mt={8}>
+          {productos.map(p=>( 
+            <Chip key={p.id_producto} checked color="blue">{p.descripcion} : {p.existencia}</Chip>
+          ))}
+        </Flex>
+        <Flex gap='xs' direction='row' wrap='wrap' mt={8}>
+          <Chip checked size='md' icon={<IconCurrencyDollar size={16} />} variant='light' color="yellow.6">Total Monto Venta : <NumberFormatter prefix='Bs. ' thousandSeparator decimalScale={2} value={transacciones.filter(f=>f.fid_cuenta == 10).reduce((acc, curr) => acc + curr.monto, 0)}></NumberFormatter></Chip>
+          <Chip checked size='md' icon={<IconShoppingCartPlus size={16} />} variant='light' color="green.6">Pedidos Hielo 3Kg : <NumberFormatter thousandSeparator value={transacciones.filter(f=>f.fid_cuenta == 10 && f.fid_producto == 1).reduce((acc, curr) => acc + curr.cantidad_entregada, 0)}></NumberFormatter></Chip>
+          <Chip checked size='md' icon={<IconShoppingCartPlus size={16} />} variant='light' color="green.6">Pedidos Hielo 2Kg : <NumberFormatter thousandSeparator value={transacciones.filter(f=>f.fid_cuenta == 10 && f.fid_producto == 2).reduce((acc, curr) => acc + curr.cantidad_entregada, 0)}></NumberFormatter></Chip>
+        </Flex>
         <Grid my={12} display='flex' align='end'>
           <Grid.Col span={{ base: 12, lg: 2 }}>
             <DatePickerInput
@@ -152,6 +168,7 @@ const Page = () => {
               placeholder="Fecha Inicio"
               size='sm'
               valueFormat='DD MMM YYYY'
+              leftSection={<IconCalendar size={18} stroke={1.5} />}
             />
           </Grid.Col>
           <Grid.Col span={{ base: 12, lg: 2 }}>
@@ -162,28 +179,57 @@ const Page = () => {
               placeholder="Fecha Fin"
               size='sm'
               valueFormat='DD MMM YYYY'
+              leftSection={<IconCalendar size={18} stroke={1.5} />}
+            />
+          </Grid.Col>
+          <Grid.Col span={{ base: 12, lg: 2 }}>
+            <NativeSelect
+              label="Periodo:"
+              data={['DÍA', 'SEMANA','MES','AÑO']}
+              value={periodo}
+              leftSection={<IconCalendarEvent size={16} />}
+              onChange={(event) => onChangePeriodo(event.currentTarget.value)}
             />
           </Grid.Col>
           <Grid.Col span={{ base: 12, lg: 3 }}><Button color='blue.2' variant='light' fullWidth onClick={()=>cargarData()} size='sm'>Cargar Transacciones</Button></Grid.Col>
           <Grid.Col span={{ base: 12, lg: 3 }}><Button color='green.5' variant='light' fullWidth onClick={()=>obtenerReporte('DOS',transacciones)} size='sm'> Histórico Pedidos</Button></Grid.Col>
         </Grid>
-        <Box style={{display:'flex', gap:'1rem',gridTemplateColumns:'repeat(auto-fill, minmax(200px, 1fr))'}}>
-          {productos.length>0 && <BarChart
-            h={300}
-            data={productos}
-            dataKey="descripcion"
-            series={[{name:'existencia',color:'teal.6'}]}
-            tickLine="y"
-          />}
-          {listaPedidos.length>0 && <BarChart
-            h={300}
-            data={listaPedidos}
-            dataKey="cliente"
-            series={[{name:'monto_pago',color:'orange.4'}]}
-            tickLine="y"
-          />}
+        <Box style={{display:'grid', gap:'1rem',gridTemplateColumns:'repeat(auto-fit, minmax(200px, 1fr))'}}>
+          {productos.length>0 &&
+            <div>
+              <Text ta={'center'} c="gainsboro" size='20px' fw={600} my={20}>
+                Stock actual de Productos 
+              </Text> 
+              <BarChart
+                h={300}
+                data={productos}
+                dataKey="descripcion"
+                series={[{name:'existencia',color:'teal.6'}]}
+                tickLine="y"
+              />
+            </div>
+          }
+          {listaPedidos.length>0 &&
+            <div>
+              <Text ta={'center'} c="gainsboro" size='20px' fw={600} my={20}>
+                Cantidad ventas por cliente 
+              </Text>
+              <BarChart
+                h={300}
+                data={listaPedidos}
+                dataKey="cliente"
+                series={[{name:'monto_pago',color:'orange.4'}]}
+                tickLine="y"
+              />
+          </div>
+          }
         </Box>
-        {pedidosDia.length>0 && <LineChart
+        {pedidosDia.length>0 && 
+        <>
+        <Text ta={'center'} c="gainsboro" size='20px' fw={600} mt={20}>
+          Pedidos por día
+        </Text>   
+        <LineChart
           style={{marginTop:'1rem'}}
           h={400}
           data={pedidosDia}
@@ -191,7 +237,9 @@ const Page = () => {
           series={[{ name: 'cantidad_entregada', color: 'indigo.4' }]}
           curveType="bump"
           connectNulls
-        />}
+        />
+        </>
+        }
       </Box>
     </div>
   )

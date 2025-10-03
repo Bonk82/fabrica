@@ -1,8 +1,8 @@
 'use client'
 import { useSupa } from '@/app/context/SupabaseContext';
-import { ActionIcon, Box, Button, Center, Group, LoadingOverlay, Modal, NumberInput, Text, TextInput } from '@mantine/core'
+import { ActionIcon, Box, Button, Center, Group, LoadingOverlay, Modal, NumberInput, Text, TextInput, Tooltip } from '@mantine/core'
 import { useForm } from '@mantine/form';
-import { IconBuilding, IconCashBanknote, IconCheck, IconDeviceFloppy, IconEdit, IconEye, IconGps, IconPhone, IconRefresh, IconTools, IconTrash, IconUser } from '@tabler/icons-react';
+import { IconBuilding, IconCashBanknote, IconCheck, IconDeviceFloppy, IconEdit, IconEye, IconGps, IconLibraryPlus, IconPhone, IconRefresh, IconTools, IconTrash, IconUser } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import { useMemo } from 'react';
 import { MantineReactTable, useMantineReactTable} from 'mantine-react-table';
@@ -14,7 +14,7 @@ import { useDisclosure } from '@mantine/hooks';
 import dayjs from 'dayjs';
 
 const Page = () => {
-  const { loading,usuario,createReg,proveedores,getReg,updateReg,deleteReg } = useSupa();
+  const { loading,usuario,createReg,proveedores,getReg,updateReg,deleteReg,toast } = useSupa();
   const [opened, { open, close }] = useDisclosure(false);
   const [id, setId] = useState(null)
 
@@ -42,20 +42,20 @@ const Page = () => {
     // },
   });
 
-  const toast = (title,message,type) =>{
-    // return <Toast title='el totulo' message='el mensaje' type='error'/>
-    let color = type
-    if(type == 'success') color = 'lime.8';
-    if(type == 'info') color = 'cyan.8';
-    if(type == 'warning') color = 'yellow.8';
-    if(type == 'error') color = 'red.8';
-    notifications.show({
-      title,
-      message,
-      color,
-      classNames: classes,
-    })
-  }
+  // const toast = (title,message,type) =>{
+  //   // return <Toast title='el totulo' message='el mensaje' type='error'/>
+  //   let color = type
+  //   if(type == 'success') color = 'lime.8';
+  //   if(type == 'info') color = 'cyan.8';
+  //   if(type == 'warning') color = 'yellow.8';
+  //   if(type == 'error') color = 'red.8';
+  //   notifications.show({
+  //     title,
+  //     message,
+  //     color,
+  //     classNames: classes,
+  //   })
+  // }
 
   const registrarProveedor = async (data) => {
     // event.preventDefault();
@@ -132,30 +132,12 @@ const Page = () => {
 
   const columns = useMemo(
     () => [
-      {
-        accessorKey: 'nombre',
-        header: 'Nombre',
-      },
-      {
-        accessorKey: 'direccion',
-        header: 'Dirección',
-      },
-      {
-        accessorKey: 'referencia',
-        header: 'Referencia',
-      },
-      {
-        accessorKey: 'telefonos',
-        header: 'Teléfonos',
-      },
-      {
-        accessorKey: 'cuenta',
-        header: 'Cuenta Bancaria',
-      },
-      {
-        accessorKey: 'tipos_insumos',
-        header: 'Tipos Insumos',
-      },
+      { accessorKey: 'nombre', header: 'Nombre' },
+      { accessorKey: 'direccion', header: 'Dirección' },
+      { accessorKey: 'referencia', header: 'Referencia' },
+      { accessorKey: 'telefonos', header: 'Teléfonos' },
+      { accessorKey: 'cuenta', header: 'Cuenta Bancaria' },
+      { accessorKey: 'tipos_insumos', header: 'Tipos Insumos' },
     ],
     [],
   );
@@ -163,14 +145,8 @@ const Page = () => {
   const table = useMantineReactTable({
     columns,
     data: proveedores, 
-    defaultColumn: {
-      minSize: 50, 
-      maxSize: 200, 
-      size: 100,
-    },
-    initialState: {
-      density: 'xs',
-    },
+    defaultColumn: {minSize: 50,maxSize: 200, size: 100,},
+    initialState: {density: 'xs',},
     enableRowActions: true,
     renderRowActions: ({ row }) => (
       <Box style={{gap:'0.8rem',display:'flex'}}>
@@ -182,12 +158,16 @@ const Page = () => {
         </ActionIcon>
       </Box>
     ),
-    mantineTableHeadCellProps:{
-      color:'cyan'
-    },
-    mantineTableProps:{
-      striped: true,
-    },
+    renderTopToolbarCustomActions:()=>(
+      <Tooltip label="Registrar Nuevo Proveedor" position="bottom" withArrow>
+        <Box>
+          <Button onClick={nuevo} size="sm" visibleFrom="md" variant="outline" >Agregar nuevo proveedor</Button>
+          <ActionIcon variant="subtle" size="lg" hiddenFrom="md" onClick={nuevo}>
+            <IconLibraryPlus />
+          </ActionIcon>
+        </Box>
+      </Tooltip>
+    ),
     localization:MRT_Localization_ES
   });
 
@@ -279,7 +259,6 @@ const Page = () => {
             </Group>
           </form>
         </Modal>
-        <Button onClick={nuevo} style={{marginBottom:'1rem'}} size='sm'>Nuevo Proveedor</Button>
         <MantineReactTable table={table} />
       </Box>
     </div>

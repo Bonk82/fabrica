@@ -94,9 +94,11 @@ body {
   height: 100dvh;
   background: rgb(2,9,19);
   background: linear-gradient(90deg, #020913 0%, #072e4e 100%); 
+}
 
-  scrollbar-width: thin;          /* "auto" or "thin" */
-  scrollbar-color: #188eab #041d3a;   /* scroll thumb and track */
+*{
+  scrollbar-width: thin;          
+  scrollbar-color: #188eab #041d3a;
 }
 
 a {
@@ -142,6 +144,8 @@ tr{
 
 .mantine-Modal-header{
   background-color: var(--mantine-primary-color-filled);
+  height: 2rem !important;
+  min-height: 2rem;
 }
 
 input{
@@ -162,6 +166,10 @@ textarea{
 }
 .mantine-BarChart-tooltipLabel, .mantine-BarChart-tooltip, .mantine-BarChart-tooltipItemBody{
   background-color: #031321;
+}
+
+table tr:nth-child(even) {
+  background-color: rgba(255, 255, 255, 0.1) !important;
 }
 
 grid-dash{

@@ -1,8 +1,8 @@
 'use client'
 import { useSupa } from '@/app/context/SupabaseContext';
-import { ActionIcon, Autocomplete, Box, Button, Center, Group, Kbd, LoadingOverlay, Modal, NativeSelect, NumberInput, Switch, Text, Textarea, TextInput } from '@mantine/core'
+import { ActionIcon, Autocomplete, Box, Button, Center, Divider, Group, Kbd, LoadingOverlay, Modal, NativeSelect, NumberInput, Switch, Text, Textarea, TextInput, Tooltip } from '@mantine/core'
 import { useForm } from '@mantine/form';
-import { IconAlignLeft, IconBox, IconCalendar, IconCar, IconCheck, IconDeviceFloppy, IconEdit, IconEye, IconFileBarcode, IconFolder, IconMessage, IconMoneybag, IconNumber, IconPlusMinus, IconProgressCheck, IconReceipt2, IconRefresh, IconStack2, IconTrash, IconUser } from '@tabler/icons-react';
+import { IconAlignLeft, IconBox, IconCalendar, IconCar, IconCheck, IconCirclePlus, IconDeviceFloppy, IconEdit, IconEye, IconFileBarcode, IconFolder, IconLibraryPlus, IconMessage, IconMoneybag, IconNumber, IconPlus, IconPlusMinus, IconProgressCheck, IconReceipt2, IconRefresh, IconShoppingCart, IconSquarePlus, IconStack2, IconTrash, IconUser } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import { useMemo } from 'react';
 import { MantineReactTable, useMantineReactTable} from 'mantine-react-table';
@@ -15,7 +15,7 @@ import dayjs from 'dayjs';
 
 
 const Page = () => {
-  const { loading,usuario,createReg,parametricas,pedidos,pedidosDetalle,clientes,productos,getReg,getRegFilter,updateReg,deleteReg } = useSupa();
+  const { loading,usuario,createReg,parametricas,pedidos,pedidosDetalle,clientes,productos,getReg,getRegFilter,updateReg,deleteReg,toast } = useSupa();
   const [opened, { open, close }] = useDisclosure(false);
   const [verDetalle, setVerDetalle] = useState(false);
   const [verGrillaDetalle, setVerGrillaDetalle] = useState(false);
@@ -73,6 +73,8 @@ const Page = () => {
       delivery:0,
       fecha_registro:null,
       observacion:'',
+      cantidad1:0,
+      cantidad2:0,
     },
     // validate: {
     //   tipo_cliente: (value) => (/^\S+@\S+$/.test(value) ? null : 'Correo Inválido'),
@@ -89,20 +91,20 @@ const Page = () => {
     }
   });
 
-  const toast = (title,message,type) =>{
-    // return <Toast title='el totulo' message='el mensaje' type='error'/>
-    let color = type
-    if(type == 'success') color = 'lime.8';
-    if(type == 'info') color = 'cyan.8';
-    if(type == 'warning') color = 'yellow.8';
-    if(type == 'error') color = 'red.8';
-    notifications.show({
-      title,
-      message,
-      color,
-      classNames: classes,
-    })
-  }
+  // const toast = (title,message,type) =>{
+  //   // return <Toast title='el totulo' message='el mensaje' type='error'/>
+  //   let color = type
+  //   if(type == 'success') color = 'lime.8';
+  //   if(type == 'info') color = 'cyan.8';
+  //   if(type == 'warning') color = 'yellow.8';
+  //   if(type == 'error') color = 'red.8';
+  //   notifications.show({
+  //     title,
+  //     message,
+  //     color,
+  //     classNames: classes,
+  //   })
+  // }
 
   const registrarPedido = async (data) => {
     // event.preventDefault();
@@ -134,14 +136,45 @@ const Page = () => {
     delete newPedido.tipo_cliente
     
     newPedido.fid_cliente = clientes.filter(f=>f.nombre == data.nombre)[0]?.id_cliente;
-    newPedido.fid_producto = productos.filter(f=>f.id_producto == elProducto)[0]?.id_producto;
-    newPedido.factura = facturado;
+    // newPedido.fid_producto = productos.filter(f=>f.id_producto == elProducto)[0]?.id_producto;
+    // newPedido.factura = facturado;
+
+    const cantidad1 = Number(data.cantidad1) || 0
+    const cantidad2 = Number(data.cantidad2) || 0
+
+    delete newPedido.cantidad1
+    delete newPedido.cantidad2
+    delete newPedido.detalle
+
+    let verid = []
     
     console.log('new pedido',newPedido,id);
     try {
-      id ? await updateReg('pedido',newPedido) : await createReg(newPedido,'pedido');
+      id ? await updateReg('pedido',newPedido) : verid = await createReg(newPedido,'pedido');
+      if(cantidad1 > 0 && verid[0]?.id_pedido){
+        const detalle1 = {
+          fid_pedido:verid[0].id_pedido,
+          fid_producto: 1,
+          cantidad_solicitada:cantidad1,
+          precio_unidad:productos.find(f=>f.id_producto == 1)?.precio || 0,
+          cantidad_entregada:0,
+        }
+        await createReg(detalle1,'pedido_detalle');
+      }
+      if(cantidad2 > 0 && verid[0]?.id_pedido){
+        const detalle2 = {
+          fid_pedido:verid[0].id_pedido,
+          fid_producto: 2,
+          cantidad_solicitada:cantidad2,
+          precio_unidad:productos.find(f=>f.id_producto == 2)?.precio || 0,
+          cantidad_entregada:0,
+        }
+        await createReg(detalle2,'pedido_detalle');
+      }
+
       cargarData();
       toast('Control Pedido',`Pedido ${id? 'actualziado': 'registrado'} satisfactoriamente!`,'success')
+      
     } catch (error) {
       toast('Control Pedido',error.message || error,'error')
       console.log(error);
@@ -186,12 +219,14 @@ const Page = () => {
       title: 'Confirmar Eliminación',
       centered: true,
       children: (
-        <Text size="sm">
+        <Text size="sm" pt={10}>
         Está seguro de ELIMINAR el pedido: <strong>{e.id_pedido}</strong>
         </Text>
       ),
       labels: { confirm: `Eliminar ${e.id_pedido ? 'Pedido' : 'Producto'}`, cancel: "Cancelar" },
-      confirmProps: { color: 'red' },
+      confirmProps: { color: 'cyan',size:'xs' },
+      cancelProps:{ style: { backgroundColor: '#022647ff' },size:'xs' },
+      overlayProps:{backgroundOpacity: 0.55, blur: 3,},
       onCancel: () => console.log('Cancel'),
       onConfirm: () => onDelete(e),
     });
@@ -216,10 +251,13 @@ const Page = () => {
     open()
     setId(data.id_pedido);
     setFacturado(data.factura);
+
     data.fecha_entrega = dayjs(data.fecha_entrega).isValid() ?  dayjs(data.fecha_entrega).format('YYYY-MM-DD HH:mm:ss'):null
     data.fecha_pago = dayjs(data.fecha_pago).isValid() ? dayjs(data.fecha_pago).format('YYYY-MM-DD HH:mm:ss') : null
     data.fecha_registro = dayjs(data.fecha_registro).format('YYYY-MM-DD HH:mm:ss')
     form.setValues(data)
+    form.setFieldValue('cantidad1', data.detalle?.find(f=> f.fid_producto == 1)?.cantidad_solicitada || 0)
+    form.setFieldValue('cantidad2', data.detalle?.find(f=> f.fid_producto == 2)?.cantidad_solicitada || 0)
     // form.setFieldValue('estado_pedido','PENDIENTE')
     // setElProducto(data.fid_producto)
   }
@@ -236,89 +274,39 @@ const Page = () => {
 
   const columns = useMemo(
     () => [
-      {
-        accessorKey: 'id_pedido',
-        header: 'Número Pedido',
-      },
-      {
-        accessorKey: 'nombre',
-        header: 'Cliente',
-      },
-      {
-        accessorKey: 'fecha_entrega',
-        header: 'Fecha Entrega:',
+      { accessorKey: 'id_pedido',header: 'Número Pedido',},
+      { accessorKey: 'nombre',header: 'Cliente', },
+      { accessorKey: 'fecha_entrega', header: 'Fecha Entrega:',
         Cell:({cell})=>(
           <span>{dayjs(cell.getValue()).format('DD/MM/YYYY')}</span>
         )
       },
-      {
-        accessorKey: 'descuento',
-        header: 'Descuento',
-      },
-      {
-        accessorKey: 'estado_pedido',
-        header: 'Estado Pedido',
-      },
-      {
-        accessorKey: 'monto_pago',
-        header: 'Monto Pago',
-      },
-      {
-        accessorKey: 'estado_pago',
-        header: 'Estado Pago',
-      },
-      {
-        accessorKey: 'fecha_pago',
-        header: 'Fecha Pago',
-      },
-      {
-        accessorKey: 'metodo_pago',
-        header: 'Método Pago',
-      },
-      {
-        accessorKey: 'metodo_entrega',
-        header: 'Método Entrega',
-      },
-      {
-        accessorKey: 'factura',
-        header: 'Facturado',
-      },
-      {
-        accessorKey: 'delivery',
-        header: 'Monto Delivery',
-      },
-      {
-        accessorKey: 'fecha_registro',
-        header: 'Fecha Pedido',
+      { accessorKey: 'descuento', header: 'Descuento',},
+      { accessorKey: 'estado_pedido', header: 'Estado Pedido',},
+      { accessorKey: 'monto_pago',header: 'Monto Pago',},
+      { accessorKey: 'estado_pago', header: 'Estado Pago',},
+      { accessorKey: 'fecha_pago', header: 'Fecha Pago',},
+      { accessorKey: 'metodo_pago', header: 'Método Pago',},
+      { accessorKey: 'metodo_entrega', header: 'Método Entrega',},
+      { accessorKey: 'factura', header: 'Facturado',},
+      { accessorKey: 'delivery', header: 'Monto Delivery',},    
+      { accessorKey: 'fecha_registro', header: 'Fecha Pedido',
         Cell:({cell})=>(
           <span>{dayjs(cell.getValue()).format('DD/MM/YYYY HH:mm:ss')}</span>
         )
       },
-      {
-        accessorKey: 'observacion',
-        header: 'Observación',
-      },
+      { accessorKey: 'observacion', header: 'Observación', },
     ],
     [],
   );
 
   const colDetalle = useMemo(
     () => [
-      {
-        accessorKey: 'fid_pedido',
-        header: 'Número Pedido',
-      },
-      {
-        accessorKey: 'descripcion',
-        header: 'Producto',
-      },
-      {
-        accessorKey: 'cantidad_solicitada',
-        header: 'Cantidad Solicitada',
-      },
-      {
-        accessorKey: 'precio_unidad',
-        header: 'Precio Unitario',
+      { accessorKey: 'fid_pedido', header: 'Número Pedido', },  
+      { accessorKey: 'codigo', header: 'Código', },   
+      { accessorKey: 'descripcion', header: 'Producto', },
+      { accessorKey: 'cantidad_solicitada', header: 'Cantidad Solicitada', },
+      { accessorKey: 'precio_unidad',header: 'Precio Unitario',
         Cell:({cell})=>(
           <span>
             {cell.getValue().toLocaleString('es-Es', { style: 'currency', currency: 'BOB'
@@ -326,10 +314,7 @@ const Page = () => {
           </span>
         )
       },
-      {
-        accessorKey: 'cantidad_entregada',
-        header: 'Cantidad Entregada',
-      },
+      {accessorKey: 'cantidad_entregada',header: 'Cantidad Entregada',},
     ],
     [],
   );
@@ -349,17 +334,11 @@ const Page = () => {
   const table = useMantineReactTable({
     columns,
     data: pedidos, 
-    defaultColumn: {
-      minSize: 50, 
-      maxSize: 200, 
-      size: 100,
+    defaultColumn: {minSize: 50, maxSize: 200, size: 100,},
+    initialState: {density: 'xs', columnPinning: {left: ['mrt-row-expand'],},
     },
-    initialState: {
-      density: 'xs',
-      columnPinning: {
-        left: ['mrt-row-expand'],
-      },
-    },
+    // enableColumnResizing: true,
+    // columnResizeMode: 'onChange',
     enableRowActions: true,
     renderRowActions: ({ row }) => (
       <Box style={{gap:'0.8rem',display:'flex'}}>
@@ -374,23 +353,21 @@ const Page = () => {
         </ActionIcon>
       </Box>
     ),
-    mantineTableHeadCellProps:{
-      color:'cyan'
-    },
-    mantineTableProps:{
-      striped: true,
-    },
+    renderTopToolbarCustomActions:()=>(
+      <Tooltip label="Registrar Nuevo Pedido" position="bottom" withArrow>
+        <Box>
+          <Button onClick={nuevo} size="sm" visibleFrom="md" variant="outline" >Agregar nuevo pedido</Button>
+          <ActionIcon variant="subtle" size="lg" hiddenFrom="md"
+          onClick={nuevo}>
+            <IconLibraryPlus />
+          </ActionIcon>
+        </Box>
+      </Tooltip>
+    ),
+    mantineTableProps:{striped: true,},
     localization:MRT_Localization_ES,
-    // enableColumnResizing:true,
     renderDetailPanel:({row}) => (
-      <Box
-        sx={{
-          alignItems: 'center',
-          display: 'flex',
-          justifyContent: 'space-around',
-          width: '100%',
-        }}
-      >
+      <Box sx={{alignItems: 'center',display: 'flex',justifyContent: 'space-around',width: '100%',}}>
         <h2>{row.original.nombre}</h2>
         <p>{row.original.direccion} {row.original.referencia}</p>
         <strong>{row.original.telefonos}</strong><br />
@@ -402,14 +379,8 @@ const Page = () => {
   const tableDetalle = useMantineReactTable({
     columns:colDetalle,
     data: pedidosDetalle, 
-    defaultColumn: {
-      minSize: 40, 
-      maxSize: 100, 
-      size: 60,
-    },
-    initialState: {
-      density: 'xs',
-    },
+    defaultColumn: {minSize: 40, maxSize: 100, size: 60},
+    initialState: {density: 'xs',},
     enableRowActions: !detalleBloq,
     renderRowActions: ({ row }) => (
       <Box style={{gap:'0.8rem',display:'flex'}}>
@@ -421,12 +392,18 @@ const Page = () => {
         </ActionIcon>
       </Box>
     ),
-    mantineTableHeadCellProps:{
-      color:'cyan'
-    },
-    mantineTableProps:{
-      striped: true,
-    },
+    renderTopToolbarCustomActions:()=>(
+      <Tooltip label="Registrar Nuevo Producto" position="bottom" withArrow>
+        <Box>
+          <Button onClick={nuevoDetalle} size="sm" visibleFrom="md" variant="outline" >Agregar producto al pedido</Button>
+          <ActionIcon variant="subtle" size="lg" hiddenFrom="md"
+          onClick={nuevoDetalle}>
+            <IconLibraryPlus />
+          </ActionIcon>
+        </Box>
+      </Tooltip>
+    ),
+    mantineTableProps:{striped: true,},
     localization:MRT_Localization_ES
   });
 
@@ -476,6 +453,18 @@ const Page = () => {
     // formDetalle.setFieldValue('estado_pedido','SOLICITADO')
   }
 
+  const calcularMontoTotal = (facturado)=>{
+    if(facturado != undefined && typeof facturado === 'boolean') form.setFieldValue('factura', facturado)
+    console.log('calculando monto total',form.getValues());
+    const p1 = productos.find(f=>f.id_producto == 1)?.precio || 0;
+    const p2 = productos.find(f=>f.id_producto == 2)?.precio || 0;
+    const cantidad1 = Number(form.getValues().cantidad1) || 0
+    const cantidad2 = Number(form.getValues().cantidad2) || 0
+    let monto_total = cantidad1 * p1 + cantidad2 * p2 - Number(form.getValues().descuento || 0);
+    if (form.getValues().factura) monto_total = monto_total * 1.16
+    form.setFieldValue('monto_pago', monto_total);
+  }
+
   return (
     <div>
       <Center>
@@ -521,98 +510,78 @@ const Page = () => {
               key={form.key('fecha_entrega')}
               {...form.getInputProps('fecha_entrega')}
             />
-            <NumberInput
-              label="Descuento:"
-              placeholder="Descuento al precio normal"
-              prefix='Bs. '
-              defaultValue={0.00}
-              decimalScale={2}
-              fixedDecimalScale
-              thousandSeparator=','
-              maxLength={15}
-              leftSection={<IconReceipt2 size={16} />}
-              key={form.key('descuento')}
-              {...form.getInputProps('descuento')}
-            />
-            {id && <NativeSelect
-              label="Estado Pedido:"
-              data={['SELECCIONE...',...parametricas.filter(f=>f.tipo === 'ESTADO_PEDIDO').map(e=>e.nombre)]}
-              required
-              leftSection={<IconFolder size={16} />}
-              key={form.key('estado_pedido')}
-              {...form.getInputProps('estado_pedido')}
-            />}
-            {id && <NumberInput
-              label="Monto Pago:"
-              placeholder="Monto pago"
-              prefix='Bs. '
-              defaultValue={0.00}
-              decimalScale={2}
-              fixedDecimalScale
-              thousandSeparator=','
-              maxLength={15}
-              leftSection={<IconReceipt2 size={16} />}
-              key={form.key('monto_pago')}
-              {...form.getInputProps('monto_pago')}
-            />}
-            {id && <NativeSelect
-              label="Estado Pago:"
-              data={['SELECCIONE...','PENDIENTE','PAGADO']}
-              required
-              leftSection={<IconFolder size={16} />}
-              key={form.key('estado_pago')}
-              {...form.getInputProps('estado_pago')}
-            />}
-            {id && <TextInput
-              label="Fecha Pago:"
-              placeholder='Fecha Pago'
-              type='datetime-local'
-              maxLength={20}
-              leftSection={<IconCalendar size={16} />}
-              key={form.key('fecha_pago')}
-              {...form.getInputProps('fecha_pago')}
-            />}
-            <NativeSelect
-              label="Método Pago:"
-              data={['SELECCIONE...',...parametricas.filter(f=>f.tipo === 'METODO_PAGO').map(e=>e.nombre)]}
-              leftSection={<IconFolder size={16} />}
-              key={form.key('metodo_pago')}
-              {...form.getInputProps('metodo_pago')}
-            />
-            <NativeSelect
-              label="Método Entrega:"
-              data={['SELECCIONE...',...parametricas.filter(f=>f.tipo === 'METODO_ENTREGA').map(e=>e.nombre)]}
-              leftSection={<IconFolder size={16} />}
-              key={form.key('metodo_entrega')}
-              {...form.getInputProps('metodo_entrega')}
-            />
             <Switch size="lg" onLabel="SI" offLabel="NO"
               label="Pedido con Factura:"
               style={{marginTop:'0.5rem'}}
-              checked={facturado}
-              onChange={(event) => setFacturado(event.currentTarget.checked)}
+              checked={form.getValues().factura}
+              onChange={(event) => calcularMontoTotal(event.target.checked)}
+              // key={form.key('factura')}
+              // {...form.getInputProps('factura')}
             />
-            <NumberInput
-              label="Monto Delivery:"
-              prefix='Bs. '
-              defaultValue={0.00}
-              decimalScale={2}
-              fixedDecimalScale
-              thousandSeparator=','
-              maxLength={15}
-              leftSection={<IconCar size={16} />}
-              key={form.key('delivery')}
-              {...form.getInputProps('delivery')}
-            />
-            {id && <TextInput
-              label="Fecha Pedido:"
-              placeholder='Fecha Pedido'
-              type='datetime-local'
-              readOnly
-              leftSection={<IconCalendar size={16} />}
-              key={form.key('fecha_registro')}
-              {...form.getInputProps('fecha_registro')}
-            />}
+            {id && 
+            <>
+              <NativeSelect
+                label="Estado Pedido:"
+                data={['SELECCIONE...',...parametricas.filter(f=>f.tipo === 'ESTADO_PEDIDO').map(e=>e.nombre)]}
+                required
+                leftSection={<IconFolder size={16} />}
+                key={form.key('estado_pedido')}
+                {...form.getInputProps('estado_pedido')}
+              />
+              <NativeSelect
+                label="Estado Pago:"
+                data={['SELECCIONE...','PENDIENTE','PAGADO']}
+                required
+                leftSection={<IconFolder size={16} />}
+                key={form.key('estado_pago')}
+                {...form.getInputProps('estado_pago')}
+              />
+              <TextInput
+                label="Fecha Pago:"
+                placeholder='Fecha Pago'
+                type='datetime-local'
+                maxLength={20}
+                leftSection={<IconCalendar size={16} />}
+                key={form.key('fecha_pago')}
+                {...form.getInputProps('fecha_pago')}
+              />
+              <NativeSelect
+                label="Método Pago:"
+                data={['SELECCIONE...',...parametricas.filter(f=>f.tipo === 'METODO_PAGO').map(e=>e.nombre)]}
+                leftSection={<IconFolder size={16} />}
+                key={form.key('metodo_pago')}
+                {...form.getInputProps('metodo_pago')}
+              />
+              <NativeSelect
+                label="Método Entrega:"
+                data={['SELECCIONE...',...parametricas.filter(f=>f.tipo === 'METODO_ENTREGA').map(e=>e.nombre)]}
+                leftSection={<IconFolder size={16} />}
+                key={form.key('metodo_entrega')}
+                {...form.getInputProps('metodo_entrega')}
+              />
+              <NumberInput
+                label="Monto Delivery:"
+                prefix='Bs. '
+                defaultValue={0.00}
+                decimalScale={2}
+                fixedDecimalScale
+                thousandSeparator=','
+                maxLength={15}
+                leftSection={<IconCar size={16} />}
+                key={form.key('delivery')}
+                {...form.getInputProps('delivery')}
+              />
+              <TextInput
+                label="Fecha Pedido:"
+                placeholder='Fecha Pedido'
+                type='datetime-local'
+                readOnly
+                leftSection={<IconCalendar size={16} />}
+                key={form.key('fecha_registro')}
+                {...form.getInputProps('fecha_registro')}
+              />
+            </>
+            }
             <Textarea
               label="Observación:"
               placeholder='La observacion sobre el pedido'
@@ -621,6 +590,56 @@ const Page = () => {
               key={form.key('observacion')}
               {...form.getInputProps('observacion')}
             />
+            <Divider my="md" />
+            <NumberInput
+              label="Bolsa hielo 3kg:"
+              defaultValue={0}
+              max={1000}
+              min={0}
+              onValueChange={calcularMontoTotal}
+              leftSection={<IconShoppingCart size={16} />}
+              key={form.key('cantidad1')}
+              {...form.getInputProps('cantidad1')}
+            />
+            <NumberInput
+              label="Bolsa hielo 2kg:"
+              defaultValue={0}
+              max={1000}
+              min={0}
+              onValueChange={calcularMontoTotal}
+              leftSection={<IconShoppingCart size={16} />}
+              key={form.key('cantidad2')}
+              {...form.getInputProps('cantidad2')}
+            />
+            <NumberInput
+              label="Descuento:"
+              placeholder="Descuento al precio normal"
+              prefix='Bs. '
+              decimalScale={2}
+              fixedDecimalScale
+              thousandSeparator=','
+              max={1000}
+              min={0}
+              onValueChange={calcularMontoTotal}
+              leftSection={<IconReceipt2 size={16} />}
+              key={form.key('descuento')}
+              {...form.getInputProps('descuento')}
+            />
+            <NumberInput
+                label="Monto Pago:"
+                placeholder="Monto pago"
+                prefix='Bs. '
+                defaultValue={0.00}
+                decimalScale={2}
+                fixedDecimalScale
+                thousandSeparator=','
+                max={100000}
+                min={0}
+                readOnly
+                leftSection={<IconReceipt2 size={16} />}
+                key={form.key('monto_pago')}
+                {...form.getInputProps('monto_pago')}
+              />
             <Group justify="flex-end" mt="md">
               {!id && <Button fullWidth leftSection={<IconDeviceFloppy/>} type='submit'>Registrar Pedido</Button>}
               {id && <Button fullWidth leftSection={<IconRefresh/>} disabled={form.getValues().estado_pedido=='ENTREGADO' || !form.isValid()} type='submit'>Actualizar Pedido</Button>}
@@ -699,15 +718,9 @@ const Page = () => {
             </Group>
           </form>
         </Modal>
-
-        <Button onClick={nuevo} style={{marginBottom:'1rem'}} size='sm'>Nuevo Pedido</Button>
-
         <MantineReactTable table={table} />
-
         {verGrillaDetalle &&
-        <Box>
-          {!detalleBloq && <Button onClick={nuevoDetalle} style={{margin:'1rem 0'}} size='sm'>Agregar Producto</Button>}
-
+        <Box mt={30}>
           <MantineReactTable table={tableDetalle} />
         </Box>}
       </Box>

@@ -171,7 +171,7 @@ export const SupabaseContextProvider = ({ children }) => {
       const { error, data } = await supabase.from(table).insert(reg).select();
       console.log('llega aca',error,data,reg,table);
       if (error) throw new Error(error.message);
-      // if(!error && table == 'cliente') setClientes(data);
+      return data;
     } catch (error) {
       console.log(error.error_description || error.message || error);
       throw new Error(error.message);
@@ -315,6 +315,7 @@ export const SupabaseContextProvider = ({ children }) => {
         deleteReg,
         desplegar,
         setDesplegar,
+        toast
       }}
     >
       {children}
